@@ -47,7 +47,7 @@ export function orderText(o) {
     o.delivery?.address ? `📍 ${h(o.delivery.address)}` : "",
     "",
     `Գաթայի արժեքը՝ ${money(o.unit * o.qty)} (${money(o.unit)} × ${o.qty})`,
-    `Տուփի արժեքը՝ ${packFee}`,
+    `${o.pack === "wrap" ? "Ձևավորման" : o.pack === "box" ? "Տուփի" : "Փաթեթավորման"} արժեքը՝ ${packFee}`,
     `Առաքման արժեքը՝ ${delFee}`,
     `💰 <b>${o.estimate ? "Նախնական գումար" : "Վերջնական գումար"}՝ ${money(o.total)}</b>`,
     `💳 ${PAY[o.payment?.status || "none"] || h(o.payment?.status)}`,

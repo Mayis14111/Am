@@ -323,7 +323,7 @@ Object.assign(T.hy, {
   packHead: "Ինչպե՞ս փաթեթավորենք գաթան։",
   fromForm: (g) => `Պատվերի ձևից վերցրեցի՝ ${g}։`,
   received: (id) => `Ձեր պատվերն ուղարկված է։ Պատվերի համարը՝ ${id}։ Մենք կկապվենք ձեզ հետ՝ մանրամասները հաստատելու համար։`,
-  lineGata: "Գաթայի արժեքը", lineBox: "Տուփի արժեքը", linePack: "Փաթեթավորման արժեքը", lineDel: "Առաքման արժեքը",
+  lineGata: "Գաթայի արժեքը", lineBox: "Տուփի արժեքը", linePack: "Փաթեթավորման արժեքը", lineDecor: "Ձևավորման արժեքը", lineDel: "Առաքման արժեքը",
   tbd: "Ենթակա է ճշտման", free: "Անվճար", estLabel: "Նախնական գումար", totLabel: "Ընդհանուր գումար",
   estNote: "Վերջնական գումարը կհաստատենք պատվերը հաստատելիս։",
   payLater: "Առցանց վճարումը հասանելի կլինի վերջնական գինը հաստատելուց հետո։",
@@ -340,7 +340,7 @@ Object.assign(T.ru, {
   packHead: "Как упаковать гату?",
   fromForm: (g) => `Взяла из формы заказа: ${g}.`,
   received: (id) => `Ваш заказ отправлен. Номер заказа: ${id}. Мы свяжемся с вами, чтобы подтвердить детали.`,
-  lineGata: "Стоимость гаты", lineBox: "Стоимость коробки", linePack: "Стоимость упаковки", lineDel: "Стоимость доставки",
+  lineGata: "Стоимость гаты", lineBox: "Стоимость коробки", linePack: "Стоимость упаковки", lineDecor: "Стоимость оформления", lineDel: "Стоимость доставки",
   tbd: "Уточняется", free: "Бесплатно", estLabel: "Предварительная сумма", totLabel: "Итого",
   estNote: "Итоговую сумму подтвердим при подтверждении заказа.",
   payLater: "Онлайн-оплата будет доступна после подтверждения итоговой цены.",
@@ -357,7 +357,7 @@ Object.assign(T.en, {
   packHead: "How should we pack it?",
   fromForm: (g) => `Taken from the order form: ${g}.`,
   received: (id) => `Your order has been sent. Order number: ${id}. We'll contact you to confirm the details.`,
-  lineGata: "Gata price", lineBox: "Box price", linePack: "Packaging price", lineDel: "Delivery price",
+  lineGata: "Gata price", lineBox: "Box price", linePack: "Packaging price", lineDecor: "Decoration price", lineDel: "Delivery price",
   tbd: "To be confirmed", free: "Free", estLabel: "Estimated total", totLabel: "Total",
   estNote: "We'll confirm the final total when we confirm your order.",
   payLater: "Online payment becomes available once the final price is confirmed.",
@@ -397,7 +397,7 @@ const pOpt = (id) => PACKS.find((p) => p.id === id);
 function calc({ fillingId, sizeIdx, qty, packId, deliveryId }) {
   const f = SHOWN.find((x) => x.id === fillingId), unit = f ? +f.prices[sizeIdx] || 0 : 0, q = qty || 1;
   const pk = pOpt(packId) || pOpt("none") || { id: "none", price: 0 }, d = dOpt(deliveryId) || {};
-  const pack = pk.id === "none" ? null : { label: pk.id === "box" ? "box" : "pack", known: !(pk.price < 0), amount: pk.price > 0 ? pk.price * q : 0 };
+  const pack = pk.id === "none" ? null : { label: pk.id === "box" ? "box" : pk.id === "wrap" ? "decor" : "pack", known: !(pk.price < 0), amount: pk.price > 0 ? pk.price * q : 0 };
   const deliv = deliveryId ? { known: !(d.price < 0), amount: d.price > 0 ? +d.price : 0 } : null;
   const gata = unit * q;
   const estimate = (pack && !pack.known) || (deliv && !deliv.known);
@@ -406,7 +406,7 @@ function calc({ fillingId, sizeIdx, qty, packId, deliveryId }) {
 /* price lines as [label, value, isUnknown] */
 function priceLines(p, l) {
   const t = T[l], out = [[t.lineGata, (p.q > 1 ? `${p.q} × ${fmtL(p.unit, l)} = ` : "") + fmtL(p.gata, l)]];
-  if (p.pack) out.push([p.pack.label === "box" ? t.lineBox : t.linePack, p.pack.known ? fmtL(p.pack.amount, l) : t.tbd, !p.pack.known]);
+  if (p.pack) out.push([p.pack.label === "box" ? t.lineBox : p.pack.label === "decor" ? t.lineDecor : t.linePack, p.pack.known ? fmtL(p.pack.amount, l) : t.tbd, !p.pack.known]);
   if (p.deliv) out.push([t.lineDel, p.deliv.known ? (p.deliv.amount ? fmtL(p.deliv.amount, l) : t.free) : t.tbd, !p.deliv.known]);
   return out;
 }
@@ -702,7 +702,7 @@ const ans = (k) => tx((G.answers || {})[k], CL).replace(/\{phones\}/g, PHONES).r
 const FILL_KW = {
   choco: /շոկոլ|shokol|chokol|chocol|шокол/,
   walnut: /ընկույզ|enkuyz|ynkuyz|nkuyz|ankuyz|орех|walnut|(^|\s)nut/,
-  raisin: /չրեր|chrer|չամիչ|chamich|изюм|raisin|сухофрукт|dried/,
+  raisin: /չրեր|chrer|չամիչ|chamich|изюм|raisin|сухофрукт|dried|խուրմ|xurm|khurm|хурм|финик|persimmon/,
   date: /խուրմ|xurm|khurm|хурм|финик|persimmon|(^|\s)dates?(\s|$)/,
   classic: /դասական|dasakan|klasik|classic|класс|խորիզ|xoriz|khoriz|սովորական գաթա/,
 };
@@ -1297,7 +1297,7 @@ if (chatBtn && chatPanel) {
     if (capT) capT.textContent = parts.join(" · ") + (q > 1 ? ` · ×${q}` : "");
     const cm = (selText("fsize").match(/\d+\s*\S+?(?=\))/) || [selText("fsize")])[0], fill = selText("kind").split("(")[0].trim();
     const unit = `${cm} · ${fill} · `.toUpperCase();
-    if (ringT) ringT.textContent = unit.repeat(Math.max(2, Math.round(58 / unit.length)));
+    if (ringT) ringT.textContent = unit.replace(/ԵՒ/g, "ԵՎ").repeat(Math.max(2, Math.round(58 / unit.length)));
   }
   btns.forEach((b) => b.addEventListener("click", (e) => {
     e.stopPropagation();

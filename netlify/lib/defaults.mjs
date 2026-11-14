@@ -3,7 +3,7 @@
 const L = (hy, ru, en) => ({ hy, ru, en });
 
 export const LANGS = ["hy", "ru", "en"];
-export const CONTENT_VERSION = 4;
+export const CONTENT_VERSION = 5;
 
 export const DEFAULT_CONTENT = {
   version: CONTENT_VERSION,
@@ -79,7 +79,7 @@ export const DEFAULT_CONTENT = {
     cards: [
       { slug: "wedding-box", image: "/img/marble.webp", packaging: "box", packNote: "separate", tag: L("Հարսանիք", "Свадьба", "Wedding"), title: L("Հարսանեկան գաթա՝ տուփով", "Свадебная гата в коробке", "Wedding gata in a box"), text: L("Ավանդական գաթա՝ խորիզով, գեղեցիկ զարդարված հարսանեկան տուփում։", "Традиционная гата с хоризом в красиво украшенной свадебной коробке.", "Traditional gata with khoriz in a beautifully decorated wedding box.") },
       { slug: "gift-bag", image: "/img/bag_pearl.webp", packaging: "bag", packNote: "separate", tag: L("Նվեր", "Подарок", "Gift"), title: L("Գաթա՝ նվեր-պայուսակում", "Гата в подарочном пакете", "Gata in a gift bag"), text: L("Գաթա՝ ուլունքներով զարդարված թափանցիկ նվեր-պայուսակում։", "Гата в прозрачном подарочном пакете, украшенном бусинами.", "Gata in a clear gift bag decorated with beads.") },
-      { slug: "bride-suitcase", image: "/img/bride.webp", packaging: "wrap", packNote: "separate", tag: L("Ավանդույթ", "Традиция", "Tradition"), title: L("Գաթա՝ հարսի ճամպրուկի համար", "Гата для чемодана невесты", "Gata for the bride's suitcase"), text: L("Ավանդական գաթա՝ շղարշով ու ժապավենով փաթեթավորված։", "Традиционная гата, упакованная в фатин с лентой.", "Traditional gata wrapped in tulle and ribbon.") },
+      { slug: "bride-suitcase", image: "/img/bride.webp", packaging: "wrap", packNote: "separate", tag: L("Ավանդույթ", "Традиция", "Tradition"), title: L("Հարսի ճամպրուկի գաթա", "Гата для чемодана невесты", "Bride's suitcase gata"), text: L("Հարսի ճամպրուկի գաթա՝ դասական խորիզով, ընկույզով կամ չրերով և խուրմայով, տարբեր չափսերով։", "Гата для чемодана невесты — с классическим хоризом, с орехами или с сухофруктами и хурмой, разных размеров.", "Gata for the bride's suitcase — with classic khoriz, walnut, or dried fruit and persimmon, in different sizes.") },
       { slug: "initials-boxes", image: "/img/initials.webp", packaging: "box", packNote: "variable", tag: L("Անհատական", "Персонально", "Personal"), title: L("Գաթայի տուփեր՝ ձեր սկզբնատառերով", "Коробки для гаты с вашими инициалами", "Gata boxes with your initials"), text: L("Ձեր անունների սկզբնատառերով ձևավորված տուփեր՝ հարսանիքի հյուրերին նվիրելու համար։", "Коробки, оформленные инициалами ваших имён, — в подарок гостям свадьбы.", "Boxes decorated with your initials, as gifts for your wedding guests.") },
     ],
     btn: L("Ընտրել այս տարբերակը", "Выбрать этот вариант", "Choose this option"),
@@ -206,7 +206,7 @@ export const DEFAULT_CONTENT = {
     items: [
       { q: L("Առաքո՞ւմ եք Երևան և Աբովյան։", "Доставляете в Ереван и Абовян?", "Do you deliver to Yerevan and Abovyan?"), a: L("Այո, առաքում ենք Երևան և Աբովյան։ Երևանի «Մեգամոլից» պատվերը կարող եք վերցնել առանց առաքման վճարի։ Ձեր հասցեով առաքման արժեքը ճշտում ենք առանձին։ Պատվերը կարող եք վերցնել նաև Գառնիից։", "Да, доставляем в Ереван и Абовян. В ереванском «Мегамолле» заказ можно забрать без оплаты доставки. Стоимость доставки на ваш адрес уточняем отдельно. Заказ можно забрать и в Гарни.", "Yes, we deliver to Yerevan and Abovyan. You can pick up your order at Megamall in Yerevan with no delivery fee. Delivery to your address is priced separately. You can also pick up in Garni.") },
       { q: L("Քանի՞ օր առաջ պետք է պատվիրել։", "За сколько дней нужно заказывать?", "How far ahead should I order?"), a: L("Խորհուրդ ենք տալիս պատվիրել 2–3 օր առաջ։ Մեծ պատվերների ժամկետը համաձայնեցրեք նախապես։ Շտապ պատվերի հնարավորությունը ճշտելու համար զանգահարեք մեզ։", "Рекомендуем заказывать за 2–3 дня. Сроки больших заказов согласуйте заранее. Чтобы узнать о срочном заказе, позвоните нам.", "We recommend ordering 2–3 days ahead. Please agree on timing for large orders in advance. For urgent orders, call us.") },
-      { q: L("Ի՞նչ միջուկներով գաթա ունեք։", "Какие начинки у вас есть?", "Which fillings do you have?"), a: L("Ունենք խորիզով, ընկույզով, չրերով և խուրմայով գաթա։ Չափսերը՝ 25, 30 և 40 սմ։", "У нас есть гата с хоризом, с орехами, с сухофруктами и с хурмой. Размеры: 25, 30 и 40 см.", "We have gata with khoriz, walnut, dried fruit and persimmon. Sizes: 25, 30 and 40 cm.") },
+      { q: L("Ի՞նչ միջուկներով գաթա ունեք։", "Какие начинки у вас есть?", "Which fillings do you have?"), a: L("Ունենք դասական խորիզով, ընկույզով և չրերով ու խուրմայով գաթա։ Չափսերը՝ 25, 30 և 40 սմ։", "У нас есть гата с классическим хоризом, с орехами и с сухофруктами и хурмой. Размеры: 25, 30 и 40 см.", "We have gata with classic khoriz, with walnut, and with dried fruit and persimmon. Sizes: 25, 30 and 40 cm.") },
       { q: L("Հարսանեկան գաթաներ պատրաստո՞ւմ եք։", "Делаете свадебную гату?", "Do you make wedding gata?"), a: L("Այո։ Առաջարկում ենք գաթաներ՝ զարդարված տուփերով և նվեր-պայուսակներով, ինչպես նաև հարսի ճամպրուկի համար գաթա։ Փաթեթավորման ձևավորումն ու արժեքը ճշտում ենք պատվիրելիս։", "Да. Предлагаем гату в украшенных коробках и подарочных пакетах, а также гату для чемодана невесты. Оформление и стоимость упаковки уточняем при заказе.", "Yes. We offer gata in decorated boxes and gift bags, and gata for the bride's suitcase. We confirm the packaging design and price when you order.") },
       { q: L("Ինչպե՞ս պատվիրել։", "Как заказать?", "How do I order?"), a: L("Լրացրեք կայքի պատվերի ձևը, պատվիրեք չատով կամ զանգահարեք մեզ։ Կարող եք գրել նաև Instagram-ում։", "Заполните форму заказа на сайте, закажите в чате или позвоните нам. Можно также написать в Instagram.", "Fill in the order form on the site, order in the chat or call us. You can also message us on Instagram.") },
     ],
@@ -221,10 +221,10 @@ export const DEFAULT_CONTENT = {
       { cm: 40, label: L("Մեծ", "Большая", "Large") },
     ],
     fillings: [
-      { id: "classic", name: L("Խորիզով (դասական)", "С хоризом (классическая)", "Khoriz (classic)"), short: L("Խորիզով", "С хоризом", "Khoriz"), prices: [3000, 3500, 4500], show: true },
+      { id: "classic", name: L("Դասական խորիզով", "С классическим хоризом", "Classic khoriz"), short: L("Դասական խորիզով", "С классическим хоризом", "Classic khoriz"), prices: [3000, 3500, 4500], show: true },
       { id: "walnut", name: L("Ընկույզով", "С орехами", "Walnut"), short: L("Ընկույզով", "С орехами", "Walnut"), prices: [3500, 4000, 5000], show: true },
-      { id: "raisin", name: L("Չրերով", "С сухофруктами", "Dried fruit"), short: L("Չրերով", "С сухофруктами", "Dried fruit"), prices: [4000, 4500, 5500], show: true },
-      { id: "date", name: L("Խուրմայով", "С хурмой", "Persimmon"), short: L("Խուրմայով", "С хурмой", "Persimmon"), prices: [4000, 4500, 5500], show: true },
+      { id: "raisin", name: L("Չրերով և խուրմայով", "С сухофруктами и хурмой", "Dried fruit and persimmon"), short: L("Չրերով և խուրմայով", "С сухофруктами и хурмой", "Dried fruit & persimmon"), prices: [4000, 4500, 5500], show: true },
+      { id: "date", name: L("Խուրմայով", "С хурмой", "Persimmon"), short: L("Խուրմայով", "С хурмой", "Persimmon"), prices: [4000, 4500, 5500], show: false }, // now part of "raisin"
       { id: "choco", name: L("Շոկոլադով", "Шоколадная", "Chocolate"), short: L("Շոկոլադով", "Шоколадная", "Chocolate"), prices: [4000, 4500, 5500], show: false },
     ],
     box: { enabled: true, price: 0 }, // kept for older versions; see packs
@@ -233,7 +233,7 @@ export const DEFAULT_CONTENT = {
       { id: "none", label: L("Առանց տուփի", "Без коробки", "No box"), price: 0, show: true },
       { id: "box", label: L("Տուփով", "В коробке", "In a box"), price: -1, show: true },
       { id: "bag", label: L("Նվեր-պայուսակով", "В подарочном пакете", "In a gift bag"), price: -1, show: true },
-      { id: "wrap", label: L("Շղարշով և ժապավենով", "В фатине с лентой", "Wrapped in tulle and ribbon"), price: -1, show: true },
+      { id: "wrap", label: L("Հարսի ճամպրուկի ձևավորում", "Оформление для чемодана невесты", "Bride's suitcase decoration"), price: 1000, show: true },
     ],
   },
   delivery: {
