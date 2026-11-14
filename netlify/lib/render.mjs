@@ -92,7 +92,7 @@ ${/^G-[A-Z0-9]+$/.test(c.seo.googleTag || "") ? `<script async src="https://www.
 <body>
 <div class="root">`;
 }
-export const ASSET_V = "8";
+export const ASSET_V = "9";
 
 function logo(c, lang, id, href, light) {
   const src = light ? c.brand.logoLight || c.brand.logo : c.brand.logo;

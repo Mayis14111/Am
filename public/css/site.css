@@ -405,3 +405,10 @@ footer .fbrand .logo img{height:120px;margin:0}
 .flangs a.on{background:var(--cream);color:var(--ink)}
 footer .copy{text-align:center;border-top:1px solid rgba(255,255,255,.12);margin-top:36px;padding-top:20px}
 .hero-text{position:relative;z-index:2}
+/* small notes with a clock icon (product, delivery pages) */
+.facts{margin-top:18px;font-size:15.5px;color:var(--ink);display:flex;flex-wrap:wrap;align-items:center;gap:2px 0}
+.facts b{font-weight:600;white-space:nowrap}
+.facts span{color:var(--gold);margin:0 8px}
+.advice{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:15px;color:var(--muted);max-width:52ch}
+.advice svg{width:20px;height:20px;flex:none;margin-top:2px;color:var(--gold-text)}
+.advice-box .advice{margin:0;max-width:none}
