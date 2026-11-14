@@ -92,7 +92,7 @@ ${/^G-[A-Z0-9]+$/.test(c.seo.googleTag || "") ? `<script async src="https://www.
 <body>
 <div class="root">`;
 }
-export const ASSET_V = "6";
+export const ASSET_V = "7";
 
 function logo(c, lang, id, href, light) {
   const src = light ? c.brand.logoLight || c.brand.logo : c.brand.logo;
@@ -276,29 +276,33 @@ const secHead = (kicker, title, lead, tag = "h2") => `<div class="sec-head">${ki
 
 function heroHtml(c, lang) {
   const H = HL[lang], { sizes, minAll } = priceData(c);
+  const pearl = (x, y, sz, d) => `<span class="pearl" style="--x:${x}%;--y:${y}%;--s:${sz}px;--d:${d}"></span>`;
   return `<header class="hero" id="top">
-  <div class="wrap hero-grid">
-    <div class="hero-text">
-      <span class="kicker">${esc(t(c.hero.title, lang))} · ${esc(t(c.brand.sub, lang).split("·")[0].trim())}</span>
-      <h1>${esc(t(c.hero.kicker, lang))}</h1>
-      <p class="lead">${inline(t(c.hero.lead, lang))}</p>
-      <div class="btns hero-btns" data-avoid>
-        <a class="btn btn-gold" href="${siteUrl_(lang, "order")}">${esc(t(c.hero.btnOrder, lang))}</a>
-        <a class="btn btn-line" href="${siteUrl_(lang, "menu")}">${esc(t(c.hero.btnMenu, lang))}</a>
-      </div>
-      <p class="facts"><b>${esc(H.sizesFact(sizes.map((s) => s.cm).join(", ")))}</b>${isFinite(minAll) ? `<span aria-hidden="true">·</span><b>${esc(H.fromFact(num(minAll)))}</b>` : ""}</p>
-      ${t(c.hero.advice, lang) ? `<p class="advice"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>${inline(t(c.hero.advice, lang))}</span></p>` : ""}
+  <div class="wrap hero-text">
+    <span class="kicker load">${esc(t(c.hero.title, lang))} · ${esc(t(c.brand.sub, lang).split("·")[0].trim())}</span>
+    <h1 class="load d1">${esc(t(c.hero.kicker, lang))}</h1>
+    <p class="lead load d2">${inline(t(c.hero.lead, lang))}</p>
+    <div class="btns hero-btns load d3" data-avoid>
+      <a class="btn btn-gold" href="${siteUrl_(lang, "order")}">${esc(t(c.hero.btnOrder, lang))}</a>
+      <a class="btn btn-line" href="${siteUrl_(lang, "menu")}">${esc(t(c.hero.btnMenu, lang))}</a>
     </div>
-    <div class="hero-stage" aria-hidden="true">
-      <div class="hero-glow"></div>
-      <div class="hero-gata"><img src="${esc(c.hero.image)}" alt="" width="600" height="600" fetchpriority="high"></div>
-      <span class="pearl" style="--x:4%;--y:16%;--s:26px"></span>
-      <span class="pearl" style="--x:88%;--y:10%;--s:18px"></span>
-      <span class="pearl" style="--x:90%;--y:70%;--s:30px"></span>
-      <span class="pearl" style="--x:8%;--y:84%;--s:18px"></span>
+    <p class="facts load d3"><b>${esc(H.sizesFact(sizes.map((s) => s.cm).join(", ")))}</b>${isFinite(minAll) ? `<span aria-hidden="true">·</span><b>${esc(H.fromFact(num(minAll)))}</b>` : ""}</p>
+  </div>
+  <div class="hero-stage load" id="heroStage" aria-hidden="true">
+    <div class="hero-glow"></div>
+    <div class="hero-gata" id="heroGata"><img src="${esc(c.hero.image)}" alt="" width="600" height="600" fetchpriority="high"></div>
+    ${pearl(2, 18, 34, 1.6)}${pearl(88, 10, 22, 2.2)}${pearl(92, 66, 40, 1.2)}${pearl(0, 72, 20, 2.6)}${pearl(20, 94, 26, 1.9)}${pearl(74, 96, 16, 2.8)}
+  </div>
+  ${t(c.hero.advice, lang) ? `<div class="wrap"><p class="advice hero-advice load d3"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>${inline(t(c.hero.advice, lang))}</span></p></div>` : ""}
+</header>
+${c.expand && c.expand.show !== false && c.expand.image ? `<section class="expand" id="expand" aria-label="${esc(t(c.expand.title, lang))}">
+  <div class="sticky">
+    <div class="frame" id="expFrame">
+      <img id="expImg" src="${esc(c.expand.image)}" alt="${esc(t(c.expand.title, lang))}" loading="lazy">
+      <div class="cap" id="expCap"><h2>${esc(t(c.expand.title, lang))}</h2><p>${esc(t(c.expand.text, lang))}</p></div>
     </div>
   </div>
-</header>`;
+</section>` : ""}`;
 }
 
 function cardsHtml(c, lang, list) {

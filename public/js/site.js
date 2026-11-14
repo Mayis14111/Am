@@ -1215,4 +1215,45 @@ if (chatBtn && chatPanel) {
   }
   show(P.bad, P.badT, `<button class="btn btn-gold" data-close>${P.close}</button>`);
 })();
+
+/* ================= interactive header + scroll scenes ================= */
+(() => {
+  if (reduce) return;
+  const gata = $("heroGata"), exp = $("expand"), pearls = [...document.querySelectorAll(".hero .pearl")];
+  const sceneP = (el) => { const r = el.getBoundingClientRect(); return clamp(-r.top / (r.height - innerHeight)); };
+  let px = 0, py = 0, tick = false;
+  function frame() {
+    tick = false;
+    const hp = clamp(scrollY / innerHeight);
+    if (gata) gata.style.transform = `rotateX(${hp * 40 - py * 10}deg) rotateY(${px * 14}deg) rotateZ(${hp * 60}deg) scale(${1 - hp * 0.12})`;
+    pearls.forEach((p) => { const d = +p.style.getPropertyValue("--d") || 1; p.style.transform = `translate3d(${px * d * -14}px,${-hp * d * 110 - py * d * 10}px,0)`; });
+    if (exp) {
+      const sp = sceneP(exp), ep = ease(clamp(sp / 0.7));
+      $("expFrame").style.width = 72 + 28 * ep + "%"; $("expFrame").style.height = 78 + 22 * ep + "%"; $("expFrame").style.borderRadius = 24 * (1 - ep) + "px";
+      $("expImg").style.transform = `scale(${1.15 - 0.15 * ep})`;
+      const cp = clamp((sp - 0.45) / 0.3); $("expCap").style.opacity = cp; $("expCap").style.transform = `translateY(${20 * (1 - cp)}px)`;
+    }
+  }
+  const req = () => { if (!tick) { tick = true; requestAnimationFrame(frame); } };
+  addEventListener("scroll", req, { passive: true }); addEventListener("resize", req); frame();
+  if (matchMedia("(hover:hover) and (pointer:fine)").matches) {
+    addEventListener("pointermove", (e) => { px = e.clientX / innerWidth - 0.5; py = e.clientY / innerHeight - 0.5; req(); }, { passive: true });
+    document.querySelectorAll(".card").forEach((el) => {
+      el.insertAdjacentHTML("beforeend", '<span class="shine" aria-hidden="true"></span>');
+      el.addEventListener("pointermove", (e) => {
+        const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        el.style.transform = `perspective(900px) rotateX(${(0.5 - y) * 7}deg) rotateY(${(x - 0.5) * 9}deg) translateY(-4px)`;
+        el.style.setProperty("--mx", x * 100 + "%"); el.style.setProperty("--my", y * 100 + "%");
+      });
+      el.addEventListener("pointerleave", () => { el.style.transform = ""; });
+    });
+  } else if (gata && window.DeviceOrientationEvent) {
+    addEventListener("deviceorientation", (e) => { if (e.gamma == null) return; px = Math.max(-0.5, Math.min(0.5, e.gamma / 60)); py = Math.max(-0.5, Math.min(0.5, (e.beta - 45) / 90)); req(); }, { passive: true });
+  }
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.remove("pre"); io.unobserve(e.target); } }), { threshold: 0.12 });
+  document.querySelectorAll(".section .sec-head,.card,.qa,.story .photo,.dcard,.ccard").forEach((el, i) => {
+    if (el.getBoundingClientRect().top > innerHeight) { el.classList.add("rv", "pre"); el.style.transitionDelay = (i % 3) * 0.08 + "s"; io.observe(el); }
+  });
+})();
+
 })();
