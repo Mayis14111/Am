@@ -35,10 +35,11 @@ export function orderText(o) {
   const lines = [
     `🧁 <b>Նոր պատվեր ${h(o.id)}</b>${o.source === "chat" ? " · չատից" : " · ձևից"}`,
     "",
+    o.product ? `🎀 ${h(o.product)}` : "",
     `🥐 ${h(o.fillingName)}${o.choco ? " (" + h(o.choco) + ")" : ""}`,
     `📏 ${h(o.size)} սմ × ${h(o.qty)} հատ`,
     o.box ? `🎁 Տուփով` : `🎁 Առանց տուփի`,
-    `💰 ${money(o.total)}${o.qty > 1 ? ` (${money(o.unit)} × ${o.qty})` : ""}`,
+    `💰 ${o.estimate ? "Նախնական՝ " : ""}${money(o.total)}${o.qty > 1 ? ` (${money(o.unit)} × ${o.qty})` : ""}${o.estimate ? " + " + [o.box && !o.boxFee ? "տուփ" : "", o.delivery?.feeLater ? "առաքում" : ""].filter(Boolean).join(", ") + " (ճշտել)" : ""}`,
     `📅 ${h(o.date || "—")}`,
     `🚗 ${h(o.delivery?.label || "—")}`,
     o.delivery?.address ? `📍 ${h(o.delivery.address)}` : "",

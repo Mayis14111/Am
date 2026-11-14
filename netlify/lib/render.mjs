@@ -1,4 +1,5 @@
 import { esc, t, LANGS } from "./store.mjs";
+import { paynetReady } from "./paynet.mjs";
 
 export const PREFIX = { hy: "/", ru: "/ru/", en: "/en/" };
 const HTML_LANG = { hy: "hy", ru: "ru", en: "en" };
@@ -6,15 +7,15 @@ const OG_LOCALE = { hy: "hy_AM", ru: "ru_RU", en: "en_US" };
 const LANG_NAME = { hy: "ՀԱՅ", ru: "РУ", en: "EN" };
 
 export const UI = {
-  hy: { order: "Պատվիրել", menu: "Մենյու", main: "Գլխավոր", address: "Հասցե", orders: "Պատվերներ", delivery: "Առաքում", deliveryTxt: "Գառնիից՝ Երևան և Աբովյան", home: "Գլխավոր էջ", notFound: "Էջը չի գտնվել", notFoundTxt: "Այս էջը գոյություն չունի կամ տեղափոխվել է։", openChat: "Բացել չատը", closeChat: "Փակել չատը", online: "Առցանց", ask: "Գրեք Ձեր հարցը…", send: "Ուղարկել", assistant: "Գաթայի օգնական" },
-  ru: { order: "Заказать", menu: "Меню", main: "Главная", address: "Адрес", orders: "Заказы", delivery: "Доставка", deliveryTxt: "Из Гарни — в Ереван и Абовян", home: "На главную", notFound: "Страница не найдена", notFoundTxt: "Такой страницы нет или она перемещена.", openChat: "Открыть чат", closeChat: "Закрыть чат", online: "Онлайн", ask: "Напишите ваш вопрос…", send: "Отправить", assistant: "Помощник Гарну Гата" },
-  en: { order: "Order", menu: "Menu", main: "Home", address: "Address", orders: "Orders", delivery: "Delivery", deliveryTxt: "From Garni to Yerevan & Abovyan", home: "Back to home", notFound: "Page not found", notFoundTxt: "This page doesn't exist or has moved.", openChat: "Open chat", closeChat: "Close chat", online: "Online", ask: "Type your question…", send: "Send", assistant: "Garnu Gata assistant" },
+  hy: { order: "Պատվիրել", menu: "Մենյու", main: "Գլխավոր", address: "Գտնվելու վայրը", orders: "Պատվիրելու համար", delivery: "Առաքում", deliveryTxt: "Գառնիից՝ Երևան և Աբովյան", home: "Գլխավոր էջ", notFound: "Էջը չի գտնվել", notFoundTxt: "Այս էջը գոյություն չունի կամ տեղափոխվել է։", openChat: "Բացել չատը", closeChat: "Փակել չատը", online: "Ավտոմատ օգնական", ask: "Գրեք ձեր հարցը…", send: "Ուղարկել", assistant: "Գառնու Գաթայի օգնական" },
+  ru: { order: "Заказать", menu: "Меню", main: "Главная", address: "Где мы", orders: "Для заказа", delivery: "Доставка", deliveryTxt: "Из Гарни — в Ереван и Абовян", home: "На главную", notFound: "Страница не найдена", notFoundTxt: "Такой страницы нет или она перемещена.", openChat: "Открыть чат", closeChat: "Закрыть чат", online: "Автоматический помощник", ask: "Напишите ваш вопрос…", send: "Отправить", assistant: "Помощник Гарну Гата" },
+  en: { order: "Order", menu: "Menu", main: "Home", address: "Location", orders: "To order", delivery: "Delivery", deliveryTxt: "From Garni to Yerevan & Abovyan", home: "Back to home", notFound: "Page not found", notFoundTxt: "This page doesn't exist or has moved.", openChat: "Open chat", closeChat: "Close chat", online: "Automated assistant", ask: "Type your question…", send: "Send", assistant: "Garnu Gata assistant" },
 };
 
 const CHIPS = {
-  hy: ["Պատվիրել չատում", "Ինչքա՞ն արժե", "Առաքում ունե՞ք", "Ի՞նչ է խորիզը", "Մեծ պատվեր հարսանիքի համար", "Հեռախոսահամար"],
-  ru: ["Заказать в чате", "Сколько стоит?", "Есть доставка?", "Что такое хориз?", "Большой заказ на свадьбу", "Телефон"],
-  en: ["Order in chat", "How much is it?", "Do you deliver?", "What is khoriz?", "Big wedding order", "Phone number"],
+  hy: ["Տեսնել գները", "Պատվիրել չատով", "Առաքման պայմանները", "Հարսանեկան պատվեր", "Ի՞նչ է խորիզը", "Հեռախոսահամարները"],
+  ru: ["Посмотреть цены", "Заказать в чате", "Условия доставки", "Свадебный заказ", "Что такое хориз?", "Телефоны"],
+  en: ["See prices", "Order in chat", "Delivery terms", "Wedding order", "What is khoriz?", "Phone numbers"],
 };
 
 // **bold** and *gold*, safe
@@ -91,7 +92,7 @@ ${/^G-[A-Z0-9]+$/.test(c.seo.googleTag || "") ? `<script async src="https://www.
 <body>
 <div class="root">`;
 }
-export const ASSET_V = "1";
+export const ASSET_V = "3";
 
 function logo(c, lang, id, href, light) {
   const src = light ? c.brand.logoLight || c.brand.logo : c.brand.logo;
@@ -160,12 +161,12 @@ function chatHtml(c, lang) {
 <div class="chat-panel" id="chatPanel" role="dialog" aria-label="${u.assistant}" hidden>
   <div class="chat-head">
     <div class="av" aria-hidden="true">${esc(t(c.brand.name, lang).charAt(0))}</div>
-    <div><b>${esc(t(c.brand.name, lang))}</b><small><span class="on"></span>${u.online}</small></div>
+    <div><b>${u.assistant}</b><small><span class="on"></span>${u.online}</small></div>
     <button class="chat-x" id="chatX" type="button" aria-label="${u.closeChat}">×</button>
   </div>
   <div class="chat-body">
     <div class="msgs" id="msgs" aria-live="polite"><div class="m bot">${esc(t(c.chat.welcome, lang))}</div></div>
-    <div class="chips">${CHIPS[lang].map((x) => `<button class="chip" type="button">${esc(x)}</button>`).join("")}</div>
+    <div class="chips">${CHIPS[lang].map((x, i) => `<button class="chip" type="button" data-act="${["price", "order", "delivery", "wedding", "khoriz", "phone"][i]}">${esc(x)}</button>`).join("")}</div>
     <form class="ask" id="cf"><input id="q" placeholder="${u.ask}" aria-label="${u.ask}" autocomplete="off"><button class="btn btn-gold" type="submit">${u.send}</button></form>
   </div>
 </div>`;
@@ -182,7 +183,7 @@ function clientData(c, lang) {
     delivery: c.delivery.options.filter((d) => d.show !== false),
     answers: c.chat.answers,
     ai: !!c.chat.ai,
-    pay: !!c.payments.enabled,
+    pay: !!c.payments.enabled && paynetReady(),
     accept: c.order.accept !== false,
     closedText: t(c.order.closedText, lang),
     minDays: +c.order.minDays || 0,
@@ -229,7 +230,7 @@ export function renderHome(c, lang, pages, base) {
     const gold = /^\*.*\*$/.test(w);
     return `<span${gold ? ' class="gold"' : ""}>${esc(w.replace(/^\*|\*$/g, ""))}</span>`;
   }).join(" ");
-  const big = (b) => { const s = t(b, lang); const m = /^(\d+)(.*)$/.exec(s); return m ? `<div class="big" data-count="${m[1]}" data-suffix="${esc(m[2])}">${esc(s)}</div>` : `<div class="big">${esc(s)}</div>`; };
+  const big = (b) => { const s = t(b, lang); if (!s) return `<div class="big orn" aria-hidden="true">✦</div>`; const m = /^(\d+)(.*)$/.exec(s); return m ? `<div class="big" data-count="${m[1]}" data-suffix="${esc(m[2])}">${esc(s)}</div>` : `<div class="big">${esc(s)}</div>`; };
   const gal = c.gallery.images;
   const half = Math.ceil(gal.length / 2);
   const track = (list) => { const h = list.map((i) => `<img src="${esc(i.src)}" alt="${esc(t(i.alt, lang))}" loading="lazy">`).join(""); return h + h; };
@@ -276,7 +277,7 @@ ${c.expand.show !== false ? `
     <p class="lead">${inline(t(c.products.lead, lang))}</p>
     <div class="products">
       ${c.products.cards.filter((k) => k.show !== false).map((k) => `<article class="card"><div class="pic"><img src="${esc(k.image)}" alt="${esc(t(k.title, lang))}" loading="lazy"></div>
-        <div class="body"><span class="tag">${esc(t(k.tag, lang))}</span><h3>${esc(t(k.title, lang))}</h3><p>${inline(t(k.text, lang))}</p><a class="btn" href="${esc(k.link || "#order")}" data-pick="${esc(t(k.title, lang))}">${esc(t(c.products.btn, lang))}</a></div></article>`).join("\n      ")}
+        <div class="body"><span class="tag">${esc(t(k.tag, lang))}</span><h3>${esc(t(k.title, lang))}</h3><p>${inline(t(k.text, lang))}</p><a class="btn" href="${esc(k.link || "#order")}" data-pick="${esc(t(k.title, lang))}" data-pack="${esc(k.packaging || "")}">${esc(t(c.products.btn, lang))}</a></div></article>`).join("\n      ")}
     </div>
   </div>
 </section>
@@ -320,7 +321,7 @@ ${c.words.show !== false ? `
   <div class="wrap">
     <span class="kicker">${esc(t(c.gallery.kicker, lang))}</span>
     <h2 class="h2">${esc(t(c.gallery.title, lang))}</h2>
-    <p class="lead">${esc(t(c.gallery.lead, lang))}${igLink}</p>
+    <p class="lead">${esc(t(c.gallery.lead, lang))}${igLink ? "<br>" + igLink : ""}</p>
   </div>
   <div class="mq" aria-hidden="true">
     <div class="track" id="tr1">${track(gal.slice(0, half))}</div>

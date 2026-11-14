@@ -15,6 +15,9 @@ export default async (req) => {
   const [c, all] = await Promise.all([getContent(true), listPages().catch(() => [])]);
   const pages = all.filter((p) => p.published);
 
+  if (path === "/robots.txt") {
+    return new Response(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\n\nSitemap: ${base}/sitemap.xml\n`, { headers: { ...HTML_HEADERS, "content-type": "text/plain; charset=utf-8" } });
+  }
   if (path === "/sitemap.xml") {
     const now = new Date().toISOString().slice(0, 10);
     const alt = (fn) => LANGS.map((l) => `<xhtml:link rel="alternate" hreflang="${l}" href="${base}${fn(l)}"/>`).join("");
@@ -41,5 +44,5 @@ ${pages.map((p) => entry((l) => pageUrl(l, p.slug), "0.6")).join("\n")}
 };
 
 export const config = {
-  path: ["/", "/ru", "/ru/", "/en", "/en/", "/p/*", "/ru/p/*", "/en/p/*", "/sitemap.xml"],
+  path: ["/", "/ru", "/ru/", "/en", "/en/", "/p/*", "/ru/p/*", "/en/p/*", "/sitemap.xml", "/robots.txt"],
 };

@@ -40,16 +40,23 @@ export default async (req) => {
   if (!c.order.accept) return err(t(c.order.closedText, "hy"), t(c.order.closedText, "ru"), t(c.order.closedText, "en"));
 
   const p = priceOf(c, b.filling, b.size, b.qty);
-  if (!p) return err("Ընտրեք գաթայի տեսակը և չափսը։", "Выберите вид и размер гаты.", "Please choose the gata type and size.");
+  if (!p) return err("Խնդրում ենք ընտրել գաթայի միջուկը և չափսը։", "Пожалуйста, выберите начинку и размер.", "Please choose the filling and size.");
+  if (p.badQty) return err("Խնդրում ենք նշել գաթաների քանակը՝ ամբողջ թվով, առնվազն 1 հատ։", "Пожалуйста, укажите количество целым числом, не меньше 1.", "Please enter the quantity as a whole number, at least 1.");
   const name = clean(b.name, 80), phone = clean(b.phone, 30);
-  if (!name) return err("Գրեք Ձեր անունը։", "Укажите ваше имя.", "Please enter your name.");
-  if (phone.replace(/\D/g, "").length < 8) return err("Գրեք ճիշտ հեռախոսահամար։", "Укажите правильный номер телефона.", "Please enter a valid phone number.");
+  const REQ = ["Խնդրում ենք լրացնել այս դաշտը։", "Пожалуйста, заполните это поле.", "Please fill in this field."];
+  if (!name) return err(...REQ);
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 8 || digits.length > 15) return err("Խնդրում ենք ստուգել հեռախոսահամարը և գրել այն ամբողջությամբ։", "Пожалуйста, проверьте номер телефона и напишите его полностью.", "Please check the phone number and write it in full.");
   const date = clean(b.date, 10);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < ymd(yerevanNow())) return err("Ընտրեք ճիշտ օր։", "Выберите правильную дату.", "Please choose a valid date.");
+  const dt = new Date(date + "T00:00:00Z");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(dt) || dt.toISOString().slice(0, 10) !== date || date > ymd(new Date(yerevanNow().getTime() + 366 * 864e5)))
+    return err("Խնդրում ենք նշել ճիշտ ամսաթիվ։", "Пожалуйста, укажите правильную дату.", "Please enter a valid date.");
+  if (date < ymd(yerevanNow())) return err("Նշված օրն արդեն անցել է։ Ընտրեք մեկ այլ օր։", "Эта дата уже прошла. Выберите другой день.", "That date has already passed. Please choose another day.");
   const d = c.delivery.options.find((x) => x.id === b.delivery && x.show !== false);
-  if (!d) return err("Ընտրեք առաքման տարբերակը։", "Выберите способ получения.", "Please choose delivery.");
+  if (!d) return err("Խնդրում ենք ընտրել ստանալու եղանակը։", "Пожалуйста, выберите способ получения.", "Please choose how you'll receive the order.");
   const address = clean(b.address, 200);
-  if (d.address && !address) return err("Գրեք առաքման հասցեն։", "Укажите адрес доставки.", "Please enter the delivery address.");
+  if (d.address && address.replace(/\s/g, "").length < 5) return err("Խնդրում ենք գրել առաքման ամբողջական հասցեն։", "Пожалуйста, напишите полный адрес доставки.", "Please write the full delivery address.");
+  const product = clean(b.product, 120);
 
   const deliveryFee = d.price > 0 ? +d.price : 0;
   const boxFee = b.box && c.menu.box.enabled && c.menu.box.price > 0 ? c.menu.box.price * p.qty : 0;
@@ -72,6 +79,8 @@ export default async (req) => {
     delivery: { id: d.id, label: t(d.label, "hy"), address, feeLater: d.price < 0 },
     customer: { name, phone },
     notes: clean(b.notes, 600),
+    product,
+    estimate: !!(b.box && c.menu.box.enabled && !(c.menu.box.price > 0)) || d.price < 0,
     status: "new",
     statusHistory: [{ status: "new", at: new Date().toISOString(), by: "customer" }],
     payment: { method: "cash", status: "none" },

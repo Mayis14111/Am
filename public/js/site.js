@@ -10,7 +10,7 @@ const tx = (v, l) => (v == null ? "" : typeof v === "string" || typeof v === "nu
 const API = "/api/order";
 
 /* ================= texts ================= */
-const CUR = { hy: "դր", ru: "др", en: "AMD" };
+const CUR = { hy: "դրամ", ru: "драм", en: "AMD" };
 const CM = { hy: "սմ", ru: "см", en: "cm" };
 const MON = {
   hy: ["հունվարի", "փետրվարի", "մարտի", "ապրիլի", "մայիսի", "հունիսի", "հուլիսի", "օգոստոսի", "սեպտեմբերի", "հոկտեմբերի", "նոյեմբերի", "դեկտեմբերի"],
@@ -21,261 +21,273 @@ const CHOCO = { dark: { hy: "սև", ru: "тёмный", en: "dark" }, milk: { hy
 
 const T = {
   hy: {
-    greet: "Բարև Ձեզ 😊 Ուրախ եմ, որ գրեցիք։ Ինչո՞վ կարող եմ օգնել՝ գներ, չափսեր, առաքո՞ւմ, թե՞ պատվեր։",
-    hi: "Բարև Ձեզ 😊",
-    thanks: "Խնդրեմ 🤍 Եթե էլի հարց ունենաք, գրեք, ես այստեղ եմ։",
-    bye: "Շնորհակալություն, որ գրեցիք 🤍 Սպասում ենք Ձեր պատվերին։",
-    pricesHead: "Մեր գներն են՝",
-    priceNote: "Հարսանեկան տուփերի և զարդարանքի գինը հաշվում ենք ըստ ձևավորման։",
-    one: (s, f, p) => `${s} ${f.toLowerCase()} գաթան՝ ${p}։`,
-    sizeHead: (s) => `${s} գաթան՝`,
-    fillHead: (f) => `${f} գաթայի գներն են՝`,
+    greet: "Բարև ձեզ։ Ինչո՞վ կարող եմ օգնել՝ գներ, չափսեր, առաքո՞ւմ, թե՞ պատվեր։",
+    hi: "Բարև ձեզ։",
+    thanks: "Խնդրեմ։ Հարցեր ունենալու դեպքում գրեք։",
+    bye: "Շնորհակալություն։ Սպասում ենք ձեր պատվերին։",
+    pricesHead: "Մեր գները՝",
+    priceNote: "Տուփի ու ձևավորման արժեքը կճշտենք պատվերը հաստատելիս։",
+    one: (s, f, p) => `${f} գաթա, ${s.toLowerCase()}՝ ${p}։`,
+    sizeHead: (s) => `${s} գաթայի գները՝`,
+    fillHead: (f) => `${f} գաթայի գները՝`,
     chocoTypes: "Կա սև, կաթնային և սպիտակ շոկոլադով։",
-    chocoYes: "Այո, ունենք շոկոլադով գաթա 🍫 սև, կաթնային և սպիտակ շոկոլադով՝",
-    sizes: (l) => `Գաթան թխում ենք այս չափսերով՝ ${l}։`,
-    delivOther: (p) => `Ներկայումս առաքում ենք Գառնիից Երևան և Աբովյան։ Այլ վայրի համար զանգահարեք՝ ${p}, կքննարկենք 🙏`,
-    orderHint: "Պատվիրելու համար գրեք «պատվիրել», և ես կօգնեմ հենց այստեղ։",
-    phone: (p, ig) => `Սիրով կպատասխանենք 📞\n${p.join("\n")}${ig ? `\n\nԿարող եք նաև գրել Instagram-ում՝ ${ig}։` : ""}`,
-    wantOrder: "Ցանկանո՞ւմ եք պատվիրել հենց այստեղ։",
-    types: (l) => `Ունենք՝\n${l}\n\nՀարսանիքների համար նաև զարդարում ենք՝ տուփերով, պայուսակներով, սկզբնատառերով։ Ցանկանո՞ւմ եք տեսնել գները կամ պատվիրել։`,
-    more: "Լավ 😊 Էլ ի՞նչ կուզենայիք իմանալ։",
-    noOk: "Լավ 🙂 Եթե էլի հարց ունենաք, գրեք։",
-    unknown: (p) => `Ներողություն, լավ չհասկացա 🙏 Կարող եք հարցնել գների, չափսերի, առաքման կամ հարսանեկան պատվերների մասին։ Կամ զանգահարեք՝ ${p}։`,
-    orderChip: "Պատվիրել չատում",
+    chocoYes: "Ունենք շոկոլադով գաթա՝ սև, կաթնային և սպիտակ շոկոլադով։ Գները՝",
+    chocoNo: (p) => `Շոկոլադով գաթայի առկայությունը ճշտելու համար զանգահարեք՝ ${p}։`,
+    sizes: (l) => `Գաթան թխում ենք հետևյալ չափսերով՝ ${l}։`,
+    delivOther: (p) => `Այժմ առաքում ենք միայն Երևան և Աբովյան։ Այլ վայրի համար զանգահարեք՝ ${p}։`,
+    orderHint: "Պատվիրելու համար սեղմեք «Պատվիրել չատով»։",
+    phone: (p, ig) => `Մեր հեռախոսահամարները՝\n${p.join("\n")}${ig ? `\n\nԿարող եք գրել նաև Instagram-ում՝ ${ig}։` : ""}`,
+    wantOrder: "Ցանկանո՞ւմ եք պատվիրել չատով։",
+    types: (l) => `Ունենք՝\n${l}\n\nՀարսանիքի համար առաջարկում ենք նաև զարդարված տուփեր և նվեր-պայուսակներ։`,
+    more: "Լավ։ Էլ ի՞նչ կցանկանայիք իմանալ։",
+    noOk: "Լավ։ Հարցեր ունենալու դեպքում գրեք։",
+    unknown: (p) => `Չկարողացա հասկանալ հարցը։ Փորձեք հարցնել գնի, չափսի կամ առաքման մասին։ Այլ հարցերի համար կարող եք զանգահարել՝ ${p}։`,
+    orderChip: "Պատվիրել չատով",
     // ordering
     from: (p) => `${p}-ից`,
     askSize: "Ո՞ր չափսի գաթա եք ուզում։",
-    askKind: (s) => `${s}՝ ո՞ր միջուկով։`,
-    askChoco: "Ո՞ր շոկոլադով 🍫",
+    askKind: () => "Ի՞նչ միջուկով գաթա եք ուզում։",
+    askChoco: "Ո՞ր շոկոլադով։",
     chocoChips: ["Սև շոկոլադով", "Կաթնային շոկոլադով", "Սպիտակ շոկոլադով"],
-    askBox: "Տուփով եք ուզում, թե՞ առանց տուփի։",
-    boxChips: ["Այո, տուփով", "Առանց տուփի"],
-    boxInfo: "Տուփի գինը կախված է ձևավորումից, այն կհաստատենք պատվերը ընդունելիս 🙂",
-    boxGot: "Գրանցեցի՝ տուփով։",
-    askQty: "Քանի՞ գաթա է պետք։ Գրեք թիվը։",
-    askDate: "Ո՞ր օրվա համար։ Կարող եք գրել, օրինակ՝ 20.10 կամ «վաղը»։",
+    askBox: "Գաթան տուփո՞վ եք ուզում, թե՞ առանց տուփի։",
+    boxChips: ["Տուփով", "Առանց տուփի"],
+    boxInfo: "Տուփի ու ձևավորման արժեքը կճշտենք պատվերը հաստատելիս։",
+    boxGot: "Նշեցի՝ տուփով։",
+    askQty: "Քանի՞ հատ գաթա եք ուզում պատվիրել։",
+    askDate: "Ո՞ր օրն եք ուզում ստանալ պատվերը։ Կարող եք գրել, օրինակ՝ 20.10 կամ «վաղը»։",
     dateChips: ["Վաղը", "Մյուս օրը"],
-    askDelivery: "Ինչպե՞ս կստանաք գաթան։",
-    askYmode: "Երևանում երկու տարբերակ ունենք՝\n• Անվճար վերցնել գաթան «Մեգամոլից»\n• Հավելավճարով կուղարկենք Ձեր նշած հասցեով՝ Yandex Delivery կամ այլ առաքման ծառայությամբ\n\nՈ՞րն եք նախընտրում։",
-    askAddress: "Գրեք առաքման հասցեն՝ փողոց, շենք, բնակարան։",
-    askName: "Ինչպե՞ս դիմենք Ձեզ։ Գրեք Ձեր անունը։",
-    askPhone: "Ձեր հեռախոսահամարը, որով կկապվենք պատվերը հաստատելու համար։",
-    askNotes: "Ունե՞ք նշումներ՝ սկզբնատառեր, գույներ, ժամ։",
+    askDelivery: "Ինչպե՞ս եք ուզում ստանալ պատվերը։",
+    askYmode: "Երևանում կա երկու տարբերակ՝\n• պատվերը վերցնել Երևանի «Մեգամոլից»՝ առանց առաքման վճարի,\n• վճարովի առաքում ձեր հասցեով (Yandex կամ այլ ծառայությամբ)։\n\nՈ՞րն եք նախընտրում։",
+    askAddress: "Գրեք առաքման հասցեն՝ փողոց, շենք կամ տուն, բնակարան։",
+    askName: "Ինչպե՞ս դիմենք ձեզ։",
+    askPhone: "Գրեք ձեր հեռախոսահամարը, որպեսզի կապվենք և հաստատենք պատվերը։",
+    askNotes: "Լրացուցիչ ցանկություններ ունե՞ք։ Օրինակ՝ տուփի գույնը, սկզբնատառերը կամ ստանալու ժամը։",
     notesChip: "Նշում չունեմ",
-    askPay: "Ինչպե՞ս կվճարեք։",
-    payChips: ["💳 Վճարել հիմա առցանց", "Վճարել ստանալիս"],
-    confirmQ: "Ամեն ինչ ճի՞շտ է։",
-    confirmChips: ["Հաստատել և ուղարկել", "Փոխել", "Չեղարկել"],
+    askPay: "Ինչպե՞ս եք ուզում վճարել։",
+    payChips: ["Վճարել առցանց հիմա", "Վճարել ստանալիս"],
+    confirmQ: "Ստուգեք պատվերի տվյալները։ Ամեն ինչ ճի՞շտ է։",
+    confirmChips: ["Ուղարկել պատվերը", "Փոխել տվյալները", "Չեղարկել լրացումը"],
     yourOrder: "📋 Ձեր պատվերը՝",
-    gata: "գաթա",
-    qty: (n) => `Քանակ՝ ${n} հատ`,
+    product: (p) => `Ընտրված տեսակը՝ ${p}`,
+    qty: (n) => `Քանակը՝ ${n} հատ`,
     withBox: "Տուփով", noBox: "Առանց տուփի",
-    day: (d) => `Օր՝ ${d}`,
-    payOnline: "Վճարում՝ առցանց", payCash: "Վճարում՝ ստանալիս",
-    note: (n) => `Նշում՝ ${n}`,
-    total: (p) => `💰 Ընդհանուր՝ ${p}`,
-    boxLater: " + տուփ (գինը կհաստատենք)",
-    delivLater: " + առաքում (հավելավճար)",
-    cancelled: "Լավ, պատվերը չեղարկեցի 🙂 Եթե որոշեք, գրեք «պատվիրել», և նորից կսկսենք։",
+    day: (d) => `Ստանալու օրը՝ ${d}`,
+    payOnline: "Վճարում՝ առցանց", payCash: "Վճարում՝ պատվերը ստանալիս",
+    note: (n) => `Լրացուցիչ ցանկություններ՝ ${n}`,
+    estimate: (p) => `Նախնական գումար՝ ${p}`,
+    total: (p) => `Ընդհանուր գումար՝ ${p}`,
+    extras: (box, del) => box && del ? "Տուփի, ձևավորման և առաքման հավելավճարները կճշտենք պատվերը հաստատելիս։" : box ? "Տուփի ու ձևավորման հավելավճարը կճշտենք պատվերը հաստատելիս։" : "Առաքման հավելավճարը կճշտենք պատվերը հաստատելիս։",
+    cancelled: "Պատվերի լրացումը դադարեցվել է։ Պատվերը չի ուղարկվել։ Նորից սկսելու համար սեղմեք «Պատվիրել չատով»։",
     changeWhat: "Ի՞նչն եք ուզում փոխել։",
     changeChoose: "Ընտրեք, թե ինչն եք ուզում փոխել։",
-    changeAck: "Լավ, փոխենք 🙂",
-    fields: { kind: "Միջուկը", pack: "Տուփը", size: "Չափսը", qty: "Քանակը", date: "Օրը", delivery: "Առաքումը", name: "Անունը", phone: "Հեռախոսը", notes: "Նշումը", pay: "Վճարումը" },
-    acks: ["Լավ 👍", "Գրանցեցի ✍️", "Հիանալի 😊", "Շատ լավ", "Պարզ է 👌"],
-    dateBad: "Կներեք, չհասկացա ամսաթիվը 🙏 Գրեք, օրինակ՝ 20.10 կամ «25 հոկտեմբերի»։",
-    phoneBad: "Խնդրում եմ գրեք ամբողջական հեռախոսահամարը, օրինակ՝ 077 12 34 56։",
-    sorry: "Կներեք, լավ չհասկացա 🙏 ",
-    cont: "Շարունակենք պատվերը 🙂 ",
-    past: "Այդ օրն արդեն անցել է 🙂 ",
-    soon: (p) => `Այդքան մոտ օրվա համար խնդրում ենք նաև զանգահարել՝ ${p} 🙏\n\n`,
-    intro: "Այո, կարող եք պատվիրել հենց այստեղ 😊",
-    introGot: (g) => ` Գրանցեցի՝ ${g}։`,
+    changeAck: "Լավ, փոխենք։",
+    fields: { kind: "Միջուկը", pack: "Փաթեթավորումը", size: "Չափսը", qty: "Քանակը", date: "Ստանալու օրը", delivery: "Ստանալու եղանակը", name: "Անունը", phone: "Հեռախոսահամարը", notes: "Ցանկությունները", pay: "Վճարումը" },
+    acks: ["Լավ։", "Նշեցի։", "Շատ լավ։", "Պարզ է։", "Հիանալի է։"],
+    dateBad: "Չհասկացա ամսաթիվը։ Գրեք, օրինակ՝ 20.10 կամ «25 հոկտեմբերի»։",
+    phoneBad: "Խնդրում ենք ստուգել հեռախոսահամարը և գրել այն ամբողջությամբ։",
+    qtyBad: "Խնդրում ենք նշել գաթաների քանակը՝ ամբողջ թվով, առնվազն 1 հատ։",
+    addrBad: "Խնդրում ենք գրել առաքման ամբողջական հասցեն։",
+    sorry: "Չհասկացա պատասխանը։ ",
+    cont: "Շարունակենք պատվերը։ ",
+    past: "Նշված օրն արդեն անցել է։ Ընտրեք մեկ այլ օր։\n\n",
+    soon: (p) => `Եթե գաթան պետք է այսօր կամ վաղը, խնդրում ենք նաև զանգահարել՝ ${p}։\n\n`,
+    intro: "Այո, կարող եք պատվիրել հենց այստեղ։",
+    introGot: (g) => ` Նշեցի՝ ${g}։`,
     introNone: " Մի քանի հարց կտամ, և պատվերը պատրաստ կլինի։",
     pcs: (n) => `${n} հատ`,
-    sending: "Ուղարկում եմ պատվերը… ⏳",
-    received: (id) => `Պատվերը ստացանք ✅ Շնորհակալություն 🤍\nՊատվերի համարը՝ ${id}\n\nՇուտով կզանգենք Ձեզ՝ հաստատելու մանրամասները։`,
-    payNow: "💳 Վճարել հիմա",
+    gataWord: " գաթա",
+    sending: "Պատվերն ուղարկվում է…",
+    received: (id) => `Ձեր պատվերն ուղարկվել է։ Շնորհակալություն։\nՊատվերի համարը՝ ${id}\nԿկապվենք ձեզ հետ՝ մանրամասներն ու վերջնական գինը հաստատելու համար։`,
+    payNow: "Վճարել առցանց",
     payInfo: "Վճարելու համար սեղմեք կոճակը։ Կարող եք վճարել քարտով, Idram-ով կամ Telcell-ով։",
-    payFail: "Առցանց վճարումը հիմա հասանելի չէ, կարող եք վճարել գաթան ստանալիս։",
-    failed: (p) => `Կներեք, ավտոմատ ուղարկել չհաջողվեց 😔 Խնդրում եմ ուղարկեք պատվերը WhatsApp-ով կամ զանգահարեք՝ ${p}։`,
-    wa: "Ուղարկել WhatsApp-ով", copy: "Պատճենել պատվերը", copied: "✓ Պատճենված է", copyFail: "Չհաջողվեց պատճենել",
-    plainHead: "Բարև Ձեզ, Գառնու Գաթա։ Նոր պատվեր կայքից՝",
-    typing: "Գրում է",
+    payFail: "Առցանց վճարումն այս պահին հասանելի չէ։ Կարող եք վճարել պատվերը ստանալիս։",
+    failed: "Չհաջողվեց ստանալ պատվերի ուղարկման հաստատումը։ Նախ կապվեք մեզ հետ՝ ճշտելու համար, թե արդյոք պատվերը ստացվել է։",
+    wa: "Գրել WhatsApp-ով", call: "Զանգահարել", copy: "Պատճենել պատվերի տվյալները", copied: "Պատճենված է", copyFail: "Չհաջողվեց պատճենել",
+    plainHead: "Բարև ձեզ։ Նոր պատվեր կայքից՝",
+    typing: "Պատրաստում է պատասխանը…",
   },
   ru: {
-    greet: "Здравствуйте 😊 Рада, что вы написали. Чем помочь — цены, размеры, доставка или заказ?",
-    hi: "Здравствуйте 😊",
-    thanks: "Пожалуйста 🤍 Если будут ещё вопросы — пишите, я здесь.",
-    bye: "Спасибо, что написали 🤍 Ждём ваш заказ.",
+    greet: "Здравствуйте! Чем помочь: цены, размеры, доставка или заказ?",
+    hi: "Здравствуйте!",
+    thanks: "Пожалуйста. Если будут вопросы — пишите.",
+    bye: "Спасибо! Ждём ваш заказ.",
     pricesHead: "Наши цены:",
-    priceNote: "Цену свадебных коробок и украшения считаем по оформлению.",
+    priceNote: "Стоимость коробки и оформления уточним при подтверждении заказа.",
     one: (s, f, p) => `${f} гата, ${s.toLowerCase()} — ${p}.`,
-    sizeHead: (s) => `${s} гата:`,
-    fillHead: (f) => `Цены — ${f.toLowerCase()} гата:`,
+    sizeHead: (s) => `Цены — ${s.toLowerCase()}:`,
+    fillHead: (f) => `Цены — гата ${f.toLowerCase()}:`,
     chocoTypes: "Есть с тёмным, молочным и белым шоколадом.",
-    chocoYes: "Да, есть шоколадная гата 🍫 с тёмным, молочным и белым шоколадом:",
+    chocoYes: "Есть шоколадная гата — с тёмным, молочным и белым шоколадом. Цены:",
+    chocoNo: (p) => `О наличии шоколадной гаты, пожалуйста, узнайте по телефону: ${p}.`,
     sizes: (l) => `Мы печём гату таких размеров: ${l}.`,
-    delivOther: (p) => `Сейчас доставляем из Гарни в Ереван и Абовян. Для другого места позвоните: ${p}, обсудим 🙏`,
-    orderHint: "Чтобы заказать, напишите «заказать» — я помогу прямо здесь.",
-    phone: (p, ig) => `С радостью ответим 📞\n${p.join("\n")}${ig ? `\n\nМожно также написать в Instagram: ${ig}.` : ""}`,
-    wantOrder: "Хотите заказать прямо здесь?",
-    types: (l) => `У нас есть:\n${l}\n\nДля свадеб также украшаем — коробки, сумочки, инициалы. Показать цены или оформить заказ?`,
-    more: "Хорошо 😊 Что ещё хотите узнать?",
-    noOk: "Хорошо 🙂 Если будут вопросы — пишите.",
-    unknown: (p) => `Извините, не совсем поняла 🙏 Спросите о ценах, размерах, доставке или свадебных заказах. Или позвоните: ${p}.`,
+    delivOther: (p) => `Сейчас мы доставляем только в Ереван и Абовян. Для другого места позвоните: ${p}.`,
+    orderHint: "Чтобы заказать, нажмите «Заказать в чате».",
+    phone: (p, ig) => `Наши телефоны:\n${p.join("\n")}${ig ? `\n\nМожно также написать в Instagram: ${ig}.` : ""}`,
+    wantOrder: "Хотите заказать в чате?",
+    types: (l) => `У нас есть:\n${l}\n\nДля свадьбы также предлагаем украшенные коробки и подарочные пакеты.`,
+    more: "Хорошо. Что ещё хотите узнать?",
+    noOk: "Хорошо. Если будут вопросы — пишите.",
+    unknown: (p) => `Не удалось понять вопрос. Спросите о цене, размере или доставке. По другим вопросам звоните: ${p}.`,
     orderChip: "Заказать в чате",
     from: (p) => `от ${p}`,
     askSize: "Какой размер гаты вы хотите?",
-    askKind: (s) => `${s} — с какой начинкой?`,
-    askChoco: "С каким шоколадом 🍫",
+    askKind: () => "С какой начинкой?",
+    askChoco: "С каким шоколадом?",
     chocoChips: ["С тёмным шоколадом", "С молочным шоколадом", "С белым шоколадом"],
-    askBox: "Нужна коробка?",
-    boxChips: ["Да, в коробке", "Без коробки"],
-    boxInfo: "Цена коробки зависит от оформления, мы подтвердим её при приёме заказа 🙂",
+    askBox: "Гату нужно в коробке или без коробки?",
+    boxChips: ["В коробке", "Без коробки"],
+    boxInfo: "Стоимость коробки и оформления уточним при подтверждении заказа.",
     boxGot: "Записала: в коробке.",
-    askQty: "Сколько гат нужно? Напишите число.",
-    askDate: "На какой день? Например: 20.10 или «завтра».",
+    askQty: "Сколько гат вы хотите заказать?",
+    askDate: "В какой день вы хотите получить заказ? Например: 20.10 или «завтра».",
     dateChips: ["Завтра", "Послезавтра"],
-    askDelivery: "Как вы получите гату?",
-    askYmode: "В Ереване есть два варианта:\n• Бесплатно забрать гату в «Мегамолле»\n• За доплату отправим на ваш адрес через Yandex Delivery или другую службу\n\nЧто вам удобнее?",
+    askDelivery: "Как вы хотите получить заказ?",
+    askYmode: "В Ереване есть два варианта:\n• забрать заказ в «Мегамолле» без оплаты доставки,\n• платная доставка на ваш адрес (Yandex или другая служба).\n\nЧто вам удобнее?",
     askAddress: "Напишите адрес доставки: улица, дом, квартира.",
-    askName: "Как к вам обращаться? Напишите ваше имя.",
-    askPhone: "Ваш номер телефона, чтобы мы подтвердили заказ.",
-    askNotes: "Есть пожелания — инициалы, цвета, время?",
+    askName: "Как к вам обращаться?",
+    askPhone: "Напишите ваш номер телефона, чтобы мы связались и подтвердили заказ.",
+    askNotes: "Есть дополнительные пожелания? Например: цвет коробки, инициалы или время получения.",
     notesChip: "Без пожеланий",
-    askPay: "Как будете оплачивать?",
-    payChips: ["💳 Оплатить сейчас онлайн", "Оплатить при получении"],
-    confirmQ: "Всё верно?",
-    confirmChips: ["Подтвердить и отправить", "Изменить", "Отменить"],
+    askPay: "Как вы хотите оплатить?",
+    payChips: ["Оплатить онлайн сейчас", "Оплатить при получении"],
+    confirmQ: "Проверьте данные заказа. Всё верно?",
+    confirmChips: ["Отправить заказ", "Изменить данные", "Отменить оформление"],
     yourOrder: "📋 Ваш заказ:",
-    gata: "гата",
+    product: (p) => `Выбранный вид: ${p}`,
     qty: (n) => `Количество: ${n} шт.`,
     withBox: "В коробке", noBox: "Без коробки",
-    day: (d) => `Дата: ${d}`,
+    day: (d) => `Дата получения: ${d}`,
     payOnline: "Оплата: онлайн", payCash: "Оплата: при получении",
-    note: (n) => `Пожелание: ${n}`,
-    total: (p) => `💰 Итого: ${p}`,
-    boxLater: " + коробка (цену подтвердим)",
-    delivLater: " + доставка (доплата)",
-    cancelled: "Хорошо, заказ отменила 🙂 Если решите — напишите «заказать», начнём заново.",
+    note: (n) => `Пожелания: ${n}`,
+    estimate: (p) => `Предварительная сумма: ${p}`,
+    total: (p) => `Итого: ${p}`,
+    extras: (box, del) => box && del ? "Стоимость коробки, оформления и доставки уточним при подтверждении заказа." : box ? "Стоимость коробки и оформления уточним при подтверждении заказа." : "Стоимость доставки уточним при подтверждении заказа.",
+    cancelled: "Оформление заказа остановлено. Заказ не отправлен. Чтобы начать заново, нажмите «Заказать в чате».",
     changeWhat: "Что хотите изменить?",
     changeChoose: "Выберите, что изменить.",
-    changeAck: "Хорошо, меняем 🙂",
-    fields: { kind: "Начинку", pack: "Коробку", size: "Размер", qty: "Количество", date: "Дату", delivery: "Получение", name: "Имя", phone: "Телефон", notes: "Пожелание", pay: "Оплату" },
-    acks: ["Хорошо 👍", "Записала ✍️", "Отлично 😊", "Прекрасно", "Понятно 👌"],
-    dateBad: "Извините, не поняла дату 🙏 Напишите, например: 20.10 или «25 октября».",
-    phoneBad: "Пожалуйста, напишите полный номер, например: 077 12 34 56.",
-    sorry: "Извините, не совсем поняла 🙏 ",
-    cont: "Продолжим заказ 🙂 ",
-    past: "Этот день уже прошёл 🙂 ",
-    soon: (p) => `Для такой близкой даты, пожалуйста, также позвоните: ${p} 🙏\n\n`,
-    intro: "Да, можно заказать прямо здесь 😊",
+    changeAck: "Хорошо, меняем.",
+    fields: { kind: "Начинку", pack: "Упаковку", size: "Размер", qty: "Количество", date: "Дату", delivery: "Получение", name: "Имя", phone: "Телефон", notes: "Пожелания", pay: "Оплату" },
+    acks: ["Хорошо.", "Записала.", "Отлично.", "Понятно.", "Прекрасно."],
+    dateBad: "Не поняла дату. Напишите, например: 20.10 или «25 октября».",
+    phoneBad: "Пожалуйста, проверьте номер телефона и напишите его полностью.",
+    qtyBad: "Пожалуйста, укажите количество целым числом, не меньше 1.",
+    addrBad: "Пожалуйста, напишите полный адрес доставки.",
+    sorry: "Не поняла ответ. ",
+    cont: "Продолжим заказ. ",
+    past: "Эта дата уже прошла. Выберите другой день.\n\n",
+    soon: (p) => `Если гата нужна сегодня или завтра, пожалуйста, также позвоните: ${p}.\n\n`,
+    intro: "Да, можно заказать прямо здесь.",
     introGot: (g) => ` Записала: ${g}.`,
     introNone: " Задам несколько вопросов — и заказ готов.",
     pcs: (n) => `${n} шт.`,
-    sending: "Отправляю заказ… ⏳",
-    received: (id) => `Заказ получили ✅ Спасибо 🤍\nНомер заказа: ${id}\n\nСкоро позвоним, чтобы подтвердить детали.`,
-    payNow: "💳 Оплатить сейчас",
+    gataWord: "",
+    sending: "Заказ отправляется…",
+    received: (id) => `Ваш заказ отправлен. Спасибо!\nНомер заказа: ${id}\nМы свяжемся с вами, чтобы подтвердить детали и итоговую цену.`,
+    payNow: "Оплатить онлайн",
     payInfo: "Чтобы оплатить, нажмите кнопку. Можно картой, Idram или Telcell.",
-    payFail: "Онлайн-оплата сейчас недоступна — можно оплатить при получении.",
-    failed: (p) => `Извините, не удалось отправить автоматически 😔 Отправьте заказ через WhatsApp или позвоните: ${p}.`,
-    wa: "Отправить в WhatsApp", copy: "Скопировать заказ", copied: "✓ Скопировано", copyFail: "Не удалось скопировать",
-    plainHead: "Здравствуйте, Гарну Гата. Новый заказ с сайта:",
-    typing: "Печатает",
+    payFail: "Онлайн-оплата сейчас недоступна. Можно оплатить при получении.",
+    failed: "Не удалось получить подтверждение отправки заказа. Сначала свяжитесь с нами, чтобы уточнить, получен ли заказ.",
+    wa: "Написать в WhatsApp", call: "Позвонить", copy: "Скопировать данные заказа", copied: "Скопировано", copyFail: "Не удалось скопировать",
+    plainHead: "Здравствуйте! Новый заказ с сайта:",
+    typing: "Готовит ответ…",
   },
   en: {
-    greet: "Hello 😊 Glad you wrote. How can I help: prices, sizes, delivery or an order?",
-    hi: "Hello 😊",
-    thanks: "You're welcome 🤍 If you have more questions, just write, I'm here.",
-    bye: "Thank you for writing 🤍 We look forward to your order.",
+    greet: "Hello! How can I help: prices, sizes, delivery or an order?",
+    hi: "Hello!",
+    thanks: "You're welcome. If you have more questions, just write.",
+    bye: "Thank you! We look forward to your order.",
     pricesHead: "Our prices:",
-    priceNote: "Wedding boxes and decorations are priced by design.",
-    one: (s, f, p) => `${s} ${f.toLowerCase()} gata: ${p}.`,
-    sizeHead: (s) => `${s} gata:`,
+    priceNote: "We confirm the price of the box and decoration when we confirm your order.",
+    one: (s, f, p) => `${f} gata, ${s.toLowerCase()}: ${p}.`,
+    sizeHead: (s) => `${s} gata prices:`,
     fillHead: (f) => `${f} gata prices:`,
     chocoTypes: "Available with dark, milk and white chocolate.",
-    chocoYes: "Yes, we have chocolate gata 🍫 with dark, milk and white chocolate:",
+    chocoYes: "We have chocolate gata with dark, milk and white chocolate. Prices:",
+    chocoNo: (p) => `Please call us to check if chocolate gata is available: ${p}.`,
     sizes: (l) => `We bake gata in these sizes: ${l}.`,
-    delivOther: (p) => `Right now we deliver from Garni to Yerevan and Abovyan. For other places call us: ${p}, and we'll see 🙏`,
-    orderHint: "To order, write \"order\" and I'll help you right here.",
-    phone: (p, ig) => `Happy to help 📞\n${p.join("\n")}${ig ? `\n\nYou can also message us on Instagram: ${ig}.` : ""}`,
-    wantOrder: "Would you like to order right here?",
-    types: (l) => `We have:\n${l}\n\nFor weddings we also decorate: boxes, bags, initials. Want to see prices or order?`,
-    more: "Great 😊 What else would you like to know?",
-    noOk: "Okay 🙂 If you have more questions, just write.",
-    unknown: (p) => `Sorry, I didn't quite get that 🙏 You can ask about prices, sizes, delivery or wedding orders. Or call us: ${p}.`,
+    delivOther: (p) => `Right now we deliver only to Yerevan and Abovyan. For other places, call: ${p}.`,
+    orderHint: "To order, tap “Order in chat”.",
+    phone: (p, ig) => `Our phone numbers:\n${p.join("\n")}${ig ? `\n\nYou can also message us on Instagram: ${ig}.` : ""}`,
+    wantOrder: "Would you like to order in the chat?",
+    types: (l) => `We have:\n${l}\n\nFor weddings we also offer decorated boxes and gift bags.`,
+    more: "Great. What else would you like to know?",
+    noOk: "Okay. If you have questions, just write.",
+    unknown: (p) => `I couldn't understand the question. Try asking about prices, sizes or delivery. For anything else, call: ${p}.`,
     orderChip: "Order in chat",
     from: (p) => `from ${p}`,
     askSize: "Which size would you like?",
-    askKind: (s) => `${s}, which filling?`,
-    askChoco: "Which chocolate 🍫",
+    askKind: () => "Which filling would you like?",
+    askChoco: "Which chocolate?",
     chocoChips: ["Dark chocolate", "Milk chocolate", "White chocolate"],
-    askBox: "Would you like it in a box?",
-    boxChips: ["Yes, in a box", "No box"],
-    boxInfo: "The box price depends on the design; we'll confirm it when we accept the order 🙂",
+    askBox: "Would you like it in a box or without a box?",
+    boxChips: ["In a box", "No box"],
+    boxInfo: "We confirm the price of the box and decoration when we confirm your order.",
     boxGot: "Noted: in a box.",
-    askQty: "How many gata do you need? Type the number.",
-    askDate: "For which day? For example: 20.10 or \"tomorrow\".",
+    askQty: "How many gata would you like to order?",
+    askDate: "Which day would you like to receive your order? For example: 20.10 or “tomorrow”.",
     dateChips: ["Tomorrow", "Day after tomorrow"],
-    askDelivery: "How will you get your gata?",
-    askYmode: "In Yerevan there are two options:\n• Pick up free at Megamall\n• For an extra fee we send it to your address by Yandex Delivery or another service\n\nWhich do you prefer?",
-    askAddress: "Type the delivery address: street, building, apartment.",
+    askDelivery: "How would you like to receive your order?",
+    askYmode: "In Yerevan there are two options:\n• pick up at Megamall with no delivery fee,\n• paid delivery to your address (Yandex or another service).\n\nWhich do you prefer?",
+    askAddress: "Write the delivery address: street, building or house, apartment.",
     askName: "What's your name?",
-    askPhone: "Your phone number, so we can call to confirm.",
-    askNotes: "Any notes? Initials, colours, time?",
+    askPhone: "Write your phone number so we can contact you and confirm the order.",
+    askNotes: "Any extra requests? For example: box colour, initials or pickup time.",
     notesChip: "No notes",
     askPay: "How would you like to pay?",
-    payChips: ["💳 Pay online now", "Pay on delivery/pickup"],
-    confirmQ: "Is everything correct?",
-    confirmChips: ["Confirm and send", "Change", "Cancel"],
+    payChips: ["Pay online now", "Pay on receipt"],
+    confirmQ: "Please check your order. Is everything correct?",
+    confirmChips: ["Send order", "Change details", "Cancel"],
     yourOrder: "📋 Your order:",
-    gata: "gata",
+    product: (p) => `Selected: ${p}`,
     qty: (n) => `Quantity: ${n}`,
     withBox: "In a box", noBox: "No box",
     day: (d) => `Date: ${d}`,
-    payOnline: "Payment: online", payCash: "Payment: on delivery/pickup",
-    note: (n) => `Note: ${n}`,
-    total: (p) => `💰 Total: ${p}`,
-    boxLater: " + box (price to confirm)",
-    delivLater: " + delivery (extra fee)",
-    cancelled: "Okay, I cancelled the order 🙂 If you change your mind, write \"order\" and we'll start again.",
+    payOnline: "Payment: online", payCash: "Payment: on receipt",
+    note: (n) => `Requests: ${n}`,
+    estimate: (p) => `Estimated total: ${p}`,
+    total: (p) => `Total: ${p}`,
+    extras: (box, del) => box && del ? "We'll confirm the box, decoration and delivery charges when we confirm your order." : box ? "We'll confirm the box and decoration charge when we confirm your order." : "We'll confirm the delivery charge when we confirm your order.",
+    cancelled: "Order stopped. Nothing was sent. To start again, tap “Order in chat”.",
     changeWhat: "What would you like to change?",
     changeChoose: "Choose what you want to change.",
-    changeAck: "Okay, let's change it 🙂",
-    fields: { kind: "Filling", pack: "Box", size: "Size", qty: "Quantity", date: "Date", delivery: "Delivery", name: "Name", phone: "Phone", notes: "Note", pay: "Payment" },
-    acks: ["Great 👍", "Noted ✍️", "Lovely 😊", "Perfect", "Got it 👌"],
-    dateBad: "Sorry, I didn't get the date 🙏 Type for example: 20.10 or \"25 October\".",
-    phoneBad: "Please type the full phone number, for example: 077 12 34 56.",
-    sorry: "Sorry, I didn't quite get that 🙏 ",
-    cont: "Let's continue 🙂 ",
-    past: "That day has already passed 🙂 ",
-    soon: (p) => `For such a close date please also call us: ${p} 🙏\n\n`,
-    intro: "Yes, you can order right here 😊",
+    changeAck: "Okay, let's change it.",
+    fields: { kind: "Filling", pack: "Packaging", size: "Size", qty: "Quantity", date: "Date", delivery: "Delivery", name: "Name", phone: "Phone", notes: "Requests", pay: "Payment" },
+    acks: ["Great.", "Noted.", "Lovely.", "Got it.", "Perfect."],
+    dateBad: "I didn't get the date. Type for example: 20.10 or “25 October”.",
+    phoneBad: "Please check the phone number and write it in full.",
+    qtyBad: "Please enter the quantity as a whole number, at least 1.",
+    addrBad: "Please write the full delivery address.",
+    sorry: "I didn't understand that. ",
+    cont: "Let's continue. ",
+    past: "That date has already passed. Please choose another day.\n\n",
+    soon: (p) => `If you need it today or tomorrow, please also call us: ${p}.\n\n`,
+    intro: "Yes, you can order right here.",
     introGot: (g) => ` Noted: ${g}.`,
     introNone: " I'll ask a few questions and your order will be ready.",
     pcs: (n) => `${n} pcs`,
-    sending: "Sending your order… ⏳",
-    received: (id) => `We got your order ✅ Thank you 🤍\nOrder number: ${id}\n\nWe'll call you soon to confirm the details.`,
-    payNow: "💳 Pay now",
+    gataWord: " gata",
+    sending: "Sending your order…",
+    received: (id) => `Your order has been sent. Thank you!\nOrder number: ${id}\nWe'll contact you to confirm the details and the final price.`,
+    payNow: "Pay online",
     payInfo: "Tap the button to pay by card, Idram or Telcell.",
-    payFail: "Online payment isn't available right now; you can pay when you receive your gata.",
-    failed: (p) => `Sorry, we couldn't send it automatically 😔 Please send your order by WhatsApp or call: ${p}.`,
-    wa: "Send by WhatsApp", copy: "Copy order", copied: "✓ Copied", copyFail: "Couldn't copy",
+    payFail: "Online payment isn't available right now. You can pay when you receive your order.",
+    failed: "We couldn't confirm that your order was sent. Please contact us first to check whether we received it.",
+    wa: "Write on WhatsApp", call: "Call", copy: "Copy order details", copied: "Copied", copyFail: "Couldn't copy",
     plainHead: "Hello Garnu Gata. New order from the website:",
-    typing: "Typing",
+    typing: "Preparing a reply…",
   },
 };
 
 /* form labels */
 const F = {
-  hy: { title: "Պատվերի ձև", name: "Անուն", namePh: "Աննա", phone: "Հեռախոս", size: "Չափս", kind: "Միջուկ", choco: "Շոկոլադ", box: "Տուփ", noBox: "Առանց տուփի", withBox: "Տուփով", qty: "Քանակ", date: "Ամսաթիվ", how: "Ստանալ", addr: "Առաքման հասցե", addrPh: "Փողոց, շենք, բնակարան", notes: "Նշումներ", notesPh: "Սկզբնատառեր, գույներ, ժամ…", pay: "Վճարում", payOn: "Վճարել հիմա առցանց", payOnS: "Քարտ, Idram, Telcell", payCash: "Վճարել ստանալիս", payCashS: "Կանխիկ կամ փոխանցումով", submit: "Ուղարկել պատվերը", submitPay: "Պատվիրել և վճարել", sending: "Ուղարկում ենք… ⏳", ok: (id) => `Պատվերը ստացանք ✅ Շնորհակալություն 🤍\nՊատվերի համարը՝ ${id}\nՇուտով կզանգենք Ձեզ՝ հաստատելու մանրամասները։`, redirect: "Տեղափոխում ենք վճարման էջ… 💳", need: "Լրացրեք այս դաշտը" },
-  ru: { title: "Форма заказа", name: "Имя", namePh: "Анна", phone: "Телефон", size: "Размер", kind: "Начинка", choco: "Шоколад", box: "Коробка", noBox: "Без коробки", withBox: "В коробке", qty: "Количество", date: "Дата", how: "Получение", addr: "Адрес доставки", addrPh: "Улица, дом, квартира", notes: "Пожелания", notesPh: "Инициалы, цвета, время…", pay: "Оплата", payOn: "Оплатить сейчас онлайн", payOnS: "Карта, Idram, Telcell", payCash: "Оплатить при получении", payCashS: "Наличными или переводом", submit: "Отправить заказ", submitPay: "Заказать и оплатить", sending: "Отправляем… ⏳", ok: (id) => `Заказ получили ✅ Спасибо 🤍\nНомер заказа: ${id}\nСкоро позвоним, чтобы подтвердить детали.`, redirect: "Переходим на страницу оплаты… 💳", need: "Заполните это поле" },
-  en: { title: "Order form", name: "Name", namePh: "Anna", phone: "Phone", size: "Size", kind: "Filling", choco: "Chocolate", box: "Box", noBox: "No box", withBox: "In a box", qty: "Quantity", date: "Date", how: "Delivery", addr: "Delivery address", addrPh: "Street, building, apartment", notes: "Notes", notesPh: "Initials, colours, time…", pay: "Payment", payOn: "Pay online now", payOnS: "Card, Idram, Telcell", payCash: "Pay on delivery/pickup", payCashS: "Cash or bank transfer", submit: "Send order", submitPay: "Order and pay", sending: "Sending… ⏳", ok: (id) => `We got your order ✅ Thank you 🤍\nOrder number: ${id}\nWe'll call you soon to confirm the details.`, redirect: "Taking you to the payment page… 💳", need: "Please fill this in" },
+  hy: { title: "Պատվերի ձև", name: "Անուն", namePh: "Աննա", phone: "Հեռախոսահամար", size: "Գաթայի չափսը", kind: "Միջուկը", choco: "Շոկոլադը", box: "Փաթեթավորումը", noBox: "Առանց տուփի", withBox: "Տուփով", qty: "Քանակը", date: "Ստանալու օրը", how: "Ստանալու եղանակը", addr: "Առաքման հասցեն", addrPh: "Փողոց, շենք կամ տուն, բնակարան", notes: "Լրացուցիչ ցանկություններ", notesPh: "Օրինակ՝ տուփի գույնը, սկզբնատառերը կամ ստանալու ժամը", pay: "Վճարում", payOn: "Վճարել առցանց հիմա", payOnS: "Քարտ, Idram, Telcell", payCash: "Վճարել պատվերը ստանալիս", payCashS: "Վճարման եղանակը կճշտենք պատվերը հաստատելիս", submit: "Ուղարկել պատվերը", submitPay: "Ուղարկել պատվերը և վճարել", sending: "Պատվերն ուղարկվում է…", redirect: "Անցնում ենք վճարման էջ…", need: "Խնդրում ենք լրացնել այս դաշտը։", dateBad: "Խնդրում ենք նշել ճիշտ ամսաթիվ։" },
+  ru: { title: "Форма заказа", name: "Имя", namePh: "Анна", phone: "Номер телефона", size: "Размер гаты", kind: "Начинка", choco: "Шоколад", box: "Упаковка", noBox: "Без коробки", withBox: "В коробке", qty: "Количество", date: "Дата получения", how: "Способ получения", addr: "Адрес доставки", addrPh: "Улица, дом, квартира", notes: "Дополнительные пожелания", notesPh: "Например: цвет коробки, инициалы или время получения", pay: "Оплата", payOn: "Оплатить онлайн сейчас", payOnS: "Карта, Idram, Telcell", payCash: "Оплатить при получении", payCashS: "Способ оплаты уточним при подтверждении заказа", submit: "Отправить заказ", submitPay: "Отправить заказ и оплатить", sending: "Заказ отправляется…", redirect: "Переходим на страницу оплаты…", need: "Пожалуйста, заполните это поле.", dateBad: "Пожалуйста, укажите правильную дату." },
+  en: { title: "Order form", name: "Name", namePh: "Anna", phone: "Phone number", size: "Gata size", kind: "Filling", choco: "Chocolate", box: "Packaging", noBox: "No box", withBox: "In a box", qty: "Quantity", date: "Date you need it", how: "How you'll receive it", addr: "Delivery address", addrPh: "Street, building or house, apartment", notes: "Extra requests", notesPh: "For example: box colour, initials or pickup time", pay: "Payment", payOn: "Pay online now", payOnS: "Card, Idram, Telcell", payCash: "Pay on receipt", payCashS: "We'll confirm the payment method with you", submit: "Send order", submitPay: "Send order and pay", sending: "Sending your order…", redirect: "Taking you to the payment page…", need: "Please fill in this field.", dateBad: "Please enter a valid date." },
 };
 const PAID = {
-  hy: { ok: "Վճարումը ստացանք ✅", okT: (id) => `Շնորհակալություն 🤍 Պատվեր ${id}։ Շուտով կզանգենք Ձեզ։`, wait: "Ստուգում ենք վճարումը… ⏳", waitT: "Մի քանի վայրկյան։", bad: "Վճարումը չավարտվեց", badT: "Պատվերը պահպանված է, կզանգենք Ձեզ։ Կարող եք նորից փորձել կամ վճարել ստանալիս։", retry: "Նորից փորձել", close: "Լավ" },
-  ru: { ok: "Оплата получена ✅", okT: (id) => `Спасибо 🤍 Заказ ${id}. Скоро позвоним вам.`, wait: "Проверяем оплату… ⏳", waitT: "Несколько секунд.", bad: "Оплата не завершена", badT: "Заказ сохранён, мы позвоним вам. Можно попробовать снова или оплатить при получении.", retry: "Попробовать снова", close: "Хорошо" },
-  en: { ok: "Payment received ✅", okT: (id) => `Thank you 🤍 Order ${id}. We'll call you soon.`, wait: "Checking your payment… ⏳", waitT: "Just a few seconds.", bad: "Payment not completed", badT: "Your order is saved and we'll call you. You can try again or pay when you receive it.", retry: "Try again", close: "OK" },
+  hy: { ok: "Վճարումը ստացվել է", okT: (id) => `Շնորհակալություն։ Պատվեր ${id}։ Շուտով կկապվենք ձեզ հետ։`, wait: "Ստուգում ենք վճարումը…", waitT: "Մի քանի վայրկյան։", bad: "Վճարումը չի ավարտվել", badT: "Պատվերը պահպանված է, և կկապվենք ձեզ հետ։ Կարող եք կրկին փորձել կամ վճարել պատվերը ստանալիս։", retry: "Կրկին փորձել", close: "Լավ" },
+  ru: { ok: "Оплата получена", okT: (id) => `Спасибо! Заказ ${id}. Скоро свяжемся с вами.`, wait: "Проверяем оплату…", waitT: "Несколько секунд.", bad: "Оплата не завершена", badT: "Заказ сохранён, мы свяжемся с вами. Можно попробовать снова или оплатить при получении.", retry: "Попробовать снова", close: "Хорошо" },
+  en: { ok: "Payment received", okT: (id) => `Thank you! Order ${id}. We'll contact you soon.`, wait: "Checking your payment…", waitT: "Just a few seconds.", bad: "Payment not completed", badT: "Your order is saved and we'll contact you. You can try again or pay when you receive it.", retry: "Try again", close: "OK" },
 };
 
 /* ================= shared order data ================= */
@@ -291,7 +303,8 @@ const fill = (id) => FILLS.find((f) => f.id === id);
 const dOpt = (id) => DELIV.find((d) => d.id === id);
 const pad = (n) => String(n).padStart(2, "0");
 const isoDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-const today = () => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); };
+// "today" is always the date in Armenia (UTC+4), the same rule the server uses
+const today = () => { const n = new Date(Date.now() + 4 * 3600e3); return new Date(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate()); };
 
 /* ================= scenes & motion ================= */
 if (G.ring && $("cyl")) $("cyl").innerHTML = G.ring.map((i) => `<div class="face"><img src="${i.src}" alt="${(i.alt || "").replace(/"/g, "&quot;")}" loading="lazy"></div>`).join("");
@@ -315,7 +328,6 @@ if (burger && mm) {
 /* ================= order form ================= */
 const FL = F[PL];
 const form = $("f");
-let pickedProduct = "";
 function buildForm() {
   if (!form) return;
   if (!G.accept) { form.innerHTML = `<h3>${FL.title}</h3><div class="closed">${G.closedText || ""}<br>📞 ${PHONES}</div>`; return; }
@@ -323,6 +335,7 @@ function buildForm() {
   const mid = Math.min(1, SIZES.length - 1);
   form.innerHTML = `
     <h3>${FL.title}</h3>
+    <div class="picked" id="fpicked" hidden><span></span><button type="button" aria-label="×" id="fpickedX">×</button></div>
     <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px" aria-hidden="true">
     <div class="row">
       <label for="name">${FL.name}<input id="name" required placeholder="${FL.namePh}" autocomplete="name" maxlength="80"></label>
@@ -335,12 +348,13 @@ function buildForm() {
     <label for="fchoco" id="fchocoL" hidden>${FL.choco}<select id="fchoco">${Object.keys(CHOCO).map((k) => opt(k, tx(CHOCO[k], PL))).join("")}</select></label>
     <div class="row">
       ${MENU.box && MENU.box.enabled ? `<label for="fbox">${FL.box}<select id="fbox">${opt("none", FL.noBox)}${opt("box", FL.withBox)}</select></label>` : ""}
-      <label for="qty">${FL.qty}<input id="qty" type="number" min="1" max="9999" value="1" inputmode="numeric"></label>
+      <label for="qty">${FL.qty}<input id="qty" type="number" min="1" max="9999" step="1" value="1" inputmode="numeric"></label>
     </div>
     <div class="row">
       <label for="date">${FL.date}<input id="date" type="date" required></label>
       <label for="how2">${FL.how}<select id="how2">${DELIV.map((d) => opt(d.id, tx(d.label, PL))).join("")}</select></label>
     </div>
+    <div class="fwarn" id="fsoon" hidden>${T[PL].soon(PHONES).trim()}</div>
     <label for="faddr" id="faddrL" hidden>${FL.addr}<input id="faddr" placeholder="${FL.addrPh}" maxlength="200"></label>
     <label for="notes">${FL.notes}<textarea id="notes" rows="2" placeholder="${FL.notesPh}" maxlength="600"></textarea></label>
     ${G.pay ? `<div class="pay-pick" role="radiogroup" aria-label="${FL.pay}">
@@ -350,34 +364,48 @@ function buildForm() {
     <div class="fprice" id="fprice"></div>
     <button class="btn btn-gold" type="submit" id="fsubmit">${FL.submit}</button>
     <div class="done" id="done" hidden></div>`;
-  const md = new Date(Date.now() + Math.max(1, G.minDays || 0) * 864e5);
+  const md = new Date(today().getTime() + Math.max(1, G.minDays || 0) * 864e5 + 36e5);
   $("date").min = isoDate(today());
+  $("date").max = isoDate(new Date(today().getTime() + 366 * 864e5));
   $("date").value = isoDate(md);
+  $("fpickedX").addEventListener("click", () => setPicked(null));
   form.addEventListener("input", fUpdate);
   form.addEventListener("change", fUpdate);
   form.addEventListener("submit", fSubmit);
   fUpdate();
 }
 function fState() {
-  const si = +$("fsize").value, f = fill($("kind").value), q = Math.max(1, parseInt($("qty").value) || 1);
+  const si = +$("fsize").value, f = fill($("kind").value), qRaw = $("qty").value.trim(), q = Number(qRaw);
+  const qOk = /^\d+$/.test(qRaw) && q >= 1 && q <= 9999, qq = qOk ? q : 1;
   const unit = f ? +f.prices[si] || 0 : 0, d = dOpt($("how2").value) || {};
   const box = !!($("fbox") && $("fbox").value === "box");
-  const boxFee = box && MENU.box.price > 0 ? MENU.box.price * q : 0;
+  const boxFee = box && MENU.box.price > 0 ? MENU.box.price * qq : 0;
   const dFee = d.price > 0 ? +d.price : 0;
   const pay = (form.querySelector("input[name=pay]:checked") || {}).value || "cash";
-  return { si, f, q, unit, box, d, total: unit * q + boxFee + dFee, boxLater: box && !(MENU.box.price > 0), dLater: d.price < 0, dFee, boxFee, pay };
+  return { si, f, q: qq, qOk, unit, box, d, total: unit * qq + boxFee + dFee, boxLater: box && !(MENU.box.price > 0), dLater: d.price < 0, dFee, boxFee, pay };
 }
+/* price text shared by the form, chat and WhatsApp message */
+function priceText(total, boxLater, dLater, l, unit, q) {
+  const t = T[l], est = boxLater || dLater;
+  const head = (est ? t.estimate : t.total)(fmtL(total, l)) + (q > 1 ? ` (${q} × ${fmtL(unit, l)})` : "");
+  return est ? head + "\n" + t.extras(boxLater, dLater) : head;
+}
+const dateCheck = (v) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return "bad";
+  const [y, m, dd] = v.split("-").map(Number), d = new Date(y, m - 1, dd);
+  if (d.getFullYear() !== y || d.getMonth() !== m - 1 || d.getDate() !== dd) return "bad";
+  if (d < today()) return "past";
+  if ((d - today()) / 864e5 > 366) return "bad";
+  return (d - today()) / 864e5 < Math.max(1, G.minDays || 0) ? "soon" : "ok";
+};
 function fUpdate() {
   const s = fState();
   $("faddrL").hidden = !s.d.address; $("faddr").required = !!s.d.address;
   $("fchocoL").hidden = !(s.f && s.f.id === "choco");
-  let txt = `💰 ${s.q} × ${fmtL(s.unit, PL)}`;
-  if (s.boxFee) txt += ` + ${FL.box.toLowerCase()} ${fmtL(s.boxFee, PL)}`;
-  if (s.dFee) txt += ` + ${fmtL(s.dFee, PL)}`;
-  txt += ` = ${fmtL(s.total, PL)}`;
-  if (s.boxLater) txt += T[PL].boxLater;
-  if (s.dLater) txt += T[PL].delivLater;
-  $("fprice").textContent = txt;
+  const [h, x] = priceText(s.total, s.boxLater, s.dLater, PL, s.unit, s.q).split("\n");
+  $("fprice").innerHTML = ""; $("fprice").append("💰 " + h);
+  if (x) { const sm = document.createElement("small"); sm.textContent = x; $("fprice").append(sm); }
+  $("fsoon").hidden = dateCheck($("date").value) !== "soon";
   $("fsubmit").textContent = G.pay && s.pay === "online" ? FL.submitPay : FL.submit;
 }
 async function postOrder(body) {
@@ -390,17 +418,43 @@ async function postOrder(body) {
   } catch (e) { return { ok: false, network: true }; } finally { clearTimeout(tm); }
 }
 function waLink(text) { return G.whatsapp ? `https://wa.me/${G.whatsapp}?text=${encodeURIComponent(text)}` : ""; }
+const telHref = () => "tel:" + String((G.phones || [])[0] || "").replace(/[^\d+]/g, "").replace(/^0/, "+374");
+/* buttons shown when we could not confirm that the order arrived */
+function fallbackButtons(text, l) {
+  const t = T[l], w = document.createElement("div"); w.className = "qr keep";
+  const link = waLink(text);
+  if (link) { const a = document.createElement("a"); a.className = "wa"; a.href = link; a.target = "_blank"; a.rel = "noopener"; a.textContent = t.wa; w.appendChild(a); }
+  if ((G.phones || []).length) { const a = document.createElement("a"); a.className = "call"; a.href = telHref(); a.textContent = t.call; w.appendChild(a); }
+  const b = document.createElement("button"); b.type = "button"; b.className = "qrb"; b.textContent = t.copy;
+  b.addEventListener("click", () => { navigator.clipboard?.writeText(text).then(() => { b.textContent = t.copied; }).catch(() => { b.textContent = t.copyFail; }); });
+  w.appendChild(b);
+  return w;
+}
+function fieldError(id, msg) {
+  const el = $(id); el.focus(); el.setCustomValidity(msg); el.reportValidity();
+  el.addEventListener("input", () => el.setCustomValidity(""), { once: true });
+  setTimeout(() => el.setCustomValidity(""), 4000);
+}
 async function fSubmit(e) {
   e.preventDefault();
-  for (const id of ["name", "phone", "date", "faddr"]) {
+  const t = T[PL];
+  for (const id of ["name", "phone", "qty", "date", "faddr"]) {
     const el = $(id);
-    if (el.required && !el.value.trim()) { el.focus(); el.setCustomValidity(FL.need); el.reportValidity(); setTimeout(() => el.setCustomValidity(""), 1500); return; }
+    if ((el.required || id === "qty") && !el.value.trim()) return fieldError(id, FL.need);
   }
-  const s = fState(), d = $("done"), btn = $("fsubmit");
+  const s = fState();
+  const digits = $("phone").value.replace(/\D/g, "");
+  if (digits.length < 8 || digits.length > 15) return fieldError("phone", t.phoneBad);
+  if (!s.qOk) return fieldError("qty", t.qtyBad);
+  const dc = dateCheck($("date").value);
+  if (dc === "bad") return fieldError("date", FL.dateBad);
+  if (dc === "past") return fieldError("date", t.past.trim());
+  if (s.d.address && $("faddr").value.replace(/\s/g, "").length < 5) return fieldError("faddr", t.addrBad);
+  const d = $("done"), btn = $("fsubmit");
   const body = {
     lang: PL, source: "form", filling: s.f && s.f.id, choco: s.f && s.f.id === "choco" ? tx(CHOCO[$("fchoco").value], "hy") : "",
     size: SIZES[s.si] && SIZES[s.si].cm, qty: s.q, box: s.box, date: $("date").value, delivery: s.d.id, address: $("faddr").value,
-    name: $("name").value, phone: $("phone").value, notes: (pickedProduct ? pickedProduct + ". " : "") + $("notes").value, pay: s.pay,
+    name: $("name").value, phone: $("phone").value, notes: $("notes").value, product: picked.title, pay: s.pay,
     website: form.querySelector("input[name=website]").value,
   };
   btn.disabled = true; d.hidden = false; d.textContent = FL.sending;
@@ -408,24 +462,37 @@ async function fSubmit(e) {
   btn.disabled = false;
   if (r.ok) {
     if (r.checkoutUrl) { d.textContent = FL.redirect; location.href = r.checkoutUrl; return; }
-    d.textContent = FL.ok(r.id) + (r.payError ? "\n\n" + T[PL].payFail : "");
+    d.textContent = t.received(r.id) + (r.payError ? "\n\n" + t.payFail : "");
     form.querySelectorAll("input:not([type=radio]):not([name=website]),textarea").forEach((i) => { if (i.id !== "qty" && i.id !== "date") i.value = ""; });
-    pickedProduct = "";
+    setPicked(null); fUpdate();
   } else if (r.error) {
     d.textContent = "⚠️ " + r.error;
   } else {
-    const txt = `${T[PL].plainHead}\n\n• ${tx(s.f && s.f.name, PL)}, ${sizeL(s.si, PL)}\n• ${T[PL].qty(s.q)}\n• ${s.box ? T[PL].withBox : T[PL].noBox}\n• ${body.date}\n• ${tx(s.d.label, PL)}${body.address ? ", " + body.address : ""}\n• ${body.name}, ${body.phone}${body.notes ? "\n• " + body.notes : ""}\n\n${T[PL].total(fmtL(s.total, PL))}`;
-    d.textContent = T[PL].failed(PHONES) + "\n\n";
-    const link = waLink(txt);
-    if (link) { const w = document.createElement("div"); w.className = "qr"; w.innerHTML = `<a class="wa" target="_blank" rel="noopener">💬 ${T[PL].wa}</a>`; w.firstChild.href = link; d.appendChild(w); }
+    const lines = [t.plainHead, ""];
+    if (picked.title) lines.push("• " + t.product(picked.title));
+    lines.push(`• ${tx(s.f && s.f.name, PL)}, ${sizeL(s.si, PL)}`, `• ${t.qty(s.q)}`);
+    if ($("fbox")) lines.push(`• ${s.box ? t.withBox : t.noBox}`);
+    lines.push(`• ${t.day(body.date)}`, `• ${tx(s.d.label, PL)}${body.address ? ", " + body.address : ""}`, `• ${body.name}, ${body.phone}`);
+    if (body.notes) lines.push("• " + t.note(body.notes));
+    lines.push("", priceText(s.total, s.boxLater, s.dLater, PL, s.unit, s.q));
+    d.textContent = t.failed;
+    d.appendChild(fallbackButtons(lines.join("\n"), PL));
   }
   d.scrollIntoView({ behavior: "smooth", block: "center" });
 }
+/* product cards: remember the chosen product and its packaging */
+let picked = { title: "" };
+function setPicked(card) {
+  picked = card ? { title: card.dataset.pick, pack: card.dataset.pack || "" } : { title: "" };
+  const box = $("fpicked"); if (!box) return;
+  box.hidden = !picked.title;
+  if (picked.title) box.querySelector("span").textContent = T[PL].product(picked.title);
+  if (picked.pack && $("fbox")) $("fbox").value = picked.pack === "box" ? "box" : "none";
+  if (picked.pack && picked.pack !== "box" && $("notes") && !$("notes").value) $("notes").value = picked.title;
+  fUpdate();
+}
 buildForm();
-document.querySelectorAll("[data-pick]").forEach((a) => a.addEventListener("click", () => {
-  pickedProduct = a.dataset.pick;
-  if ($("notes") && !$("notes").value) $("notes").placeholder = a.dataset.pick;
-}));
+document.querySelectorAll("[data-pick]").forEach((a) => a.addEventListener("click", () => setPicked(a)));
 
 /* ================= chat assistant ================= */
 /* keyword stems; a word matches if it starts with the stem (stems of 5+ letters also allow one typo) */
@@ -433,7 +500,7 @@ const INTENTS = {
   greet: ["բարև", "բարեւ", "ողջույն", "բարի", "barev", "barew", "bari", "voghj", "hello", "hi", "hey", "salam", "привет", "здравств", "добрый", "салам"],
   thanks: ["շնորհակ", "մերսի", "ապրեք", "ապրես", "shnorh", "mersi", "merci", "aprek", "apres", "thank", "thx", "спасиб", "благодар"],
   bye: ["ցտեսություն", "հաջող", "ctesutyun", "hajogh", "bye", "пока", "до свид"],
-  price: ["գին*", "գնե", "գինը", "գինն", "արժ", "ինչքան", "ինչքա", "որքան", "դրամ", "դր", "gin*", "giny", "gine", "gner", "gnern", "arj*", "arzh", "arzhe", "inchqan", "inchkan", "inch kan", "inchqa", "vorqan", "dram", "price", "cost", "how much", "цен", "сколько", "стоит", "стоим", "прайс", "драм"],
+  price: ["գին*", "գներ*", "գնե", "գինը", "գինն", "արժ", "ինչքան", "ինչքա", "որքան", "դրամ", "դր", "gin*", "giny", "gine", "gner", "gnern", "arj*", "arzh", "arzhe", "inchqan", "inchkan", "inch kan", "inchqa", "vorqan", "dram", "price", "cost", "how much", "цен", "сколько", "стоит", "стоим", "прайс", "драм"],
   fill: ["ընկույզ", "enkuyz", "nkuyz", "չրեր", "chrer", "չամիչ", "chamich", "խուրմ", "xurm", "khurm", "орех", "изюм", "хурм", "финик", "walnut", "raisin", "сухофрукт"],
   choco: ["շոկոլ", "shokol", "chokol", "chocol", "chocolate", "choco", "шокол", "шоколад"],
   size: ["չափ", "սմ", "փոքր", "միջին", "մեծ*", "chap*", "sm", "poqr", "pokr", "mijin", "mec*", "mets", "size", "small", "medium", "large", "big", "размер", "см", "маленьк", "средн", "больш"],
@@ -441,7 +508,7 @@ const INTENTS = {
   phone: ["հեռախ", "զանգ", "կապ*", "համարը", "համարն", "համար տվ", "վայբեր", "վոթսափ", "heraxos", "herakhos", "zang", "kap*", "hamary", "hamar@", "hamarn", "hamar tv", "nomer", "viber", "whatsapp", "phone", "call", "number", "contact", "телефон", "номер", "звон", "связ", "вайбер"],
   where: ["որտեղ", "հասցե", "գառնի", "գտնվ", "vortegh", "vorteg", "hasce", "garni", "where", "address", "location", "где", "адрес", "гарни"],
   order: ["պատվ", "պատվեր", "գնել", "order", "buy", "patver", "patvir", "gnel", "заказ", "закаж", "купить"],
-  wedding: ["հարսան", "նշանդր", "կնունք", "տոն*", "միջոցառ", "հյուր", "տուփ", "պայուսակ", "սկզբնատառ", "զարդ", "մարգարիտ", "harsan", "nshandr", "knunq", "ton*", "hyur", "tup*", "payusak", "zard", "margarit", "wedding", "event", "box", "bag", "decor", "initial", "guest", "свадьб", "помолв", "крестин", "коробк", "упаковк", "инициал", "декор"],
+  wedding: ["հարսան", "նշանդր", "նշանադր", "ուլունք", "կնունք", "տոն*", "միջոցառ", "հյուր", "տուփ", "պայուսակ", "սկզբնատառ", "զարդ", "մարգարիտ", "harsan", "nshandr", "knunq", "ton*", "hyur", "tup*", "payusak", "zard", "margarit", "wedding", "event", "box", "bag", "decor", "initial", "guest", "свадьб", "помолв", "крестин", "коробк", "упаковк", "инициал", "декор"],
   khoriz: ["խորիզ", "միջուկ", "բաղադր", "ինչից", "ինչ է գաթ", "xoriz", "khoriz", "mijuk", "baghadr", "filling", "ingredient", "начинк", "состав", "хориз", "what is gata"],
   fresh: ["թարմ", "պահ*", "քանի օր", "սառնարան", "tarm", "pah*", "qani or", "fresh", "store", "keep", "свеж", "хран"],
   when: ["առաջ", "araj", "arach", "advance", "ahead", "заранее", "երբ", "քանի օր առաջ", "որքան շուտ", "այսօր", "վաղը", "erb", "aysor", "vaghy", "vaxy", "when", "today", "tomorrow", "когда", "сегодня", "завтра"],
@@ -482,15 +549,15 @@ const FILL_KW = {
   choco: /շոկոլ|shokol|chokol|chocol|шокол/,
   walnut: /ընկույզ|enkuyz|ynkuyz|nkuyz|ankuyz|орех|walnut|(^|\s)nut/,
   raisin: /չրեր|chrer|չամիչ|chamich|изюм|raisin|сухофрукт|dried/,
-  date: /խուրմ|xurm|khurm|хурм|финик|(^|\s)dates?(\s|$)/,
+  date: /խուրմ|xurm|khurm|хурм|финик|persimmon|(^|\s)dates?(\s|$)/,
   classic: /դասական|dasakan|klasik|classic|класс|խորիզ|xoriz|khoriz|սովորական գաթա/,
 };
 function fillFrom(h) {
-  for (const f of FILLS) for (const l of ["hy", "ru", "en"]) {
+  for (const f of SHOWN) for (const l of ["hy", "ru", "en"]) {
     const n = norm(tx(f.name, l)), s = norm(tx(f.short, l));
     if ((n && h.includes(n)) || (s && s.length > 3 && h.includes(s))) return f.id;
   }
-  for (const id of Object.keys(FILL_KW)) if (fill(id) && FILL_KW[id].test(h)) return id;
+  for (const id of Object.keys(FILL_KW)) if (SHOWN.some((f) => f.id === id) && FILL_KW[id].test(h)) return id;
   return null;
 }
 function sizeFrom(text) {
@@ -504,7 +571,8 @@ function sizeFrom(text) {
   if (/մեծ|(^|\s)mec|(^|\s)mets|large|(^|\s)big|больш/.test(h)) return SIZES.length - 1;
   return -1;
 }
-const priceList = () => SHOWN.map((f) => `${tx(f.short, CL)}: ${f.prices.map(fmt).join(" / ")}`).join("\n") + `\n(${SIZES.map((s, i) => sizeL(i, CL).toLowerCase()).join(" / ")})`;
+const SEP = () => (CL === "hy" ? "՝ " : ": ");
+const priceList = () => SHOWN.map((f) => `• ${tx(f.short, CL)}${SEP()}${f.prices.map((p) => (+p || 0).toLocaleString("en-US").replace(/,/g, " ")).join(" / ")} ${CUR[CL]}`).join("\n") + `\n(${SIZES.map((s) => s.cm).join(" / ")} ${CM[CL]})`;
 
 let lastTopic = null;
 const R = {
@@ -512,18 +580,18 @@ const R = {
   thanks: () => L().thanks,
   bye: () => L().bye,
   price: (t) => {
-    const s = sizeFrom(t), f = fill(fillFrom(norm(t)));
+    const s = sizeFrom(t), f = SHOWN.find((x) => x.id === fillFrom(norm(t)));
     if (s >= 0 && f) return L().one(sizeL(s, CL), tx(f.short, CL), fmt(f.prices[s]));
-    if (s >= 0) return L().sizeHead(sizeL(s, CL)) + "\n" + SHOWN.map((x) => `• ${tx(x.short, CL)}: ${fmt(x.prices[s])}`).join("\n");
-    if (f) return L().fillHead(tx(f.short, CL)) + "\n" + f.prices.map((p, i) => `• ${sizeL(i, CL)}: ${fmt(p)}`).join("\n") + (f.id === "choco" ? "\n\n" + L().chocoTypes : "");
+    if (s >= 0) return L().sizeHead(sizeL(s, CL)) + "\n" + SHOWN.map((x) => `• ${tx(x.short, CL)}${SEP()}${fmt(x.prices[s])}`).join("\n");
+    if (f) return L().fillHead(tx(f.short, CL)) + "\n" + f.prices.map((p, i) => `• ${sizeL(i, CL)}${SEP()}${fmt(p)}`).join("\n") + (f.id === "choco" ? "\n\n" + L().chocoTypes : "");
     return `${L().pricesHead}\n\n${priceList()}\n\n${L().priceNote}`;
   },
   fill: (t) => R.price(t),
   choco: (t) => {
-    const f = fill("choco"); if (!f) return R.types();
+    const f = SHOWN.find((x) => x.id === "choco"); if (!f) return L().chocoNo(PHONES);
     const s = sizeFrom(t);
     if (s >= 0) return L().one(sizeL(s, CL), tx(f.short, CL), fmt(f.prices[s])) + " " + L().chocoTypes;
-    return L().chocoYes + "\n" + f.prices.map((p, i) => `• ${sizeL(i, CL)}: ${fmt(p)}`).join("\n");
+    return L().chocoYes + "\n" + f.prices.map((p, i) => `• ${sizeL(i, CL)}${SEP()}${fmt(p)}`).join("\n");
   },
   size: (t) => (sizeFrom(t) >= 0 ? R.price(t) : L().sizes(SIZES.map((s, i) => sizeL(i, CL).toLowerCase()).join(", ")) + "\n\n" + priceList()),
   delivery: (t) => {
@@ -538,7 +606,7 @@ const R = {
   fresh: () => ans("fresh"),
   when: () => ans("when"),
   hours: () => ans("hours"),
-  pay: () => ans("pay"),
+  pay: () => ans(G.pay ? "payOnline" : "pay"),
   types: () => L().types(SHOWN.map((f) => "• " + tx(f.name, CL)).join("\n")),
   yes: () => (lastTopic === "types" ? R.price("") : L().more),
   no: () => L().noOk,
@@ -605,7 +673,8 @@ function dateFrom(t) {
   let m = t.match(/(\d{1,2})[./-](\d{1,2})(?:[./-](\d{2,4}))?/);
   if (m && +m[2] >= 1 && +m[2] <= 12 && +m[1] >= 1 && +m[1] <= 31) {
     const y = m[3] ? (+m[3] < 100 ? 2000 + +m[3] : +m[3]) : d0.getFullYear();
-    const d = new Date(y, +m[2] - 1, +m[1]); if (!m[3] && d < d0) d.setFullYear(y + 1); return d;
+    const d = new Date(y, +m[2] - 1, +m[1]); if (d.getMonth() !== +m[2] - 1) return "bad";
+    if (!m[3] && d < d0) d.setFullYear(y + 1); return d;
   }
   const words = h.split(" ");
   for (let i = 0; i < 12; i++) {
@@ -667,14 +736,15 @@ function prompt(st) {
 }
 function summary() {
   const l = L(), f = fill(O.kind), d = dOpt(O.delivery) || {}, tt = totals();
-  const lines = [l.yourOrder,
-    `• ${tx(f.name, CL)}${O.kind === "choco" && O.choco ? ` (${tx(CHOCO[O.choco], CL)})` : ""}, ${sizeL(O.size, CL)}`,
-    `• ${l.qty(O.qty)}`];
+  const lines = [l.yourOrder];
+  if (O.product) lines.push(`• ${l.product(O.product)}`);
+  lines.push(`• ${tx(f.short, CL)}${L().gataWord}${O.kind === "choco" && O.choco ? ` (${tx(CHOCO[O.choco], CL)})` : ""}, ${sizeL(O.size, CL).toLowerCase()}`,
+    `• ${l.qty(O.qty)}`);
   if (BOX_ON) lines.push(`• ${O.pack === "box" ? l.withBox : l.noBox}`);
   lines.push(`• ${l.day(fmtDate(O.date))}`, `• ${tx(d.label, CL)}${O.address ? `, ${O.address}` : ""}`, `• ${O.name}, ${O.phone}`);
   if (O.notes) lines.push(`• ${l.note(O.notes)}`);
   if (G.pay) lines.push(`• ${O.pay === "online" ? l.payOnline : l.payCash}`);
-  lines.push("", l.total(fmt(tt.total)) + (tt.boxLater ? l.boxLater : "") + (tt.dLater ? l.delivLater : ""));
+  lines.push("", priceText(tt.total, tt.boxLater, tt.dLater, CL, unitPrice(), O.qty));
   return lines.join("\n");
 }
 const CHANGE = [
@@ -703,7 +773,7 @@ function startOrder(t) {
   if (!G.accept) return { text: (G.closedText || "") + "\n📞 " + PHONES, chips: [] };
   O = newOrder(); waiting = null; extract(t, null);
   const got = [];
-  if (O.kind) got.push(tx(fill(O.kind).short, CL).toLowerCase() + (CL === "hy" ? " գաթա" : CL === "ru" ? "" : " gata"));
+  if (O.kind) got.push(tx(fill(O.kind).short, CL).toLowerCase() + L().gataWord);
   if (O.qty) got.push(L().pcs(O.qty));
   if (O.size != null) got.push(sizeL(O.size, CL).toLowerCase());
   if (O.date) got.push(fmtDate(O.date));
@@ -716,17 +786,17 @@ function extract(t, step) {
   if (O.kind === "choco" && !O.choco) { const c = chocoFrom(h); if (c) O.choco = c; }
   if (BOX_ON && !O.pack) { const p = boxFrom(h, step === "pack"); if (p) O.pack = p; }
   if (O.size == null) { const s = sizeFrom(t.replace(/մեծ պատվեր|mec patver|mets patver|большой заказ|big order/gi, "")); if (s >= 0 && (step === "size" || /սմ|sm|см|cm|փոքր|միջին|մեծ|poqr|pokr|mijin|mec|mets|small|medium|large|big|маленьк|средн|больш/.test(h))) O.size = s; }
-  if (!O.date) { const d = dateFrom(t); if (d) O.date = d; }
-  if (O.qty == null) { const q = qtyFrom(t, step === "qty"); if (q) O.qty = q; }
+  if (!O.date) { const d = dateFrom(t); if (d && d !== "bad" && (d - today()) / 864e5 <= 366) O.date = d; }
+  if (O.qty == null) { const q = qtyFrom(t, step === "qty"); if (q && q >= 1 && q <= 9999) O.qty = q; }
   if (!O.delivery) { const dv = delivFrom(h); if (dv) { if (dv.id) { O.delivery = dv.id; O.dGroup = null; } else if (!O.dGroup) O.dGroup = dv.group; } }
 }
-function plainOrder() { return L().plainHead + "\n\n" + summary().split("\n").slice(1).join("\n").replace("💰 ", ""); }
+function plainOrder() { return L().plainHead + "\n\n" + summary().split("\n").slice(1).join("\n"); }
 function finish() {
   const msg = plainOrder();
   const f = fill(O.kind);
   const body = {
     lang: CL, source: "chat", filling: O.kind, choco: O.choco ? tx(CHOCO[O.choco], "hy") : "", size: SIZES[O.size].cm, qty: O.qty,
-    box: O.pack === "box", date: isoDate(O.date), delivery: O.delivery, address: O.address || "", name: O.name, phone: O.phone, notes: O.notes || "", pay: O.pay,
+    box: O.pack === "box", date: isoDate(O.date), delivery: O.delivery, address: O.address || "", name: O.name, phone: O.phone, notes: O.notes || "", product: O.product || "", pay: O.pay,
   };
   const saved = O;
   O = null; waiting = null;
@@ -736,7 +806,7 @@ function orderTurn(t) {
   const h = norm(t), l = L();
   if (/չեղարկ|cheghark|chexark|cancel|отмен|(^|\s)stop|стоп/.test(h)) { O = null; waiting = null; return { text: l.cancelled, chips: [l.orderChip] }; }
   if (waiting === "confirm") {
-    if (/հաստատ|hastat|ուղարկ|uxark|ughark|այո|ayo|^ha$|^да|подтвер|yes|^ok|confirm|send/.test(h)) return finish();
+    if (/հաստատ|hastat|ուղարկ|uxark|ughark|այո|ayo|^ha$|^да|подтвер|отправ|yes|^ok|confirm|send/.test(h)) return finish();
     if (/փոխ|pox|poch|change|измен/.test(h)) { waiting = "change"; return { text: l.changeWhat, chips: changeChips() }; }
   }
   if (waiting === "change") {
@@ -767,19 +837,23 @@ function orderTurn(t) {
       else if (ADDR_RE.test(h) || /առաք|araq|arak|достав|deliver/.test(h)) { O.delivery = "yerevan"; O.dGroup = null; }
     }
   }
-  else if (waiting === "address") { if (h.length >= 3) O.address = t.trim().slice(0, 200); }
+  else if (waiting === "address") {
+    if (t.replace(/\s/g, "").length >= 5) O.address = t.trim().slice(0, 200);
+    else return { text: l.addrBad, chips: [] };
+  }
   else if (waiting === "name") {
     const n = t.trim().replace(/^(իմ անունը|anuns|anunu|menya zovut|меня зовут|my name is|i am|i'm|ես)\s*/i, "").replace(/\s+(է|e|em|եմ)$/i, "");
     if (n.length >= 2 && n.length <= 40 && !/\d{4}/.test(n)) O.name = n;
   }
-  else if (waiting === "phone") { const d = t.replace(/\D/g, ""); if (d.length >= 8 && d.length <= 13) O.phone = t.trim(); }
+  else if (waiting === "phone") { const d = t.replace(/\D/g, ""); if (d.length >= 8 && d.length <= 15) O.phone = t.trim(); }
   else if (waiting === "notes") { O.notes = /^(ոչ|չէ|չունեմ|voch|che|chunem|no|нет|не|без)(\s|$)|նշում չունեմ|nshum chunem|no notes|без пожел/.test(h) ? "" : t.trim().slice(0, 600); }
   else if (waiting === "pay") {
     if (/առցանց|onlayn|online|онлайн|հիմա|now|сейчас|քարտ|qart|card|карт|idram|telcell/.test(h)) O.pay = "online";
-    else if (/ստանալիս|կանխիկ|stanalis|kanxik|cash|налич|получен|delivery|pickup|later|հետո|потом/.test(h)) O.pay = "cash";
+    else if (/ստանալիս|կանխիկ|stanalis|kanxik|cash|налич|получен|receipt|delivery|pickup|later|հետո|потом/.test(h)) O.pay = "cash";
   }
   else extract(t, waiting);
   if (JSON.stringify(O) === before) {
+    if (waiting === "qty" && /\d/.test(t)) return { text: l.qtyBad, chips: prompt("qty").chips };
     if (waiting === "date" && /\d/.test(t)) return { text: l.dateBad, chips: prompt("date").chips };
     if (waiting === "phone") return { text: l.phoneBad, chips: [] };
     const r = reply(t), p = prompt(waiting);
@@ -788,11 +862,23 @@ function orderTurn(t) {
   }
   return nextAsk(l.acks[ackI++ % l.acks.length]);
 }
-function respond(t) {
+/* quick-reply buttons: the same action whatever the button text says */
+const QUICK = {};
+document.querySelectorAll(".chip[data-act]").forEach((c) => (QUICK[norm(c.textContent)] = c.dataset.act));
+const ACT = { price: () => R.price(""), delivery: () => R.delivery(""), wedding: () => R.wedding(), khoriz: () => R.khoriz(), phone: () => R.phone() };
+function respond(t, act) {
   if (/[а-яё]/i.test(t)) CL = "ru"; else if (/[Ա-և]/.test(t)) CL = "hy";
+  act = act || (!O && QUICK[norm(t)]);
+  if (act === "order") { O = null; return startOrder(""); }
+  if (act && ACT[act]) {
+    if (O) { const p = prompt(waiting); return { text: ACT[act]() + "\n\n" + L().cont + p.text, chips: p.chips }; }
+    return { text: ACT[act](), topic: act, chips: act === "price" || act === "wedding" ? [L().orderChip] : [] };
+  }
   if (O) return orderTurn(t);
   const h = score(t), n = norm(t);
-  if (h.order || /պատվիրել չատում|chatum|в чате|in chat/.test(n) || qtyFrom(t, false)) return startOrder(t);
+  // "wedding order" is a question about wedding orders, not the start of an order
+  if (h.wedding && h.order && !qtyFrom(t, false) && !h.price) { const r = reply(t.replace(/պատվեր\S*|заказ\S*|order\S*|patver\S*/gi, "")); return { text: r.text, topic: "wedding", chips: [L().orderChip] }; }
+  if (h.order || /պատվիրել չատ|chatum|chatov|в чате|in chat/.test(n) || qtyFrom(t, false)) return startOrder(t);
   const r = reply(t);
   return { text: r.text, topic: r.topic, unknown: r.unknown, chips: ["price", "choco", "wedding", "types", "size"].includes(r.topic) ? [L().orderChip] : [] };
 }
@@ -805,13 +891,13 @@ function add(text, who) {
 }
 function typing() {
   const t = document.createElement("div"); t.className = "m bot typing"; t.setAttribute("aria-label", L().typing);
-  t.innerHTML = "<i></i><i></i><i></i>"; $("msgs").appendChild(t); $("msgs").scrollTop = 1e6; return t;
+  t.innerHTML = "<i></i><i></i><i></i><span></span>"; t.lastChild.textContent = L().typing; $("msgs").appendChild(t); $("msgs").scrollTop = 1e6; return t;
 }
 function addExtras(r) {
   if (r.link || r.copy || r.pay) {
     const w = document.createElement("div"); w.className = "qr keep";
     if (r.pay) { const a = document.createElement("a"); a.className = "pay"; a.href = r.pay; a.textContent = L().payNow; w.appendChild(a); }
-    if (r.link) { const a = document.createElement("a"); a.className = "wa"; a.href = r.link; a.target = "_blank"; a.rel = "noopener"; a.textContent = "💬 " + L().wa; w.appendChild(a); }
+    if (r.link) { const a = document.createElement("a"); a.className = "wa"; a.href = r.link; a.target = "_blank"; a.rel = "noopener"; a.textContent = L().wa; w.appendChild(a); }
     if (r.copy) {
       const b = document.createElement("button"); b.type = "button"; b.className = "qrb"; b.textContent = L().copy;
       b.addEventListener("click", () => { navigator.clipboard?.writeText(r.copy).then(() => { b.textContent = L().copied; }).catch(() => { b.textContent = L().copyFail; }); });
@@ -836,8 +922,8 @@ async function submitChat(s) {
     O = s.saved; waiting = "change";
     add("⚠️ " + r.error + "\n\n" + L().changeWhat, "bot"); addExtras({ chips: changeChips() });
   } else {
-    add(L().failed(PHONES), "bot");
-    addExtras({ link: waLink(s.msg), copy: s.msg });
+    add(L().failed, "bot");
+    $("msgs").appendChild(fallbackButtons(s.msg, CL)); $("msgs").scrollTop = 1e6;
   }
 }
 async function aiAnswer(q) {
@@ -848,11 +934,11 @@ async function aiAnswer(q) {
     const j = await r.json(); return r.ok && j.text ? j.text : null;
   } catch { return null; }
 }
-function send(q) {
+function send(q, act) {
   q = String(q).trim(); if (!q || busy) return;
   document.querySelectorAll("#msgs .qr:not(.keep)").forEach((x) => x.remove());
   add(q, "me"); busy = true;
-  let r; try { r = respond(q); } catch (e) { console.error(e); r = { text: R.unknown(), chips: [] }; }
+  let r; try { r = respond(q, act); } catch (e) { console.error(e); r = { text: R.unknown(), chips: [] }; }
   const wait = Math.min(1800, 600 + r.text.length * 4);
   setTimeout(async () => {
     const t = typing();
@@ -872,7 +958,7 @@ function send(q) {
 /* floating chat */
 const chatBtn = $("chatBtn"), chatPanel = $("chatPanel");
 if (chatBtn && chatPanel) {
-  document.querySelectorAll(".chip").forEach((c) => c.addEventListener("click", () => send(c.textContent)));
+  document.querySelectorAll(".chip").forEach((c) => c.addEventListener("click", () => send(c.textContent, c.dataset.act)));
   $("cf").addEventListener("submit", (e) => { e.preventDefault(); send($("q").value); $("q").value = ""; });
   const isPhone = () => matchMedia("(max-width:520px)").matches;
   let kbOpen = false;

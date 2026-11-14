@@ -1,5 +1,6 @@
 import { getStore } from "@netlify/blobs";
-import { DEFAULT_CONTENT, LANGS } from "./defaults.mjs";
+import { DEFAULT_CONTENT, LANGS, CONTENT_VERSION } from "./defaults.mjs";
+import { V1_CONTENT } from "./defaults_v1.mjs";
 
 export const store = (name) => getStore({ name, consistency: "strong" });
 
@@ -18,16 +19,37 @@ export function merge(base, over) {
   return out;
 }
 
+const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+// Content saved before an update keeps every value the owner edited, but values that
+// are still the OLD default are dropped, so the NEW default text shows instead.
+function dropOldDefaults(saved, old) {
+  if (!isObj(saved) || !isObj(old)) return saved;
+  const out = {};
+  for (const k of Object.keys(saved)) {
+    if (k in old && same(saved[k], old[k])) continue;
+    out[k] = isObj(saved[k]) && isObj(old[k]) && !LANG_KEYS(saved[k]) ? dropOldDefaults(saved[k], old[k]) : saved[k];
+  }
+  return out;
+}
+const LANG_KEYS = (o) => Object.keys(o).every((k) => LANGS.includes(k));
+export function migrate(saved) {
+  if (!saved || (saved.version || 1) >= CONTENT_VERSION) return saved;
+  const m = dropOldDefaults(saved, V1_CONTENT);
+  m.version = CONTENT_VERSION;
+  return m;
+}
+
 let cache = null, cacheAt = 0;
 export async function getContent(fresh = false) {
   if (!fresh && cache && Date.now() - cacheAt < 3000) return cache;
   let saved = null;
   try { saved = await store("content").get("site", { type: "json" }); } catch (e) { console.error("content read", e); }
-  cache = merge(structuredClone(DEFAULT_CONTENT), saved || {});
+  cache = merge(structuredClone(DEFAULT_CONTENT), migrate(saved) || {});
   cacheAt = Date.now();
   return cache;
 }
 export async function saveContent(c) {
+  c.version = CONTENT_VERSION;
   c.updatedAt = new Date().toISOString();
   await store("content").setJSON("site", c);
   cache = null;
@@ -75,12 +97,13 @@ export const yerevanNow = () => new Date(Date.now() + 4 * 3600e3);
 export const ymd = (d) => d.toISOString().slice(0, 10);
 
 // Price for an order line, computed on the server from the live menu.
-export function priceOf(content, fillingId, cm, qty) {
+export function priceOf(content, fillingId, cm, qty, opts = {}) {
   const m = content.menu;
-  const f = m.fillings.find((x) => x.id === fillingId);
+  const f = m.fillings.find((x) => x.id === fillingId && (opts.allowHidden || x.show !== false));
   const si = m.sizes.findIndex((s) => +s.cm === +cm);
   if (!f || si < 0) return null;
   const unit = +f.prices[si] || 0;
-  const q = Math.max(1, Math.min(9999, parseInt(qty) || 1));
+  const q = Number(qty);
+  if (!Number.isInteger(q) || q < 1 || q > 9999) return { badQty: true };
   return { unit, qty: q, total: unit * q, filling: f, size: m.sizes[si] };
 }

@@ -320,3 +320,11 @@ body.chat-typing .chat-btn{opacity:0;pointer-events:none}
 footer .logo img{height:170px;width:auto;margin:0 auto}
 @media (max-width:420px){.nav .logo img{height:32px}}
 footer .logo:has(img)+.rule{margin-top:10px;opacity:0}
+
+.feat .big.orn{font-size:26px;line-height:1;color:var(--gold-soft)}
+.picked{display:flex;align-items:center;gap:8px;background:var(--sand);border-radius:12px;padding:10px 14px;font-size:14px}
+.picked button{margin-left:auto;border:0;background:none;font-size:18px;color:var(--muted);cursor:pointer}
+.fwarn{font-size:13px;color:#8a5a1a;background:#fff3e6;border-radius:10px;padding:8px 12px}
+.fprice small{display:block;font-weight:400;color:var(--muted);margin-top:4px}
+.qr .call{display:inline-flex;align-items:center;gap:6px;background:var(--ink);color:#fff;border-radius:999px;padding:10px 18px;font-weight:500;font-size:15px}
+.typing span{margin-left:6px;font-size:13px;color:var(--muted);animation:none}

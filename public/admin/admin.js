@@ -334,10 +334,11 @@ async function openOrder(id) {
       card(el("div", { class: "fieldhead" }, "Status"), el("div", { class: "stbtns" }, Object.entries(STATUS).map(([k, l]) => el("button", { class: o.status === k ? "on" : "", onclick: () => patch({ status: k }, "Status: " + l) }, l))),
         el("div", { class: "small muted" }, (o.statusHistory || []).map((h) => `${STATUS[h.status]} · ${new Date(h.at).toLocaleString()} (${h.by})`).join("  ←  "))),
       card(el("dl", { class: "kv" },
+        o.product ? el("dt", {}, "Product") : null, o.product ? el("dd", {}, o.product) : null,
         el("dt", {}, "Gata"), el("dd", {}, `${o.fillingName}${o.choco ? " (" + o.choco + ")" : ""}, ${o.size} cm`),
         el("dt", {}, "Quantity"), el("dd", {}, `${o.qty} × ${money(o.unit)}`),
         el("dt", {}, "Box"), el("dd", {}, o.box ? "Yes, in a box" : "No"),
-        el("dt", {}, "Total"), el("dd", {}, el("b", {}, money(o.total)), o.box && !o.boxFee ? " + box (confirm price)" : "", o.delivery?.feeLater ? " + delivery fee" : ""),
+        el("dt", {}, "Total"), el("dd", {}, o.estimate ? "Estimate: " : "", el("b", {}, money(o.total)), o.box && !o.boxFee ? " + box (confirm price)" : "", o.delivery?.feeLater ? " + delivery fee" : ""),
         el("dt", {}, "Date"), el("dd", {}, el("b", {}, fdate(o.date)), " (" + (o.date || "") + ")"),
         el("dt", {}, "Delivery"), el("dd", {}, o.delivery?.label || "—", o.delivery?.address ? el("div", {}, "📍 " + o.delivery.address) : null),
         el("dt", {}, "Customer"), el("dd", {}, o.customer?.name || "—"),
@@ -361,7 +362,7 @@ async function openOrder(id) {
       box.append(el("div", { class: "small", style: "word-break:break-all" }, link),
         el("div", { class: "btns" },
           el("button", { class: "btn sm", onclick: () => { navigator.clipboard.writeText(link); toast("Link copied ✓"); } }, "Copy link"),
-          el("a", { class: "btn sm", href: waTo(o.customer?.phone, `Բարև Ձեզ 🤍 Գառնու Գաթա։ Պատվեր ${o.id}, ${money(p.amount || o.total)}։ Վճարելու հղումը՝ ${link}`), target: "_blank" }, "Send by WhatsApp"),
+          el("a", { class: "btn sm", href: waTo(o.customer?.phone, `Բարև ձեզ։ Գառնու Գաթայից ենք։ Պատվեր ${o.id}, գումարը՝ ${money(p.amount || o.total)}։ Վճարելու հղումը՝ ${link}`), target: "_blank" }, "Send by WhatsApp"),
           el("button", { class: "btn sm", onclick: (e) => busy(e.currentTarget, async () => { const j = await api(`orders/${o.id}/check`, { method: "POST" }); refresh(j.order); render(); toast("Status: " + (PAYST[j.order.payment.status] || j.order.payment.status)); }) }, "Check status")));
     }
     box.append(el("div", { class: "btns" }, el("span", { class: "small muted" }, "Amount ֏"), amt,
@@ -432,7 +433,7 @@ VIEWS.customers = async () => {
 /* =============== menu & delivery =============== */
 VIEWS.menu = async () => {
   if (!C) await loadContent();
-  contentPage("Menu & prices", "These prices are used by the order form, the chat assistant and Google. <b>Hidden</b> fillings are not shown as buttons, but customers can still order them by writing (for example chocolate).", (b) => {
+  contentPage("Menu & prices", "These prices are used by the order form, the chat assistant and Google. Fillings that are <b>not shown</b> cannot be ordered on the website (you can still add them to a phone order yourself).", (b) => {
     const m = C.menu;
     const priceTable = () => {
       const t = el("table", { class: "tbl price-grid" });
@@ -443,7 +444,7 @@ VIEWS.menu = async () => {
     };
     b.append(card(el("h2", {}, "Prices (֏ per gata)"), el("div", { style: "overflow:auto" }, priceTable())));
     b.append(Lst(m.fillings, "Fillings", (f) => el("div", { class: "grid" },
-      el("div", { class: "grid g2" }, Tf(f, "id", "Short code (latin, no spaces)", { hint: "Used inside the system. Don't change for existing ones." }), Bf(f, "show", "Show as a button in order form and chat")),
+      el("div", { class: "grid g2" }, Tf(f, "id", "Short code (latin, no spaces)", { hint: "Used inside the system. Don't change for existing ones." }), Bf(f, "show", "Available to order on the website")),
       Lf(f, "name", "Full name"), Lf(f, "short", "Short name")), () => ({ id: "new" + Date.now().toString(36).slice(-3), name: L0(), short: L0(), prices: m.sizes.map(() => 0), show: true }), { name: "Filling", label: (f) => tx(f.name) }));
     b.append(Lst(m.sizes, "Sizes", (s) => el("div", { class: "grid" }, Tf(s, "cm", "Size in cm", { type: "number" }), Lf(s, "label", "Name")), () => ({ cm: 35, label: L0() }), { name: "Size", label: (s) => s.cm + " cm" }));
     b.append(card(el("h2", {}, "Box"), Bf(m.box, "enabled", "Ask customers if they want a box"), Tf(m.box, "price", "Box price ֏ (0 = you confirm the price later by phone)", { type: "number" })));
@@ -467,11 +468,11 @@ VIEWS.home = async () => {
     b.append(sec("Top of page (hero)", Lf(C.hero, "kicker", "Small line above title"), Lf(C.hero, "title", "Big title"), Lf(C.hero, "lead", "Text under title", { area: true }), Lf(C.hero, "btnOrder", "Order button"), Lf(C.hero, "btnMenu", "Second button"), If(C.hero, "image", "Round gata photo"), Lf(C.hero, "alt", "Photo description (for Google)")));
     b.append(sec("Big photo scene", Bf(C.expand, "show", "Show this section"), If(C.expand, "image", "Photo"), Lf(C.expand, "title", "Title"), Lf(C.expand, "text", "Text")));
     b.append(sec("Products", Lf(C.products, "kicker", "Small line"), Lf(C.products, "title", "Title"), Lf(C.products, "lead", "Text", { area: true }), Lf(C.products, "btn", "Button text on cards"),
-      Lst(C.products.cards, "Product cards", (k) => el("div", { class: "grid" }, If(k, "image", "Photo"), Lf(k, "tag", "Small tag"), Lf(k, "title", "Title"), Lf(k, "text", "Text", { area: true }), Bf(k, "show", "Show")), () => ({ image: "/img/top.webp", tag: L0(), title: L0(), text: L0(), show: true }), { name: "Card", label: (k) => tx(k.title) })));
+      Lst(C.products.cards, "Product cards", (k) => el("div", { class: "grid" }, If(k, "image", "Photo"), el("label", { class: "f" }, "Packaging (sets the order form when customers tap Order)", el("select", { onchange: (e) => { k.packaging = e.target.value; } }, [["", "Not set"], ["box", "Box"], ["bag", "Gift bag"], ["wrap", "Tulle wrapping"]].map(([v, l]) => el("option", { value: v, selected: (k.packaging || "") === v }, l)))), Lf(k, "tag", "Small tag"), Lf(k, "title", "Title"), Lf(k, "text", "Text", { area: true }), Bf(k, "show", "Show")), () => ({ image: "/img/top.webp", tag: L0(), title: L0(), text: L0(), show: true }), { name: "Card", label: (k) => tx(k.title) })));
     b.append(sec("3D photo ring", Bf(C.ring, "show", "Show this section"), Lf(C.ring, "kicker", "Small line"), Lf(C.ring, "title", "Title"), el("div", { class: "small muted" }, "Uses the photos from Photos → Gallery.")));
     b.append(sec("Big words scene", Bf(C.words, "show", "Show this section"), Lf(C.words, "text", "Words", { hint: "Put *stars* around a word to make it gold." })));
     b.append(sec("Why us", Lf(C.features, "kicker", "Small line"), Lf(C.features, "title", "Title"),
-      Lst(C.features.items, null, (f) => el("div", { class: "grid" }, Lf(f, "big", "Big text (a number counts up)"), Lf(f, "title", "Title"), Lf(f, "text", "Text", { area: true })), () => ({ big: L0(), title: L0(), text: L0() }), { name: "Box", label: (f) => tx(f.title) })));
+      Lst(C.features.items, null, (f) => el("div", { class: "grid" }, Lf(f, "big", "Big gold text (optional; a number counts up; empty = small ornament)"), Lf(f, "title", "Title"), Lf(f, "text", "Text", { area: true })), () => ({ big: L0(), title: L0(), text: L0() }), { name: "Box", label: (f) => tx(f.title) })));
     b.append(sec("Our story", If(C.story, "image", "Photo"), Lf(C.story, "kicker", "Small line"), Lf(C.story, "title", "Title"), Lf(C.story, "p1", "Paragraph 1", { area: true }), Lf(C.story, "p2", "Paragraph 2", { area: true })));
     b.append(sec("How to order (steps)", Lf(C.steps, "kicker", "Small line"), Lf(C.steps, "title", "Title"),
       Lst(C.steps.items, null, (s) => el("div", { class: "grid" }, Lf(s, "title", "Title"), Lf(s, "text", "Text", { area: true })), () => ({ title: L0(), text: L0() }), { name: "Step" })));
@@ -566,7 +567,7 @@ VIEWS.chat = async () => {
     b.append(card(Bf(C.chat, "show", "Show the chat button on the website"),
       Bf(C.chat, "ai", "✨ Let AI answer questions the assistant does not understand", "Uses Netlify AI credits. The AI only knows your menu, prices, delivery and FAQ."),
       Lf(C.chat, "welcome", "First message", { area: true })));
-    const N = { delivery: "Delivery", where: "Where are you", khoriz: "What is gata / khoriz", fresh: "How long it stays fresh", when: "How early to order", hours: "Opening hours", pay: "Payment", wedding: "Weddings & decoration" };
+    const N = { delivery: "Delivery", where: "Where are you", khoriz: "What is gata / khoriz", fresh: "How long it stays fresh", when: "How early to order", hours: "Opening hours", pay: "Payment (online payment off)", payOnline: "Payment (online payment on)", wedding: "Weddings & decoration" };
     b.append(card(el("h2", {}, "Answers"), ...Object.keys(C.chat.answers).map((k) => Lf(C.chat.answers, k, N[k] || k, { area: true, rows: 4 }))));
     b.append(card(el("h2", {}, "Try it"), el("a", { class: "btn", href: "/", target: "_blank" }, "Open the website and test the chat ↗")));
   });

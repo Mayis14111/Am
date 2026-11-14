@@ -143,8 +143,8 @@ export default async (req) => {
       // order taken by phone / Instagram, entered by admin
       const b = await req.json();
       const c = await getContent();
-      const p = priceOf(c, b.filling, b.size, b.qty);
-      if (!p) return json({ error: "Choose filling and size" }, 400);
+      const p = priceOf(c, b.filling, b.size, b.qty, { allowHidden: true });
+      if (!p || p.badQty) return json({ error: "Choose filling, size and a whole-number quantity" }, 400);
       const d = c.delivery.options.find((x) => x.id === b.delivery) || c.delivery.options[0];
       const total = b.total ? +b.total : p.total;
       const o = {
