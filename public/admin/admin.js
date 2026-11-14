@@ -4,7 +4,8 @@ const $app = document.getElementById("app");
 const LANGS = ["hy", "ru", "en"];
 const LN = { hy: "ՀԱՅ", ru: "RU", en: "EN" };
 const STATUS = { new: "New", confirmed: "Confirmed", baking: "Baking", ready: "Ready", delivered: "Delivered", cancelled: "Cancelled" };
-const PAYST = { none: "Pay on receipt", pending: "Waiting payment", processing: "Processing", completed: "Paid", failed: "Failed", expired: "Expired", refunded: "Refunded" };
+const PAYST = { none: "Չի վճարվել", pending: "Սպասում է վճարման", processing: "Վճարումը մշակվում է", completed: "Վճարված է", failed: "Վճարումը չհաջողվեց", expired: "Ժամկետն անցել է", refunded: "Վերադարձված" };
+const PRICE_LBL = (o) => (o.estimate ? "Նախնական գումար" : "Վերջնական գումար");
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const money = (n) => (+n || 0).toLocaleString("en-US").replace(/,/g, " ") + " ֏";
 const tx = (v, l = "hy") => (v == null ? "" : typeof v === "object" ? v[l] || v.hy || v.en || "" : String(v));
@@ -247,11 +248,13 @@ VIEWS.dashboard = async () => {
     el("a", { class: "card stat", href: "#orders", style: "text-decoration:none;color:inherit" }, el("b", { class: s.newCount ? "bad" : "" }, s.newCount), el("span", {}, "New orders to confirm")),
     el("div", { class: "card stat" }, el("b", {}, s.todayDue), el("span", {}, "Due today")),
     el("div", { class: "card stat" }, el("b", {}, s.upcoming), el("span", {}, "Upcoming (not delivered)")),
-    el("div", { class: "card stat" }, el("b", {}, money(s.monthSum)), el("span", {}, `This month · ${s.monthOrders} orders`)),
+    el("div", { class: "card stat" }, el("b", {}, money(s.monthSum)), el("span", {}, `Order value this month (${s.monthOrders} orders, includes Նախնական գումար)`)),
+    el("div", { class: "card stat" }, el("b", { class: "ok" }, money(s.monthPaid || 0)), el("span", {}, "Վճարված է — money actually received this month")),
+    el("div", { class: "card stat" }, el("b", {}, s.estimates || 0), el("span", {}, "Orders with Նախնական գումար (price still to confirm)")),
   ));
   const days = Object.entries(s.byDay), max = Math.max(1, ...days.map(([, v]) => v.n));
   main.append(el("div", { class: "grid g2", style: "margin-top:16px" },
-    card(el("h2", {}, "Orders, last 30 days"), el("div", { class: "bars" }, days.map(([d, v]) => el("div", { style: `height:${(v.n / max) * 100}%`, "data-t": `${d.slice(5)} · ${v.n} · ${money(v.sum)}` }))), el("div", { class: "small muted" }, `Paid online (3 months): ${money(s.paidOnline)}`)),
+    card(el("h2", {}, "Orders, last 30 days"), el("div", { class: "bars" }, days.map(([d, v]) => el("div", { style: `height:${(v.n / max) * 100}%`, "data-t": `${d.slice(5)} · ${v.n} · ${money(v.sum)}` }))), el("div", { class: "small muted" }, `Վճարված է, last 3 months: ${money(s.paidOnline)}`)),
     card(el("h2", {}, "Most ordered"), ...Object.entries(s.byFilling).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k, v]) => el("div", { class: "btns", style: "justify-content:space-between" }, el("span", {}, k), el("b", {}, v + " pcs"))), Object.keys(s.byFilling).length ? null : el("div", { class: "muted" }, "No orders yet")),
   ));
   const up = o.filter((x) => x.date >= today() && !["delivered", "cancelled"].includes(x.status)).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 8);
@@ -277,9 +280,9 @@ function orderList(list) {
   if (!list.length) return el("div", { class: "card empty" }, "No orders here yet 🙂");
   return el("div", { class: "olist" }, list.map((o) => el("div", { class: "card oc", onclick: () => openOrder(o.id) },
     el("div", { class: "btns" }, pill(o.status), el("span", { class: "small muted" }, o.id)),
-    el("div", { class: "amt" }, money(o.total)),
+    el("div", { class: "amt" }, el("small", { class: "muted", style: "display:block;font-weight:400;font-size:12px" }, PRICE_LBL(o)), money(o.total)),
     el("div", { class: "who" }, `${o.customer?.name || "—"} · ${o.customer?.phone || ""}`),
-    el("div", { class: "what" }, `${o.fillingName}${o.choco ? " (" + o.choco + ")" : ""} · ${o.size} cm × ${o.qty}${o.box ? " · box" : ""} · ${o.delivery?.label || ""}`),
+    el("div", { class: "what" }, `${o.fillingName}${o.choco ? " (" + o.choco + ")" : ""} · ${o.size} cm × ${o.qty} · ${o.packLabel || (o.box ? "Տուփով" : "Առանց տուփի")} · ${o.delivery?.label || ""}`),
     el("div", { class: "when" }, "📅 ", el("b", {}, fdate(o.date)), " ", ppill(o)),
   )));
 }
@@ -337,8 +340,8 @@ async function openOrder(id) {
         o.product ? el("dt", {}, "Product") : null, o.product ? el("dd", {}, o.product) : null,
         el("dt", {}, "Gata"), el("dd", {}, `${o.fillingName}${o.choco ? " (" + o.choco + ")" : ""}, ${o.size} cm`),
         el("dt", {}, "Quantity"), el("dd", {}, `${o.qty} × ${money(o.unit)}`),
-        el("dt", {}, "Box"), el("dd", {}, o.box ? "Yes, in a box" : "No"),
-        el("dt", {}, "Total"), el("dd", {}, o.estimate ? "Estimate: " : "", el("b", {}, money(o.total)), o.box && !o.boxFee ? " + box (confirm price)" : "", o.delivery?.feeLater ? " + delivery fee" : ""),
+        el("dt", {}, "Packaging"), el("dd", {}, o.packLabel || (o.box ? "Տուփով" : "Առանց տուփի"), o.packLater ? " · price to confirm" : ""),
+        el("dt", {}, PRICE_LBL(o)), el("dd", {}, el("b", {}, money(o.total)), o.estimate ? el("div", { class: "small muted" }, [o.packLater ? "packaging" : "", o.delivery?.feeLater ? "delivery" : ""].filter(Boolean).join(" + ") + " not included yet") : ""),
         el("dt", {}, "Date"), el("dd", {}, el("b", {}, fdate(o.date)), " (" + (o.date || "") + ")"),
         el("dt", {}, "Delivery"), el("dd", {}, o.delivery?.label || "—", o.delivery?.address ? el("div", {}, "📍 " + o.delivery.address) : null),
         el("dt", {}, "Customer"), el("dd", {}, o.customer?.name || "—"),
@@ -346,6 +349,7 @@ async function openOrder(id) {
         el("dt", {}, "Notes"), el("dd", {}, o.notes || "—"),
         el("dt", {}, "From"), el("dd", {}, `${o.source} · ${(o.lang || "").toUpperCase()} · ${new Date(o.createdAt).toLocaleString()}`),
       )),
+      priceBox(),
       payBox(),
       editBox(),
       card(el("div", { class: "btns" },
@@ -353,10 +357,18 @@ async function openOrder(id) {
         el("button", { class: "btn red", onclick: async () => { if (!confirm("Delete this order forever?")) return; await api("orders/" + o.id, { method: "DELETE" }); ORDERS = ORDERS.filter((x) => x.id !== o.id); ov.remove(); toast("Deleted"); route(); } }, "🗑 Delete"))),
     );
   }
+  function priceBox() {
+    const amt = el("input", { type: "number", value: o.total, style: "max-width:150px" });
+    return card(el("div", { class: "fieldhead" }, "Գումար ", el("span", { class: "pill " + (o.estimate ? "p-pending" : "p-completed") }, PRICE_LBL(o))),
+      o.estimate ? el("div", { class: "small" }, "After you agree the box/delivery price with the customer, enter the full amount and confirm it. Online payment links need a confirmed amount.") : el("div", { class: "small muted" }, o.finalAt ? "Confirmed " + new Date(o.finalAt).toLocaleString() : "All charges were known when the order was placed."),
+      el("div", { class: "btns" }, el("span", { class: "small muted" }, "Amount ֏"), amt,
+        o.estimate ? el("button", { class: "btn sm gold", onclick: (e) => busy(e.currentTarget, () => patch({ total: +amt.value, final: true }, "Վերջնական գումարը հաստատված է")) }, "Հաստատել վերջնական գումարը")
+          : el("button", { class: "btn sm", onclick: (e) => busy(e.currentTarget, () => patch({ total: +amt.value }, "Saved")) }, "Update amount")));
+  }
   function payBox() {
     const p = o.payment || {};
     const amt = el("input", { type: "number", value: p.amount || o.total, style: "max-width:140px" });
-    const box = card(el("div", { class: "fieldhead" }, "Payment ", ppill(o)));
+    const box = card(el("div", { class: "fieldhead" }, "Վճարում (payment) ", ppill(o)), el("div", { class: "small muted" }, "Payment status is separate from the baking/delivery status above."));
     if (p.checkoutUrl && p.status === "pending") {
       const link = p.checkoutUrl;
       box.append(el("div", { class: "small", style: "word-break:break-all" }, link),
@@ -366,11 +378,11 @@ async function openOrder(id) {
           el("button", { class: "btn sm", onclick: (e) => busy(e.currentTarget, async () => { const j = await api(`orders/${o.id}/check`, { method: "POST" }); refresh(j.order); render(); toast("Status: " + (PAYST[j.order.payment.status] || j.order.payment.status)); }) }, "Check status")));
     }
     box.append(el("div", { class: "btns" }, el("span", { class: "small muted" }, "Amount ֏"), amt,
-      el("button", { class: "btn sm gold", onclick: (e) => busy(e.currentTarget, async () => { const j = await api(`orders/${o.id}/paylink`, { method: "POST", body: { amount: +amt.value } }); refresh(j.order); render(); navigator.clipboard?.writeText(j.url).catch(() => {}); toast("Payment link created and copied ✓"); }) }, "💳 Create payment link")));
+      el("button", { class: "btn sm gold", disabled: !!o.estimate, title: o.estimate ? "Confirm the final amount first" : "", onclick: (e) => busy(e.currentTarget, async () => { const j = await api(`orders/${o.id}/paylink`, { method: "POST", body: { amount: +amt.value } }); refresh(j.order); render(); navigator.clipboard?.writeText(j.url).catch(() => {}); toast("Payment link created and copied ✓"); }) }, "💳 Create payment link")));
     box.append(el("div", { class: "btns" },
-      p.status !== "completed" ? el("button", { class: "btn sm", onclick: () => patch({ paymentStatus: "completed" }, "Marked as paid") }, "✓ Mark as paid (cash/transfer)") : null,
+      p.status !== "completed" ? el("button", { class: "btn sm", onclick: () => patch({ paymentStatus: "completed" }, "Վճարված է") }, "✓ Նշել՝ Վճարված է (cash/transfer)") : null,
       p.status === "completed" && p.uuid ? el("button", { class: "btn sm red", onclick: async (e) => { const a = prompt("Refund amount ֏", p.paidAmount || p.amount); if (!a) return; await busy(e.currentTarget, async () => { const j = await api(`orders/${o.id}/refund`, { method: "POST", body: { amount: +a } }); refresh(j.order); render(); toast("Refunded"); }); } }, "↩️ Refund") : null,
-      p.status === "completed" && !p.uuid ? el("button", { class: "btn sm", onclick: () => patch({ paymentStatus: "none" }, "Marked as not paid") }, "Mark as not paid") : null));
+      p.status === "completed" && !p.uuid ? el("button", { class: "btn sm", onclick: () => patch({ paymentStatus: "none" }, "Չի վճարվել") }, "Նշել՝ Չի վճարվել") : null));
     if (p.paidAt) box.append(el("div", { class: "small ok" }, "Paid " + new Date(p.paidAt).toLocaleString()));
     return box;
   }
@@ -386,7 +398,7 @@ async function openOrder(id) {
 async function newOrderForm() {
   if (!C) await loadContent();
   const m = C.menu;
-  const n = { filling: m.fillings[0]?.id, size: m.sizes[1]?.cm || m.sizes[0]?.cm, qty: 1, box: false, date: today(), delivery: C.delivery.options[0]?.id, address: "", name: "", phone: "", notes: "", adminNote: "", total: "", source: "phone" };
+  const n = { filling: m.fillings[0]?.id, size: m.sizes[1]?.cm || m.sizes[0]?.cm, qty: 1, box: false, date: today(), delivery: C.delivery.options[0]?.id, pack: "none", address: "", name: "", phone: "", notes: "", adminNote: "", total: "", source: "phone" };
   const sel = (key, opts) => el("select", { onchange: (e) => { n[key] = e.target.value; } }, opts.map(([v, l]) => el("option", { value: v, selected: String(n[key]) === String(v) }, l)));
   const btn = el("button", { class: "btn gold", onclick: (e) => busy(e.currentTarget, async () => {
     const j = await api("orders", { method: "POST", body: { ...n, size: +n.size, qty: +n.qty, total: n.total ? +n.total : undefined } });
@@ -401,7 +413,7 @@ async function newOrderForm() {
       Tf(n, "name", "Customer name"), Tf(n, "phone", "Phone"),
       el("label", { class: "f" }, "Came from", sel("source", [["phone", "Phone call"], ["instagram", "Instagram"], ["whatsapp", "WhatsApp"], ["shop", "In person"]])),
       Tf(n, "total", "Total ֏ (empty = from menu)", { type: "number" })),
-      Bf(n, "box", "In a box"), Tf(n, "notes", "Notes", { area: true }), Tf(n, "adminNote", "Private note", { area: true }), el("div", {}, btn)));
+      el("label", { class: "f" }, "Packaging", sel("pack", (C.menu.packs || [{ id: "none", label: { hy: "Առանց տուփի" } }]).map((p) => [p.id, tx(p.label)]))), Tf(n, "notes", "Notes", { area: true }), Tf(n, "adminNote", "Private note", { area: true }), el("div", {}, btn)));
   n.box = false;
 }
 
@@ -447,7 +459,10 @@ VIEWS.menu = async () => {
       el("div", { class: "grid g2" }, Tf(f, "id", "Short code (latin, no spaces)", { hint: "Used inside the system. Don't change for existing ones." }), Bf(f, "show", "Available to order on the website")),
       Lf(f, "name", "Full name"), Lf(f, "short", "Short name")), () => ({ id: "new" + Date.now().toString(36).slice(-3), name: L0(), short: L0(), prices: m.sizes.map(() => 0), show: true }), { name: "Filling", label: (f) => tx(f.name) }));
     b.append(Lst(m.sizes, "Sizes", (s) => el("div", { class: "grid" }, Tf(s, "cm", "Size in cm", { type: "number" }), Lf(s, "label", "Name")), () => ({ cm: 35, label: L0() }), { name: "Size", label: (s) => s.cm + " cm" }));
-    b.append(card(el("h2", {}, "Box"), Bf(m.box, "enabled", "Ask customers if they want a box"), Tf(m.box, "price", "Box price ֏ (0 = you confirm the price later by phone)", { type: "number" })));
+    if (!Array.isArray(m.packs) || !m.packs.length) m.packs = JSON.parse(JSON.stringify(DEF.menu.packs));
+    b.append(Lst(m.packs, "Packaging options", (p) => el("div", { class: "grid" },
+      el("div", { class: "grid g3" }, Tf(p, "id", "Code", { hint: "none / box / bag / wrap — product cards use these" }), Tf(p, "price", "Price per gata ֏", { type: "number", hint: "-1 = confirm later (Ենթակա է ճշտման), 0 = free" }), Bf(p, "show", "Offer on website")),
+      Lf(p, "label", "Name")), () => ({ id: "new", label: L0(), price: -1, show: true }), { name: "Option", label: (p) => tx(p.label) }));
   });
 };
 VIEWS.delivery = async () => {
@@ -455,7 +470,8 @@ VIEWS.delivery = async () => {
   contentPage("Delivery options", "Fee: <b>0</b> = free, <b>-1</b> = extra fee you confirm later, any other number = fixed fee in ֏ added to the total.<br>The chat knows these codes: <code>pickup</code>, <code>megamall</code>, <code>yerevan</code>, <code>abovyan</code>.", (b) => {
     b.append(Lst(C.delivery.options, null, (d) => el("div", { class: "grid" },
       el("div", { class: "grid g3" }, Tf(d, "id", "Code"), Tf(d, "price", "Fee ֏", { type: "number" }), el("div", { class: "grid" }, Bf(d, "address", "Ask for address"), Bf(d, "show", "Show on site"))),
-      Lf(d, "label", "Name shown to customers")), () => ({ id: "new", label: L0(), address: true, price: -1, show: true }), { name: "Option", label: (d) => tx(d.label) }));
+      Lf(d, "label", "Name shown to customers"), Lf(d, "note", "Details (address, hours, fee) — only confirmed facts", { area: true, rows: 2 })), () => ({ id: "new", label: L0(), note: L0(), address: true, price: -1, show: true }), { name: "Option", label: (d) => tx(d.label) }));
+    b.append(card(el("h2", {}, "Section on the homepage"), Lf(C.deliveryInfo, "kicker", "Small line"), Lf(C.deliveryInfo, "title", "Title"), Lf(C.deliveryInfo, "lead", "Text")));
   });
 };
 
@@ -465,24 +481,21 @@ VIEWS.home = async () => {
   contentPage("Homepage texts & photos", "Write in Armenian, then press <b>✨ Translate</b> to fill Russian and English automatically. Use <code>**text**</code> for bold. Press <b>Save</b> at the bottom when done.", (b) => {
     const sec = (t, ...k) => card(el("h2", {}, t), ...k);
     b.append(sec("Logo & name", Lf(C.brand, "name", "Business name"), Lf(C.brand, "logoText", "Logo text (when no logo image)"), Lf(C.brand, "sub", "Small text under logo"), If(C.brand, "logo", "Logo image (top menu, dark)"), If(C.brand, "logoLight", "Logo image for dark footer (light)"), C.brand.logo ? el("button", { class: "btn sm", onclick: () => { C.brand.logo = ""; route(); } }, "Remove logo image (use text)") : null, If(C.brand, "favicon", "Small browser icon (favicon)")));
-    b.append(sec("Top of page (hero)", Lf(C.hero, "kicker", "Small line above title"), Lf(C.hero, "title", "Big title"), Lf(C.hero, "lead", "Text under title", { area: true }), Lf(C.hero, "btnOrder", "Order button"), Lf(C.hero, "btnMenu", "Second button"), If(C.hero, "image", "Round gata photo"), Lf(C.hero, "alt", "Photo description (for Google)")));
-    b.append(sec("Big photo scene", Bf(C.expand, "show", "Show this section"), If(C.expand, "image", "Photo"), Lf(C.expand, "title", "Title"), Lf(C.expand, "text", "Text")));
+    b.append(sec("Top of page", Lf(C.hero, "kicker", "Small line above title"), Lf(C.hero, "title", "Big title"), Lf(C.hero, "lead", "Text under title", { area: true }), Lf(C.hero, "advice", "Order-ahead advice (shown under the buttons)", { area: true }), Lf(C.hero, "btnOrder", "Order button"), Lf(C.hero, "btnMenu", "Second button"), If(C.hero, "image", "Round gata photo"), el("div", { class: "small muted" }, "Sizes and the starting price next to the buttons come from Menu & prices.")));
     b.append(sec("Products", Lf(C.products, "kicker", "Small line"), Lf(C.products, "title", "Title"), Lf(C.products, "lead", "Text", { area: true }), Lf(C.products, "btn", "Button text on cards"),
-      Lst(C.products.cards, "Product cards", (k) => el("div", { class: "grid" }, If(k, "image", "Photo"), el("label", { class: "f" }, "Packaging (sets the order form when customers tap Order)", el("select", { onchange: (e) => { k.packaging = e.target.value; } }, [["", "Not set"], ["box", "Box"], ["bag", "Gift bag"], ["wrap", "Tulle wrapping"]].map(([v, l]) => el("option", { value: v, selected: (k.packaging || "") === v }, l)))), Lf(k, "tag", "Small tag"), Lf(k, "title", "Title"), Lf(k, "text", "Text", { area: true }), Bf(k, "show", "Show")), () => ({ image: "/img/top.webp", tag: L0(), title: L0(), text: L0(), show: true }), { name: "Card", label: (k) => tx(k.title) })));
-    b.append(sec("3D photo ring", Bf(C.ring, "show", "Show this section"), Lf(C.ring, "kicker", "Small line"), Lf(C.ring, "title", "Title"), el("div", { class: "small muted" }, "Uses the photos from Photos → Gallery.")));
-    b.append(sec("Big words scene", Bf(C.words, "show", "Show this section"), Lf(C.words, "text", "Words", { hint: "Put *stars* around a word to make it gold." })));
-    b.append(sec("Why us", Lf(C.features, "kicker", "Small line"), Lf(C.features, "title", "Title"),
-      Lst(C.features.items, null, (f) => el("div", { class: "grid" }, Lf(f, "big", "Big gold text (optional; a number counts up; empty = small ornament)"), Lf(f, "title", "Title"), Lf(f, "text", "Text", { area: true })), () => ({ big: L0(), title: L0(), text: L0() }), { name: "Box", label: (f) => tx(f.title) })));
-    b.append(sec("Our story", If(C.story, "image", "Photo"), Lf(C.story, "kicker", "Small line"), Lf(C.story, "title", "Title"), Lf(C.story, "p1", "Paragraph 1", { area: true }), Lf(C.story, "p2", "Paragraph 2", { area: true })));
-    b.append(sec("How to order (steps)", Lf(C.steps, "kicker", "Small line"), Lf(C.steps, "title", "Title"),
-      Lst(C.steps.items, null, (s) => el("div", { class: "grid" }, Lf(s, "title", "Title"), Lf(s, "text", "Text", { area: true })), () => ({ title: L0(), text: L0() }), { name: "Step" })));
-    b.append(sec("Order section", Lf(C.order, "kicker", "Small line"), Lf(C.order, "title", "Title"), Lf(C.order, "lead", "Text", { area: true }), Lf(C.order, "note", "Note under the form", { area: true })));
+      Lf(C.products, "pricesTitle", "Price table title"), Lf(C.products, "pricesNote", "Note under the price table", { area: true, rows: 2 }),
+      Lst(C.products.cards, "Product cards", (k) => el("div", { class: "grid" }, If(k, "image", "Photo"),
+        el("label", { class: "f" }, "Packaging (sets the order form when customers choose this card)", el("select", { onchange: (e) => { k.packaging = e.target.value; } }, [["", "Not set"], ...((C.menu.packs || []).map((p) => [p.id, tx(p.label)]))].map(([v, l]) => el("option", { value: v, selected: (k.packaging || "") === v }, l)))),
+        el("label", { class: "f" }, "Price note on the card", el("select", { onchange: (e) => { k.packNote = e.target.value; } }, [["separate", "Packaging price is charged separately"], ["included", "Box included in the price"], ["variable", "Price depends on the chosen option"]].map(([v, l]) => el("option", { value: v, selected: (k.packNote || "separate") === v }, l)))),
+        Lf(k, "tag", "Small tag"), Lf(k, "title", "Title"), Lf(k, "text", "Text", { area: true }), Bf(k, "show", "Show")), () => ({ image: "/img/top.webp", packaging: "box", packNote: "separate", tag: L0(), title: L0(), text: L0(), show: true }), { name: "Card", label: (k) => tx(k.title) })));
+    b.append(sec("Our story", If(C.story, "image", "Photo"), Lf(C.story, "kicker", "Small line"), Lf(C.story, "title", "Title"), Lf(C.story, "p1", "Paragraph 1", { area: true }), Lf(C.story, "p2", "Paragraph 2", { area: true }), el("div", { class: "small muted" }, "The photo gallery under the story is edited in Photos.")));
+    b.append(sec("Order section", Lf(C.order, "kicker", "Small line"), Lf(C.order, "title", "Title"), Lf(C.order, "lead", "Text above the form", { area: true }), Lf(C.order, "note", "Text under the send button", { area: true })));
     b.append(sec("Footer", Lf(C.footer, "copy", "Bottom line")));
   });
 };
 VIEWS.photos = async () => {
   if (!C) await loadContent();
-  contentPage("Photos", "Upload new photos here, then choose them in the gallery, homepage or pages. The gallery photos also make the 3D ring.", (b) => {
+  contentPage("Photos", "Upload new photos here, then choose them in the gallery, homepage or pages. Customers swipe through the gallery under the story.", (b) => {
     const lib = el("div", { class: "media" });
     const drawLib = async () => {
       const { media } = await api("media");
@@ -491,7 +504,7 @@ VIEWS.photos = async () => {
       media.forEach((m) => lib.append(el("div", { class: "m", title: m.name || "" }, el("img", { src: m.url, loading: "lazy" }),
         el("button", { class: "del", onclick: async (e) => { e.stopPropagation(); if (!confirm("Delete this photo? If it is used on the site it will disappear there.")) return; await api("media/" + m.id, { method: "DELETE" }); drawLib(); } }, "Delete"))));
     };
-    b.append(card(el("h2", {}, "Gallery (moving photo strip)"),
+    b.append(card(el("h2", {}, "Gallery"),
       Lst(C.gallery.images, null, (g) => el("div", { class: "grid" }, If(g, "src", "Photo"), Lf(g, "alt", "Description (for Google)")), () => ({ src: "/img/top.webp", alt: L0() }), { name: "Photo" }),
       el("div", { class: "btns" }, el("button", { class: "btn", onclick: () => mediaPicker((u) => { C.gallery.images.push({ src: u, alt: L0() }); route(); }) }, "+ Add from library")),
       Lf(C.gallery, "kicker", "Small line"), Lf(C.gallery, "title", "Title"), Lf(C.gallery, "lead", "Text")));

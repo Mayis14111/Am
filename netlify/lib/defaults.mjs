@@ -3,7 +3,7 @@
 const L = (hy, ru, en) => ({ hy, ru, en });
 
 export const LANGS = ["hy", "ru", "en"];
-export const CONTENT_VERSION = 2;
+export const CONTENT_VERSION = 3;
 
 export const DEFAULT_CONTENT = {
   version: CONTENT_VERSION,
@@ -28,10 +28,9 @@ export const DEFAULT_CONTENT = {
     domain: "garnugata.am",
   },
   nav: [
-    { label: L("Տեսականի", "Ассортимент", "Menu"), href: "#products", show: true },
+    { label: L("Տեսականի և գներ", "Ассортимент и цены", "Menu & prices"), href: "#products", show: true },
+    { label: L("Առաքում", "Доставка", "Delivery"), href: "#delivery", show: true },
     { label: L("Մեր մասին", "О нас", "About"), href: "#story", show: true },
-    { label: L("Լուսանկարներ", "Фото", "Photos"), href: "#gallery", show: true },
-    { label: L("Ինչպես պատվիրել", "Как заказать", "How to order"), href: "#how", show: true },
     { label: L("Հարցեր", "Вопросы", "FAQ"), href: "#faq", show: true },
   ],
   hero: {
@@ -41,6 +40,11 @@ export const DEFAULT_CONTENT = {
       "Գառնիում թխում ենք ավանդական գաթա և գեղեցիկ փաթեթավորում՝ հարսանիքի, նշանադրության, կնունքի կամ նվերի համար։",
       "Мы печём традиционную гату в Гарни и красиво упаковываем её для свадьбы, помолвки, крестин или в подарок.",
       "We bake traditional gata in Garni and wrap it beautifully for weddings, engagements, christenings or as a gift."
+    ),
+    advice: L(
+      "Խնդրում ենք պատվիրել առնվազն 2–3 օր առաջ։ Եթե պատվերը պետք է այսօր կամ վաղը, զանգահարեք մեզ՝ հնարավորությունը ճշտելու համար։",
+      "Пожалуйста, заказывайте минимум за 2–3 дня. Если заказ нужен сегодня или завтра, позвоните нам, чтобы уточнить возможность.",
+      "Please order at least 2–3 days ahead. If you need it today or tomorrow, call us to check if it's possible."
     ),
     btnOrder: L("Պատվիրել", "Заказать", "Order"),
     btnMenu: L("Տեսնել տեսականին", "Смотреть ассортимент", "See the menu"),
@@ -61,17 +65,28 @@ export const DEFAULT_CONTENT = {
     kicker: L("Տեսականի", "Ассортимент", "Menu"),
     title: L("Ընտրեք ձեր գաթան", "Выберите свою гату", "Choose your gata"),
     lead: L(
-      "Ընտրեք գաթայի միջուկը, չափսը, քանակը և փաթեթավորումը։ Տուփի ու ձևավորման արժեքը կճշտենք պատվերը հաստատելիս։",
-      "Выберите начинку, размер, количество и упаковку. Стоимость коробки и оформления уточним при подтверждении заказа.",
-      "Choose the filling, size, quantity and packaging. We confirm the price of the box and decoration when we confirm your order."
+      "Ընտրեք փաթեթավորման տարբերակը։ Չափսը, միջուկը և քանակը կնշեք պատվերի ձևում։",
+      "Выберите вариант упаковки. Размер, начинку и количество укажете в форме заказа.",
+      "Choose a packaging option. You'll pick the size, filling and quantity in the order form."
+    ),
+    pricesTitle: L("Միջուկներ և գներ", "Начинки и цены", "Fillings and prices"),
+    pricesNote: L(
+      "Գները՝ մեկ գաթայի համար, առանց տուփի կամ այլ փաթեթավորման։",
+      "Цены за одну гату, без коробки и другой упаковки.",
+      "Prices are per gata, without a box or other packaging."
     ),
     cards: [
-      { image: "/img/marble.webp", packaging: "box", tag: L("Հարսանիք", "Свадьба", "Wedding"), title: L("Հարսանեկան գաթա՝ տուփով", "Свадебная гата в коробке", "Wedding gata in a box"), text: L("Ավանդական գաթա՝ խորիզով, գեղեցիկ զարդարված հարսանեկան տուփում։", "Традиционная гата с хоризом в красиво украшенной свадебной коробке.", "Traditional gata with khoriz in a beautifully decorated wedding box.") },
-      { image: "/img/bag_pearl.webp", packaging: "bag", tag: L("Նվեր", "Подарок", "Gift"), title: L("Գաթա՝ նվեր-պայուսակում", "Гата в подарочном пакете", "Gata in a gift bag"), text: L("Գաթա՝ ուլունքներով զարդարված թափանցիկ նվեր-պայուսակում։", "Гата в прозрачном подарочном пакете, украшенном бусинами.", "Gata in a clear gift bag decorated with beads.") },
-      { image: "/img/bride.webp", packaging: "wrap", tag: L("Ավանդույթ", "Традиция", "Tradition"), title: L("Գաթա՝ հարսի ճամպրուկի համար", "Гата для чемодана невесты", "Gata for the bride's suitcase"), text: L("Ավանդական գաթա՝ շղարշով ու ժապավենով փաթեթավորված։", "Традиционная гата, упакованная в фатин с лентой.", "Traditional gata wrapped in tulle and ribbon.") },
-      { image: "/img/initials.webp", packaging: "box", tag: L("Անհատական", "Персонально", "Personal"), title: L("Գաթայի տուփեր՝ ձեր սկզբնատառերով", "Коробки для гаты с вашими инициалами", "Gata boxes with your initials"), text: L("Ձեր անունների սկզբնատառերով ձևավորված տուփեր՝ հարսանիքի հյուրերին նվիրելու համար։", "Коробки, оформленные инициалами ваших имён, — в подарок гостям свадьбы.", "Boxes decorated with your initials, as gifts for your wedding guests.") },
+      { image: "/img/marble.webp", packaging: "box", packNote: "separate", tag: L("Հարսանիք", "Свадьба", "Wedding"), title: L("Հարսանեկան գաթա՝ տուփով", "Свадебная гата в коробке", "Wedding gata in a box"), text: L("Ավանդական գաթա՝ խորիզով, գեղեցիկ զարդարված հարսանեկան տուփում։", "Традиционная гата с хоризом в красиво украшенной свадебной коробке.", "Traditional gata with khoriz in a beautifully decorated wedding box.") },
+      { image: "/img/bag_pearl.webp", packaging: "bag", packNote: "separate", tag: L("Նվեր", "Подарок", "Gift"), title: L("Գաթա՝ նվեր-պայուսակում", "Гата в подарочном пакете", "Gata in a gift bag"), text: L("Գաթա՝ ուլունքներով զարդարված թափանցիկ նվեր-պայուսակում։", "Гата в прозрачном подарочном пакете, украшенном бусинами.", "Gata in a clear gift bag decorated with beads.") },
+      { image: "/img/bride.webp", packaging: "wrap", packNote: "separate", tag: L("Ավանդույթ", "Традиция", "Tradition"), title: L("Գաթա՝ հարսի ճամպրուկի համար", "Гата для чемодана невесты", "Gata for the bride's suitcase"), text: L("Ավանդական գաթա՝ շղարշով ու ժապավենով փաթեթավորված։", "Традиционная гата, упакованная в фатин с лентой.", "Traditional gata wrapped in tulle and ribbon.") },
+      { image: "/img/initials.webp", packaging: "box", packNote: "variable", tag: L("Անհատական", "Персонально", "Personal"), title: L("Գաթայի տուփեր՝ ձեր սկզբնատառերով", "Коробки для гаты с вашими инициалами", "Gata boxes with your initials"), text: L("Ձեր անունների սկզբնատառերով ձևավորված տուփեր՝ հարսանիքի հյուրերին նվիրելու համար։", "Коробки, оформленные инициалами ваших имён, — в подарок гостям свадьбы.", "Boxes decorated with your initials, as gifts for your wedding guests.") },
     ],
-    btn: L("Պատվիրել", "Заказать", "Order"),
+    btn: L("Ընտրել այս տարբերակը", "Выбрать этот вариант", "Choose this option"),
+  },
+  deliveryInfo: {
+    kicker: L("Առաքում", "Доставка", "Delivery"),
+    title: L("Առաքում և ստացում", "Доставка и получение", "Delivery and pickup"),
+    lead: L("Ստացման եղանակը կընտրեք պատվերի ձևում։", "Способ получения вы выберете в форме заказа.", "You'll choose how to receive your order in the form."),
   },
   ring: { show: true, kicker: L("Մեր աշխատանքները", "Наши работы", "Our work"), title: L("Գաթա՝ ձեր տոնի համար", "Гата для вашего праздника", "Gata for your celebration") },
   words: {
@@ -134,14 +149,14 @@ export const DEFAULT_CONTENT = {
     kicker: L("Պատվեր", "Заказ", "Order"),
     title: L("Պատվիրեք ձեր գաթան", "Закажите свою гату", "Order your gata"),
     lead: L(
-      "Խորհուրդ ենք տալիս պատվիրել 2–3 օր առաջ։ Մեծ պատվերների ժամկետը համաձայնեցրեք նախապես։ Եթե գաթան պետք է այսօր կամ վաղը, զանգահարեք մեզ։",
-      "Рекомендуем заказывать за 2–3 дня. Сроки больших заказов согласуйте заранее. Если гата нужна сегодня или завтра, позвоните нам.",
-      "We recommend ordering 2–3 days ahead. Please agree on timing for large orders in advance. If you need gata today or tomorrow, call us."
+      "Լրացրեք ձևը քայլ առ քայլ․ գինը կհաշվարկվի անմիջապես։",
+      "Заполните форму шаг за шагом — цена посчитается сразу.",
+      "Fill in the form step by step; the price is calculated right away."
     ),
     note: L(
-      "Պատվերն ուղարկելուց հետո կկապվենք ձեզ հետ՝ մանրամասներն ու վերջնական գինը հաստատելու համար։",
-      "После отправки заказа мы свяжемся с вами, чтобы подтвердить детали и итоговую цену.",
-      "After you send your order, we'll contact you to confirm the details and the final price."
+      "Պատվերն ուղարկելուց հետո կկապվենք ձեզ հետ՝ վերջնական գինը և ստացման ժամկետը հաստատելու համար։",
+      "После отправки заказа мы свяжемся с вами, чтобы подтвердить итоговую цену и срок получения.",
+      "After you send your order, we'll contact you to confirm the final price and when you'll receive it."
     ),
     minDays: 2,
     accept: true,
@@ -178,14 +193,25 @@ export const DEFAULT_CONTENT = {
       { id: "date", name: L("Խուրմայով", "С хурмой", "Persimmon"), short: L("Խուրմայով", "С хурмой", "Persimmon"), prices: [4000, 4500, 5500], show: true },
       { id: "choco", name: L("Շոկոլադով", "Шоколадная", "Chocolate"), short: L("Շոկոլադով", "Шоколадная", "Chocolate"), prices: [4000, 4500, 5500], show: false },
     ],
-    box: { enabled: true, price: 0 }, // price 0 = confirmed later
+    box: { enabled: true, price: 0 }, // kept for older versions; see packs
+    // packaging options; price: -1 = confirmed later, 0 = free, >0 = fixed price per gata
+    packs: [
+      { id: "none", label: L("Առանց տուփի", "Без коробки", "No box"), price: 0, show: true },
+      { id: "box", label: L("Տուփով", "В коробке", "In a box"), price: -1, show: true },
+      { id: "bag", label: L("Նվեր-պայուսակով", "В подарочном пакете", "In a gift bag"), price: -1, show: true },
+      { id: "wrap", label: L("Շղարշով և ժապավենով", "В фатине с лентой", "Wrapped in tulle and ribbon"), price: -1, show: true },
+    ],
   },
   delivery: {
     options: [
-      { id: "pickup", label: L("Վերցնել Գառնիից", "Самовывоз из Гарни", "Pick up in Garni"), address: false, price: 0, show: true },
-      { id: "megamall", label: L("Վերցնել Երևանի «Մեգամոլից»՝ առանց առաքման վճարի", "Забрать в «Мегамолле» (Ереван) — без оплаты доставки", "Pick up at Megamall (Yerevan) — no delivery fee"), address: false, price: 0, show: true },
-      { id: "yerevan", label: L("Առաքում իմ հասցեով՝ Երևանում", "Доставка на мой адрес в Ереване", "Delivery to my address in Yerevan"), address: true, price: -1, show: true },
-      { id: "abovyan", label: L("Առաքում իմ հասցեով՝ Աբովյանում", "Доставка на мой адрес в Абовяне", "Delivery to my address in Abovyan"), address: true, price: -1, show: true },
+      { id: "pickup", label: L("Վերցնել Գառնիից", "Самовывоз из Гарни", "Pick up in Garni"), address: false, price: 0, show: true,
+        note: L("Վերցնելու հասցեն և ժամը կճշտենք պատվերը հաստատելիս։", "Адрес и время самовывоза уточним при подтверждении заказа.", "We'll confirm the pickup address and time when we confirm your order.") },
+      { id: "megamall", label: L("Վերցնել Մեգամոլից", "Забрать в «Мегамолле»", "Pick up at Megamall"), address: false, price: 0, show: true,
+        note: L("Երևանի «Մեգամոլ» առևտրի կենտրոն։ Ժամը կճշտենք պատվերը հաստատելիս։", "Торговый центр «Мегамолл» в Ереване. Время уточним при подтверждении заказа.", "Megamall shopping centre in Yerevan. We'll confirm the time when we confirm your order.") },
+      { id: "yerevan", label: L("Առաքում Երևանում", "Доставка по Еревану", "Delivery in Yerevan"), address: true, price: -1, show: true,
+        note: L("Ձեր հասցեով՝ Yandex կամ այլ ծառայությամբ։ Առաքման արժեքը կճշտենք պատվերը հաստատելիս։", "На ваш адрес через Yandex или другую службу. Стоимость доставки уточним при подтверждении заказа.", "To your address by Yandex or another service. We'll confirm the delivery price when we confirm your order.") },
+      { id: "abovyan", label: L("Առաքում Աբովյանում", "Доставка в Абовян", "Delivery in Abovyan"), address: true, price: -1, show: true,
+        note: L("Ձեր հասցեով։ Առաքման արժեքը կճշտենք պատվերը հաստատելիս։", "На ваш адрес. Стоимость доставки уточним при подтверждении заказа.", "To your address. We'll confirm the delivery price when we confirm your order.") },
     ],
     // price: 0 = free, -1 = extra fee confirmed later, >0 = fixed fee in AMD
   },

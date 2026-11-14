@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { store, env, json, getContent, saveContent, listPages, getPage, siteUrl, priceOf, t } from "../lib/store.mjs";
+import { store, env, json, getContent, saveContent, listPages, getPage, siteUrl, priceOf, t, packsOf } from "../lib/store.mjs";
 import { DEFAULT_CONTENT } from "../lib/defaults.mjs";
 import { isAdmin, makeCookie, clearCookie, bumpVersion, safeEqual, hmac } from "../lib/auth.mjs";
 import { tg, sendAll, tgToken, tgSecret, orderText, orderButtons, STATUS } from "../lib/telegram.mjs";
@@ -69,7 +69,9 @@ function stats(orders) {
     upcoming: live.filter((o) => o.date >= today && o.status !== "delivered").length,
     monthOrders: live.filter((o) => (o.createdAt || "").slice(0, 7) === month).length,
     monthSum: live.filter((o) => (o.createdAt || "").slice(0, 7) === month).reduce((a, o) => a + o.total, 0),
-    paidOnline: live.filter((o) => o.payment?.status === "completed").reduce((a, o) => a + (o.payment.paidAmount || o.payment.amount || 0), 0),
+    paidOnline: live.filter((o) => o.payment?.status === "completed").reduce((a, o) => a + (o.payment.paidAmount || o.payment.amount || o.total || 0), 0),
+    monthPaid: live.filter((o) => o.payment?.status === "completed" && (o.payment.paidAt || o.createdAt || "").slice(0, 7) === month).reduce((a, o) => a + (o.payment.paidAmount || o.payment.amount || o.total || 0), 0),
+    estimates: live.filter((o) => o.estimate && !["delivered"].includes(o.status)).length,
     byDay, byFilling,
   };
 }
@@ -146,11 +148,12 @@ export default async (req) => {
       const p = priceOf(c, b.filling, b.size, b.qty, { allowHidden: true });
       if (!p || p.badQty) return json({ error: "Choose filling, size and a whole-number quantity" }, 400);
       const d = c.delivery.options.find((x) => x.id === b.delivery) || c.delivery.options[0];
+      const pk = packsOf(c).find((x) => x.id === b.pack) || packsOf(c)[0];
       const total = b.total ? +b.total : p.total;
       const o = {
         id: newId(), createdAt: new Date().toISOString(), source: b.source || "phone", lang: "hy",
         filling: p.filling.id, fillingName: t(p.filling.name, "hy"), choco: b.choco || "", size: p.size.cm, qty: p.qty, unit: p.unit,
-        box: !!b.box, total, date: b.date || "", delivery: { id: d.id, label: t(d.label, "hy"), address: b.address || "" },
+        box: pk.id !== "none", pack: pk.id, packLabel: t(pk.label, "hy"), estimate: !b.total && (pk.price < 0 || d.price < 0), total, date: b.date || "", delivery: { id: d.id, label: t(d.label, "hy"), address: b.address || "" },
         customer: { name: b.name || "", phone: b.phone || "" }, notes: b.notes || "", status: "confirmed",
         statusHistory: [{ status: "confirmed", at: new Date().toISOString(), by: "admin" }], payment: { method: "cash", status: "none" }, adminNote: b.adminNote || "",
       };
@@ -164,6 +167,8 @@ export default async (req) => {
       if (M === "PATCH") {
         const b = await req.json();
         if (b.status) setStatus(o, b.status, "admin");
+        if (b.final === true) { o.estimate = false; o.finalAt = new Date().toISOString(); }
+        if (b.final === false) o.estimate = true;
         for (const k of ["adminNote", "date", "notes", "total", "qty", "size", "box"]) if (k in b) o[k] = k === "total" || k === "qty" ? +b[k] : b[k];
         if (b.customer) o.customer = { ...o.customer, ...b.customer };
         if (b.address !== undefined) o.delivery = { ...o.delivery, address: b.address };
@@ -173,6 +178,7 @@ export default async (req) => {
       }
       if (seg[2] === "paylink" && M === "POST") {
         if (!paynetReady()) return json({ error: "Paynet is not connected yet (PAYNET_API_KEY)." }, 400);
+        if (o.estimate) return json({ error: "Confirm the final amount first (Վերջնական գումար), then create the payment link." }, 400);
         const b = await req.json().catch(() => ({}));
         if (b.amount) o.payment = { ...(o.payment || {}), amount: Math.round(+b.amount) };
         else if (o.payment) o.payment.amount = o.total;

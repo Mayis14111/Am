@@ -29,25 +29,32 @@ export const STATUS = {
   new: "🆕 Նոր", confirmed: "✅ Հաստատված", baking: "🔥 Թխվում է", ready: "📦 Պատրաստ է",
   delivered: "🎉 Հանձնված", cancelled: "❌ Չեղարկված",
 };
-export const PAY = { none: "Վճարել ստանալիս", pending: "⏳ Սպասում է առցանց վճարման", completed: "💳 Վճարված է", failed: "⚠️ Վճարումը չհաջողվեց", expired: "⌛ Վճարման ժամկետն անցավ", refunded: "↩️ Վերադարձված", processing: "⏳ Մշակվում է" };
+export const PAY = { none: "Չի վճարվել", pending: "⏳ Սպասում է առցանց վճարման", processing: "⏳ Վճարումը մշակվում է", completed: "💳 Վճարված է", failed: "⚠️ Վճարումը չհաջողվեց", expired: "⌛ Վճարման ժամկետն անցել է", refunded: "↩️ Գումարը վերադարձվել է" };
 
 export function orderText(o) {
+  const later = "ենթակա է ճշտման";
+  const packFee = o.pack === "none" || (!o.pack && !o.box) ? "—" : o.boxFee ? money(o.boxFee) : o.packLater !== false ? later : "0";
+  const delFee = o.deliveryFee ? money(o.deliveryFee) : o.delivery?.feeLater ? later : "անվճար";
   const lines = [
-    `🧁 <b>Նոր պատվեր ${h(o.id)}</b>${o.source === "chat" ? " · չատից" : " · ձևից"}`,
+    `🧁 <b>Նոր պատվեր ${h(o.id)}</b>${o.source === "chat" ? " · չատից" : o.source === "form" ? " · ձևից" : ""}`,
     "",
     o.product ? `🎀 ${h(o.product)}` : "",
     `🥐 ${h(o.fillingName)}${o.choco ? " (" + h(o.choco) + ")" : ""}`,
     `📏 ${h(o.size)} սմ × ${h(o.qty)} հատ`,
-    o.box ? `🎁 Տուփով` : `🎁 Առանց տուփի`,
-    `💰 ${o.estimate ? "Նախնական՝ " : ""}${money(o.total)}${o.qty > 1 ? ` (${money(o.unit)} × ${o.qty})` : ""}${o.estimate ? " + " + [o.box && !o.boxFee ? "տուփ" : "", o.delivery?.feeLater ? "առաքում" : ""].filter(Boolean).join(", ") + " (ճշտել)" : ""}`,
+    `🎁 ${h(o.packLabel || (o.box ? "Տուփով" : "Առանց տուփի"))}`,
     `📅 ${h(o.date || "—")}`,
     `🚗 ${h(o.delivery?.label || "—")}`,
     o.delivery?.address ? `📍 ${h(o.delivery.address)}` : "",
     "",
+    `Գաթայի արժեքը՝ ${money(o.unit * o.qty)} (${money(o.unit)} × ${o.qty})`,
+    `Տուփի արժեքը՝ ${packFee}`,
+    `Առաքման արժեքը՝ ${delFee}`,
+    `💰 <b>${o.estimate ? "Նախնական գումար" : "Վերջնական գումար"}՝ ${money(o.total)}</b>`,
+    `💳 ${PAY[o.payment?.status || "none"] || h(o.payment?.status)}`,
+    "",
     `👤 ${h(o.customer?.name)}`,
     `📞 ${h(o.customer?.phone)}`,
     o.notes ? `📝 ${h(o.notes)}` : "",
-    `💳 ${PAY[o.payment?.status || "none"] || h(o.payment?.status)}`,
     `🌐 ${h((o.lang || "hy").toUpperCase())}`,
   ];
   return lines.filter((l, i, a) => l !== "" || a[i - 1] !== "").join("\n");

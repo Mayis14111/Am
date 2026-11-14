@@ -1,4 +1,4 @@
-import { esc, t, LANGS } from "./store.mjs";
+import { esc, t, LANGS, packsOf } from "./store.mjs";
 import { paynetReady } from "./paynet.mjs";
 
 export const PREFIX = { hy: "/", ru: "/ru/", en: "/en/" };
@@ -92,7 +92,7 @@ ${/^G-[A-Z0-9]+$/.test(c.seo.googleTag || "") ? `<script async src="https://www.
 <body>
 <div class="root">`;
 }
-export const ASSET_V = "3";
+export const ASSET_V = "4";
 
 function logo(c, lang, id, href, light) {
   const src = light ? c.brand.logoLight || c.brand.logo : c.brand.logo;
@@ -156,12 +156,11 @@ function chatHtml(c, lang) {
   return `<button class="chat-btn" id="chatBtn" type="button" aria-label="${u.openChat}" aria-expanded="false" aria-controls="chatPanel">
   <svg class="ic-chat" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.2 3.6c-.5.4-1.3.1-1.3-.6V16A2.5 2.5 0 0 1 4 13.5z" fill="currentColor"/><circle cx="8.5" cy="9.5" r="1.2" fill="#b9853f"/><circle cx="12" cy="9.5" r="1.2" fill="#b9853f"/><circle cx="15.5" cy="9.5" r="1.2" fill="#b9853f"/></svg>
   <svg class="ic-close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-  <span class="dot" aria-hidden="true"></span>
 </button>
 <div class="chat-panel" id="chatPanel" role="dialog" aria-label="${u.assistant}" hidden>
   <div class="chat-head">
     <div class="av" aria-hidden="true">${esc(t(c.brand.name, lang).charAt(0))}</div>
-    <div><b>${u.assistant}</b><small><span class="on"></span>${u.online}</small></div>
+    <div><b>${u.assistant}</b><small>${u.online}</small></div>
     <button class="chat-x" id="chatX" type="button" aria-label="${u.closeChat}">×</button>
   </div>
   <div class="chat-body">
@@ -187,7 +186,8 @@ function clientData(c, lang) {
     accept: c.order.accept !== false,
     closedText: t(c.order.closedText, lang),
     minDays: +c.order.minDays || 0,
-    ring: (c.ring.images && c.ring.images.length ? c.ring.images : c.gallery.images).map((i) => ({ src: i.src, alt: t(i.alt, lang) })),
+    packs: packsOf(c),
+    orderNote: t(c.order.note, lang),
   };
 }
 
@@ -223,146 +223,150 @@ function jsonLd(c, lang, base) {
   ];
 }
 
+const HL = {
+  hy: { sizesPrices: "Չափսեր և գներ", from: (p) => `${p} դրամից`, cur: "դրամ", cm: "սմ", packIncluded: "Տուփը ներառված է գնի մեջ", packSeparateBox: "Տուփի արժեքը հաշվարկվում է առանձին", packSeparate: "Փաթեթավորման արժեքը հաշվարկվում է առանձին", packVariable: "Գինը՝ ըստ ընտրված տարբերակի", fixed: (p) => ` (${p} դրամ՝ մեկ հատի համար)`, sizesFact: (s) => `Չափսեր՝ ${s} սմ`, fromFact: (p) => `Գինը՝ ${p} դրամից`, prev: "Նախորդ լուսանկարը", next: "Հաջորդ լուսանկարը", filling: "Միջուկ", deliveryFree: "Առանց առաքման վճարի", deliveryLater: "Առաքման արժեքը՝ ենթակա է ճշտման", orderNow: "Պատվիրել" },
+  ru: { sizesPrices: "Размеры и цены", from: (p) => `от ${p} драм`, cur: "драм", cm: "см", packIncluded: "Коробка входит в цену", packSeparateBox: "Стоимость коробки считается отдельно", packSeparate: "Стоимость упаковки считается отдельно", packVariable: "Цена — в зависимости от выбранного варианта", fixed: (p) => ` (${p} драм за штуку)`, sizesFact: (s) => `Размеры: ${s} см`, fromFact: (p) => `Цена: от ${p} драм`, prev: "Предыдущее фото", next: "Следующее фото", filling: "Начинка", deliveryFree: "Без оплаты доставки", deliveryLater: "Стоимость доставки уточняется", orderNow: "Заказать" },
+  en: { sizesPrices: "Sizes and prices", from: (p) => `from ${p} AMD`, cur: "AMD", cm: "cm", packIncluded: "Box included in the price", packSeparateBox: "Box price is charged separately", packSeparate: "Packaging price is charged separately", packVariable: "Price depends on the chosen option", fixed: (p) => ` (${p} AMD each)`, sizesFact: (s) => `Sizes: ${s} cm`, fromFact: (p) => `From ${p} AMD`, prev: "Previous photo", next: "Next photo", filling: "Filling", deliveryFree: "No delivery fee", deliveryLater: "Delivery price to be confirmed", orderNow: "Order" },
+};
+const num = (n) => (+n || 0).toLocaleString("en-US").replace(/,/g, " ");
+
 export function renderHome(c, lang, pages, base) {
-  const u = UI[lang];
+  const u = UI[lang], H = HL[lang];
   const paths = Object.fromEntries(LANGS.map((l) => [l, PREFIX[l]]));
-  const words = t(c.words.text, lang).split(/\s+/).filter(Boolean).map((w) => {
-    const gold = /^\*.*\*$/.test(w);
-    return `<span${gold ? ' class="gold"' : ""}>${esc(w.replace(/^\*|\*$/g, ""))}</span>`;
-  }).join(" ");
-  const big = (b) => { const s = t(b, lang); if (!s) return `<div class="big orn" aria-hidden="true">✦</div>`; const m = /^(\d+)(.*)$/.exec(s); return m ? `<div class="big" data-count="${m[1]}" data-suffix="${esc(m[2])}">${esc(s)}</div>` : `<div class="big">${esc(s)}</div>`; };
+  const m = c.menu, sizes = m.sizes, shown = m.fillings.filter((f) => f.show !== false);
+  const minAt = (i) => Math.min(...shown.map((f) => +f.prices[i] || Infinity));
+  const minAll = Math.min(...sizes.map((s, i) => minAt(i)));
+  const packs = packsOf(c);
+  const packNote = (k) => {
+    if (k.packNote === "included") return H.packIncluded;
+    if (k.packNote === "variable") return H.packVariable;
+    const pk = packs.find((p) => p.id === k.packaging);
+    const base_ = k.packaging === "box" ? H.packSeparateBox : H.packSeparate;
+    return base_ + (pk && pk.price > 0 ? H.fixed(num(pk.price)) : "");
+  };
   const gal = c.gallery.images;
-  const half = Math.ceil(gal.length / 2);
-  const track = (list) => { const h = list.map((i) => `<img src="${esc(i.src)}" alt="${esc(t(i.alt, lang))}" loading="lazy">`).join(""); return h + h; };
-  const igLink = c.contact.instagram ? ` <a href="${esc(c.contact.instagram)}" target="_blank" rel="noopener" style="color:var(--gold)">${esc(c.contact.instagramHandle || "Instagram")}</a>` : "";
+  const igLink = c.contact.instagram ? `<a href="${esc(c.contact.instagram)}" target="_blank" rel="noopener">${esc(c.contact.instagramHandle || "Instagram")}</a>` : "";
+  const delivery = c.delivery.options.filter((d) => d.show !== false);
 
   const body = `
 ${nav(c, lang, pages, true, paths)}
 
 <header class="hero" id="top">
-  <div class="wrap">
-    <span class="kicker load">${esc(t(c.hero.kicker, lang))}</span>
-    <h1 class="load d1">${esc(t(c.hero.title, lang))}</h1>
-    <p class="lead load d2">${inline(t(c.hero.lead, lang))}</p>
-    <div class="btns load d3">
-      <a class="btn btn-gold" href="#order">${esc(t(c.hero.btnOrder, lang))}</a>
-      <a class="btn btn-line" href="#products">${esc(t(c.hero.btnMenu, lang))}</a>
+  <div class="wrap hero-grid">
+    <div class="hero-text">
+      <span class="kicker">${esc(t(c.hero.kicker, lang))}</span>
+      <h1>${esc(t(c.hero.title, lang))}</h1>
+      <p class="lead">${inline(t(c.hero.lead, lang))}</p>
+      <ul class="facts">
+        <li>${esc(H.sizesFact(sizes.map((s) => s.cm).join(", ")))}</li>
+        ${isFinite(minAll) ? `<li>${esc(H.fromFact(num(minAll)))}</li>` : ""}
+      </ul>
+      <div class="btns" data-avoid>
+        <a class="btn btn-gold" href="#order">${esc(t(c.hero.btnOrder, lang))}</a>
+        <a class="btn btn-line" href="#products">${esc(t(c.hero.btnMenu, lang))}</a>
+      </div>
+      ${t(c.hero.advice, lang) ? `<p class="advice">${inline(t(c.hero.advice, lang))}</p>` : ""}
     </div>
-  </div>
-  <div class="hero-stage load" id="heroStage">
-    <div class="hero-glow" aria-hidden="true"></div>
-    <div class="hero-gata" id="heroGata"><img src="${esc(c.hero.image)}" alt="${esc(t(c.hero.alt, lang))}" width="1000" height="1000" fetchpriority="high" style="object-fit:cover"></div>
-    <span class="pearl" style="--x:2%;--y:18%;--s:34px;--d:1.6"></span>
-    <span class="pearl" style="--x:88%;--y:10%;--s:22px;--d:2.2"></span>
-    <span class="pearl" style="--x:92%;--y:66%;--s:40px;--d:1.2"></span>
-    <span class="pearl" style="--x:0%;--y:72%;--s:20px;--d:2.6"></span>
-    <span class="pearl" style="--x:20%;--y:94%;--s:26px;--d:1.9"></span>
-    <span class="pearl" style="--x:74%;--y:96%;--s:16px;--d:2.8"></span>
+    <div class="hero-stage" aria-hidden="true">
+      <div class="hero-glow"></div>
+      <div class="hero-gata"><img src="${esc(c.hero.image)}" alt="" width="600" height="600" fetchpriority="high"></div>
+      <span class="pearl" style="--x:4%;--y:16%;--s:26px"></span>
+      <span class="pearl" style="--x:88%;--y:10%;--s:18px"></span>
+      <span class="pearl" style="--x:90%;--y:70%;--s:30px"></span>
+      <span class="pearl" style="--x:8%;--y:84%;--s:18px"></span>
+    </div>
   </div>
 </header>
-${c.expand.show !== false ? `
-<section class="expand" id="expand" aria-label="${esc(t(c.expand.title, lang))}">
-  <div class="sticky">
-    <div class="frame" id="expFrame">
-      <img id="expImg" src="${esc(c.expand.image)}" alt="${esc(t(c.expand.title, lang))}" loading="lazy">
-      <div class="cap" id="expCap"><h2>${esc(t(c.expand.title, lang))}</h2><p>${esc(t(c.expand.text, lang))}</p></div>
-    </div>
-  </div>
-</section>` : ""}
 
-<section class="section center" id="products">
+<section class="section" id="products">
   <div class="wrap">
-    <span class="kicker">${esc(t(c.products.kicker, lang))}</span>
-    <h2 class="h2">${esc(t(c.products.title, lang))}</h2>
-    <p class="lead">${inline(t(c.products.lead, lang))}</p>
+    <div class="sec-head">
+      <span class="kicker">${esc(t(c.products.kicker, lang))}</span>
+      <h2 class="h2">${esc(t(c.products.title, lang))}</h2>
+      <p class="lead">${inline(t(c.products.lead, lang))}</p>
+    </div>
     <div class="products">
-      ${c.products.cards.filter((k) => k.show !== false).map((k) => `<article class="card"><div class="pic"><img src="${esc(k.image)}" alt="${esc(t(k.title, lang))}" loading="lazy"></div>
-        <div class="body"><span class="tag">${esc(t(k.tag, lang))}</span><h3>${esc(t(k.title, lang))}</h3><p>${inline(t(k.text, lang))}</p><a class="btn" href="${esc(k.link || "#order")}" data-pick="${esc(t(k.title, lang))}" data-pack="${esc(k.packaging || "")}">${esc(t(c.products.btn, lang))}</a></div></article>`).join("\n      ")}
+      ${c.products.cards.filter((k) => k.show !== false).map((k) => `<article class="card" data-avoid>
+        <div class="pic"><img src="${esc(k.image)}" alt="${esc(t(k.title, lang))}" loading="lazy" width="400" height="400"></div>
+        <div class="body">
+          <span class="tag">${esc(t(k.tag, lang))}</span>
+          <h3>${esc(t(k.title, lang))}</h3>
+          <p>${inline(t(k.text, lang))}</p>
+          <div class="sp"><b>${H.sizesPrices}</b><ul>${sizes.map((s, i) => isFinite(minAt(i)) ? `<li><span>${s.cm} ${H.cm}</span><span>${esc(H.from(num(minAt(i))))}</span></li>` : "").join("")}</ul></div>
+          <p class="packnote">${esc(packNote(k))}</p>
+          <a class="btn btn-gold btn-sm" data-avoid href="#order" data-pick="${esc(t(k.title, lang))}" data-pack="${esc(k.packaging || "")}" data-img="${esc(k.image)}">${esc(t(c.products.btn, lang))}</a>
+        </div>
+      </article>`).join("\n      ")}
+    </div>
+    <div class="price-table">
+      <h3>${esc(t(c.products.pricesTitle, lang))}</h3>
+      <div class="pt-scroll"><table>
+        <caption>${H.cur}</caption>
+        <thead><tr><th scope="col">${H.filling}</th>${sizes.map((s) => `<th scope="col">${s.cm} ${H.cm}</th>`).join("")}</tr></thead>
+        <tbody>${shown.map((f) => `<tr><th scope="row">${esc(t(f.short, lang))}</th>${sizes.map((s, i) => `<td>${num(f.prices[i])}</td>`).join("")}</tr>`).join("")}</tbody>
+      </table></div>
+      <p class="note">${esc(t(c.products.pricesNote, lang))}</p>
     </div>
   </div>
 </section>
-${c.ring.show !== false ? `
-<section class="ring" id="ring" aria-label="${esc(t(c.ring.kicker, lang))}">
-  <div class="sticky">
-    <span class="kicker">${esc(t(c.ring.kicker, lang))}</span>
-    <h2 class="h2">${esc(t(c.ring.title, lang))}</h2>
-    <div class="stagering"><div class="cyl" id="cyl"></div></div>
-  </div>
-</section>` : ""}
-${c.words.show !== false ? `
-<section class="words dark" id="words" aria-label="${esc(t(c.words.text, lang).replace(/\*/g, ""))}">
-  <div class="sticky"><p id="wordP">${words}</p></div>
-</section>` : ""}
 
-<section class="section center">
+<section class="section alt" id="delivery">
   <div class="wrap">
-    <span class="kicker">${esc(t(c.features.kicker, lang))}</span>
-    <h2 class="h2">${esc(t(c.features.title, lang))}</h2>
-    <div class="feats">
-      ${c.features.items.map((f) => `<div class="feat">${big(f.big)}<h3>${esc(t(f.title, lang))}</h3><p>${inline(t(f.text, lang))}</p></div>`).join("\n      ")}
+    <div class="sec-head">
+      <span class="kicker">${esc(t(c.deliveryInfo.kicker, lang))}</span>
+      <h2 class="h2">${esc(t(c.deliveryInfo.title, lang))}</h2>
+      <p class="lead">${esc(t(c.deliveryInfo.lead, lang))}</p>
     </div>
+    <div class="deliv">
+      ${delivery.map((d) => `<div class="dcard"><h3>${esc(t(d.label, lang))}</h3><p class="fee">${d.price > 0 ? num(d.price) + " " + H.cur : d.price < 0 ? H.deliveryLater : H.deliveryFree}</p>${t(d.note, lang) ? `<p>${esc(t(d.note, lang))}</p>` : ""}</div>`).join("\n      ")}
+    </div>
+  </div>
+</section>
+
+<section class="section order" id="order">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">${esc(t(c.order.kicker, lang))}</span>
+      <h2 class="h2">${esc(t(c.order.title, lang))}</h2>
+      <p class="lead">${inline(t(c.order.lead, lang))}</p>
+    </div>
+    <form class="box" id="f" novalidate></form>
   </div>
 </section>
 
 <section class="section dark" id="story">
   <div class="wrap story">
-    <div class="photo"><img id="storyImg" src="${esc(c.story.image)}" alt="${esc(t(c.story.title, lang))}" loading="lazy"></div>
+    <div class="photo"><img src="${esc(c.story.image)}" alt="${esc(t(c.story.title, lang))}" loading="lazy" width="600" height="750"></div>
     <div>
       <span class="kicker">${esc(t(c.story.kicker, lang))}</span>
       <h2>${esc(t(c.story.title, lang))}</h2>
       <p>${inline(t(c.story.p1, lang))}</p>
       ${t(c.story.p2, lang) ? `<p>${inline(t(c.story.p2, lang))}</p>` : ""}
-      <div class="btns on-dark" style="justify-content:flex-start"><a class="btn btn-gold" href="#order">${u.order}</a>${c.contact.instagram ? `<a class="btn btn-line" href="${esc(c.contact.instagram)}" target="_blank" rel="noopener">Instagram</a>` : ""}</div>
+      <div class="btns on-dark" data-avoid><a class="btn btn-gold" href="#order">${H.orderNow}</a>${c.contact.instagram ? `<a class="btn btn-line" href="${esc(c.contact.instagram)}" target="_blank" rel="noopener">Instagram</a>` : ""}</div>
+    </div>
+  </div>
+  <div class="wrap" id="gallery">
+    <div class="gal-head"><h3>${esc(t(c.gallery.title, lang))}</h3><p>${esc(t(c.gallery.lead, lang))} ${igLink}</p>
+      <div class="gal-nav" data-avoid><button type="button" class="gbtn" data-dir="-1" aria-label="${H.prev}">‹</button><button type="button" class="gbtn" data-dir="1" aria-label="${H.next}">›</button></div></div>
+    <div class="gal" id="gal" tabindex="0" aria-label="${esc(t(c.gallery.title, lang))}">
+      ${gal.map((i) => `<img src="${esc(i.src)}" alt="${esc(t(i.alt, lang))}" loading="lazy" width="400" height="400">`).join("")}
     </div>
   </div>
 </section>
 
-<section class="section center" id="gallery">
+<section class="section" id="faq">
   <div class="wrap">
-    <span class="kicker">${esc(t(c.gallery.kicker, lang))}</span>
-    <h2 class="h2">${esc(t(c.gallery.title, lang))}</h2>
-    <p class="lead">${esc(t(c.gallery.lead, lang))}${igLink ? "<br>" + igLink : ""}</p>
-  </div>
-  <div class="mq" aria-hidden="true">
-    <div class="track" id="tr1">${track(gal.slice(0, half))}</div>
-    <div class="track rev" id="tr2">${track(gal.slice(half))}</div>
-  </div>
-</section>
-
-<section class="section center" id="how" style="padding-top:24px">
-  <div class="wrap">
-    <span class="kicker">${esc(t(c.steps.kicker, lang))}</span>
-    <h2 class="h2">${esc(t(c.steps.title, lang))}</h2>
-    <div class="steps">
-      ${c.steps.items.map((s, i) => `<div class="step"><div class="n">${i + 1}</div><h3>${esc(t(s.title, lang))}</h3><p>${inline(t(s.text, lang))}</p></div>`).join("\n      ")}
+    <div class="sec-head">
+      <span class="kicker">${esc(t(c.faq.kicker, lang))}</span>
+      <h2 class="h2">${esc(t(c.faq.title, lang))}</h2>
     </div>
-  </div>
-</section>
-
-<section class="section order center" id="order">
-  <div class="wrap">
-    <span class="kicker">${esc(t(c.order.kicker, lang))}</span>
-    <h2 class="h2">${esc(t(c.order.title, lang))}</h2>
-    <p class="lead">${inline(t(c.order.lead, lang))}</p>
-    <div class="ow">
-      <form class="box" id="f" novalidate></form>
-      <p class="note" style="text-align:center">${inline(t(c.order.note, lang))}</p>
+    <div class="faq">
+      ${c.faq.items.map((f) => `<details class="qa" data-avoid><summary>${esc(t(f.q, lang))}</summary><p>${inline(t(f.a, lang))}</p></details>`).join("\n      ")}
     </div>
   </div>
 </section>
 
 ${chatHtml(c, lang)}
-
-<section class="section center" id="faq">
-  <div class="wrap">
-    <span class="kicker">${esc(t(c.faq.kicker, lang))}</span>
-    <h2 class="h2">${esc(t(c.faq.title, lang))}</h2>
-    <div class="faq">
-      ${c.faq.items.map((f) => `<details class="qa"><summary>${esc(t(f.q, lang))}</summary><p>${inline(t(f.a, lang))}</p></details>`).join("\n      ")}
-    </div>
-  </div>
-</section>
-
 ${footer(c, lang, pages)}`;
 
   return head(c, lang, {

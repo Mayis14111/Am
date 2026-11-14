@@ -1,6 +1,7 @@
 import { getStore } from "@netlify/blobs";
 import { DEFAULT_CONTENT, LANGS, CONTENT_VERSION } from "./defaults.mjs";
 import { V1_CONTENT } from "./defaults_v1.mjs";
+import { V2_CONTENT } from "./defaults_v2.mjs";
 
 export const store = (name) => getStore({ name, consistency: "strong" });
 
@@ -34,7 +35,9 @@ function dropOldDefaults(saved, old) {
 const LANG_KEYS = (o) => Object.keys(o).every((k) => LANGS.includes(k));
 export function migrate(saved) {
   if (!saved || (saved.version || 1) >= CONTENT_VERSION) return saved;
-  const m = dropOldDefaults(saved, V1_CONTENT);
+  let m = saved;
+  if ((saved.version || 1) < 2) m = dropOldDefaults(m, V1_CONTENT);
+  m = dropOldDefaults(m, V2_CONTENT);
   m.version = CONTENT_VERSION;
   return m;
 }
@@ -106,4 +109,15 @@ export function priceOf(content, fillingId, cm, qty, opts = {}) {
   const q = Number(qty);
   if (!Number.isInteger(q) || q < 1 || q > 9999) return { badQty: true };
   return { unit, qty: q, total: unit * q, filling: f, size: m.sizes[si] };
+}
+
+// Packaging options. Old content had only "box: { enabled, price }".
+export function packsOf(c) {
+  const m = c.menu || {};
+  let packs = Array.isArray(m.packs) && m.packs.length ? m.packs : [
+    { id: "none", label: { hy: "Առանց տուփի", ru: "Без коробки", en: "No box" }, price: 0, show: true },
+    { id: "box", label: { hy: "Տուփով", ru: "В коробке", en: "In a box" }, price: m.box && m.box.price > 0 ? m.box.price : -1, show: true },
+  ];
+  if (m.box && m.box.enabled === false) packs = packs.filter((p) => p.id === "none");
+  return packs.filter((p) => p.show !== false);
 }

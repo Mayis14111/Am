@@ -1,4 +1,4 @@
-import { getContent, json, priceOf, t, siteUrl, yerevanNow, ymd } from "../lib/store.mjs";
+import { getContent, json, priceOf, t, siteUrl, yerevanNow, ymd, store, packsOf } from "../lib/store.mjs";
 import { newId, saveOrder, linkPayment, getOrder } from "../lib/orders.mjs";
 import { sendAll, orderText, orderButtons } from "../lib/telegram.mjs";
 import { paynetReady, getPayment } from "../lib/paynet.mjs";
@@ -37,6 +37,13 @@ export default async (req) => {
   const lang = ["hy", "ru", "en"].includes(b.lang) ? b.lang : "hy";
   const err = (hy, ru, en) => json({ error: { hy, ru, en }[lang] }, 400);
 
+  // the same request sent twice (double click, retry after a lost answer) returns the first order
+  const key = /^[\w-]{8,64}$/.test(b.key || "") ? b.key : null;
+  if (key) {
+    const prev = await store("orders").get("idem/" + key, { type: "json" }).catch(() => null);
+    if (prev) return json({ ...prev, duplicate: true });
+  }
+
   if (!c.order.accept) return err(t(c.order.closedText, "hy"), t(c.order.closedText, "ru"), t(c.order.closedText, "en"));
 
   const p = priceOf(c, b.filling, b.size, b.qty);
@@ -58,8 +65,12 @@ export default async (req) => {
   if (d.address && address.replace(/\s/g, "").length < 5) return err("Խնդրում ենք գրել առաքման ամբողջական հասցեն։", "Пожалуйста, напишите полный адрес доставки.", "Please write the full delivery address.");
   const product = clean(b.product, 120);
 
+  const packs = packsOf(c);
+  const pk = packs.find((x) => x.id === (b.pack || (b.box ? "box" : "none")));
+  if (!pk) return err("Խնդրում ենք ընտրել փաթեթավորումը։", "Пожалуйста, выберите упаковку.", "Please choose the packaging.");
   const deliveryFee = d.price > 0 ? +d.price : 0;
-  const boxFee = b.box && c.menu.box.enabled && c.menu.box.price > 0 ? c.menu.box.price * p.qty : 0;
+  const boxFee = pk.price > 0 ? pk.price * p.qty : 0;
+  const packLater = pk.price < 0, deliveryLater = d.price < 0;
   const o = {
     id: newId(),
     createdAt: new Date().toISOString(),
@@ -71,7 +82,10 @@ export default async (req) => {
     size: p.size.cm,
     qty: p.qty,
     unit: p.unit,
-    box: !!b.box,
+    box: pk.id !== "none",
+    pack: pk.id,
+    packLabel: t(pk.label, "hy"),
+    packLater,
     boxFee,
     deliveryFee,
     total: p.total + boxFee + deliveryFee,
@@ -80,7 +94,7 @@ export default async (req) => {
     customer: { name, phone },
     notes: clean(b.notes, 600),
     product,
-    estimate: !!(b.box && c.menu.box.enabled && !(c.menu.box.price > 0)) || d.price < 0,
+    estimate: packLater || deliveryLater,
     status: "new",
     statusHistory: [{ status: "new", at: new Date().toISOString(), by: "customer" }],
     payment: { method: "cash", status: "none" },
@@ -88,7 +102,8 @@ export default async (req) => {
   };
 
   let checkoutUrl = null, payError = null;
-  const wantOnline = b.pay === "online" && c.payments.enabled && paynetReady();
+  // never charge an estimate as if it were final: online payment only when every charge is known
+  const wantOnline = b.pay === "online" && c.payments.enabled && paynetReady() && !o.estimate;
   if (wantOnline) {
     try { checkoutUrl = await startPayment(o, c, siteUrl(req)); }
     catch (e) { payError = String(e.message || e); o.payment = { method: "cash", status: "none", error: payError }; }
@@ -99,7 +114,9 @@ export default async (req) => {
   const telegramOk = tgr.some((r) => r.ok);
   if (!telegramOk) console.error("telegram failed", JSON.stringify(tgr));
 
-  return json({ ok: true, id: o.id, total: o.total, token: orderToken(o.id), checkoutUrl, payError: payError ? true : undefined, telegramOk });
+  const res = { ok: true, id: o.id, total: o.total, estimate: o.estimate, token: orderToken(o.id), checkoutUrl, payError: payError ? true : undefined };
+  if (key) await store("orders").setJSON("idem/" + key, res).catch(() => {});
+  return json({ ...res, telegramOk });
 };
 
 export const config = { path: "/api/order", rateLimit: { windowLimit: 20, windowSize: 60, aggregateBy: ["ip", "domain"] } };

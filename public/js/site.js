@@ -71,7 +71,7 @@ const T = {
     product: (p) => `Ընտրված տեսակը՝ ${p}`,
     qty: (n) => `Քանակը՝ ${n} հատ`,
     withBox: "Տուփով", noBox: "Առանց տուփի",
-    day: (d) => `Ստանալու օրը՝ ${d}`,
+    day: (d) => `Ստացման ամսաթիվ՝ ${d}`,
     payOnline: "Վճարում՝ առցանց", payCash: "Վճարում՝ պատվերը ստանալիս",
     note: (n) => `Լրացուցիչ ցանկություններ՝ ${n}`,
     estimate: (p) => `Նախնական գումար՝ ${p}`,
@@ -306,89 +306,207 @@ const isoDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getD
 // "today" is always the date in Armenia (UTC+4), the same rule the server uses
 const today = () => { const n = new Date(Date.now() + 4 * 3600e3); return new Date(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate()); };
 
-/* ================= scenes & motion ================= */
-if (G.ring && $("cyl")) $("cyl").innerHTML = G.ring.map((i) => `<div class="face"><img src="${i.src}" alt="${(i.alt || "").replace(/"/g, "&quot;")}" loading="lazy"></div>`).join("");
-function layoutRing() {
-  if (reduce || !$("cyl")) return;
-  const faces = [...document.querySelectorAll(".face")]; if (!faces.length) return;
-  const w = $("cyl").offsetWidth;
-  const R = Math.round(w / 2 / Math.tan(Math.PI / Math.max(3, faces.length)) + w * 0.12);
-  faces.forEach((f, i) => (f.style.transform = `rotateY(${(i * 360) / faces.length}deg) translateZ(${R}px)`));
-}
+/* ================= extra texts (form v3, price lines, chat controls) ================= */
+const WD = {
+  hy: ["կիրակի", "երկուշաբթի", "երեքշաբթի", "չորեքշաբթի", "հինգշաբթի", "ուրբաթ", "շաբաթ"],
+  ru: ["воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"],
+  en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+};
+Object.assign(T.hy, {
+  closeChat: "Փակել չատը",
+  introNone: " Մի քանի հարց կտամ, հետո կկարողանաք ստուգել և ուղարկել պատվերը։",
+  ctlBack: "Հետ", ctlChange: "Փոխել ընտրությունը", ctlContact: "Կապվել մեզ հետ",
+  contactText: (p) => `Կարող եք զանգահարել կամ գրել մեզ՝ ${p}։ Պատվերի լրացումը կարող եք շարունակել այստեղ։`,
+  backNone: "Ավելի հետ գնալ չի ստացվում։",
+  sizesHead: "Չափսեր և գներ՝",
+  kindHead: (s) => `${s}՝ միջուկներ և գներ՝`,
+  packHead: "Ինչպե՞ս փաթեթավորենք գաթան։",
+  fromForm: (g) => `Պատվերի ձևից վերցրեցի՝ ${g}։`,
+  received: (id) => `Ձեր պատվերն ուղարկված է։ Պատվերի համարը՝ ${id}։ Մենք կկապվենք ձեզ հետ՝ մանրամասները հաստատելու համար։`,
+  lineGata: "Գաթայի արժեքը", lineBox: "Տուփի արժեքը", linePack: "Փաթեթավորման արժեքը", lineDel: "Առաքման արժեքը",
+  tbd: "Ենթակա է ճշտման", free: "Անվճար", estLabel: "Նախնական գումար", totLabel: "Ընդհանուր գումար",
+  estNote: "Վերջնական գումարը կհաստատենք պատվերը հաստատելիս։",
+  payLater: "Առցանց վճարումը հասանելի կլինի վերջնական գինը հաստատելուց հետո։",
+  orderClosed: "Պատվերն արդեն ուղարկված է։ Նոր պատվերի համար սեղմեք «Պատվիրել չատով»։",
+});
+Object.assign(T.ru, {
+  closeChat: "Закрыть чат",
+  introNone: " Задам несколько вопросов, затем вы сможете проверить и отправить заказ.",
+  ctlBack: "Назад", ctlChange: "Изменить выбор", ctlContact: "Связаться с нами",
+  contactText: (p) => `Вы можете позвонить или написать нам: ${p}. Оформление заказа можно продолжить здесь.`,
+  backNone: "Дальше назад нельзя.",
+  sizesHead: "Размеры и цены:",
+  kindHead: (s) => `${s}: начинки и цены:`,
+  packHead: "Как упаковать гату?",
+  fromForm: (g) => `Взяла из формы заказа: ${g}.`,
+  received: (id) => `Ваш заказ отправлен. Номер заказа: ${id}. Мы свяжемся с вами, чтобы подтвердить детали.`,
+  lineGata: "Стоимость гаты", lineBox: "Стоимость коробки", linePack: "Стоимость упаковки", lineDel: "Стоимость доставки",
+  tbd: "Уточняется", free: "Бесплатно", estLabel: "Предварительная сумма", totLabel: "Итого",
+  estNote: "Итоговую сумму подтвердим при подтверждении заказа.",
+  payLater: "Онлайн-оплата будет доступна после подтверждения итоговой цены.",
+  orderClosed: "Заказ уже отправлен. Для нового заказа нажмите «Заказать в чате».",
+});
+Object.assign(T.en, {
+  closeChat: "Close chat",
+  introNone: " I'll ask a few questions, then you can check and send your order.",
+  ctlBack: "Back", ctlChange: "Change choice", ctlContact: "Contact us",
+  contactText: (p) => `You can call or message us: ${p}. You can keep filling in your order here.`,
+  backNone: "Can't go back any further.",
+  sizesHead: "Sizes and prices:",
+  kindHead: (s) => `${s}: fillings and prices:`,
+  packHead: "How should we pack it?",
+  fromForm: (g) => `Taken from the order form: ${g}.`,
+  received: (id) => `Your order has been sent. Order number: ${id}. We'll contact you to confirm the details.`,
+  lineGata: "Gata price", lineBox: "Box price", linePack: "Packaging price", lineDel: "Delivery price",
+  tbd: "To be confirmed", free: "Free", estLabel: "Estimated total", totLabel: "Total",
+  estNote: "We'll confirm the final total when we confirm your order.",
+  payLater: "Online payment becomes available once the final price is confirmed.",
+  orderClosed: "The order has been sent. For a new order, tap “Order in chat”.",
+});
+Object.assign(F.hy, {
+  s1: "Գաթան", s2: "Արժեքը", s3: "Ստացումը", s4: "Ձեր տվյալները", s5: "Լրացուցիչ ցանկություններ", s6: "Ստուգեք և ուղարկեք",
+  picked: "Ձեր ընտրությունը", change: "Փոխել",
+  size: "Չափս", kind: "Միջուկ", box: "Փաթեթավորում", qty: "Քանակ", date: "Ստացման ամսաթիվ", how: "Ստացման եղանակ", addr: "Առաքման հասցե",
+  name: "Անուն", phone: "Հեռախոսահամար", notes: "Լրացուցիչ ցանկություններ", optional: "ոչ պարտադիր",
+  notesPh: "Օրինակ՝ գույնը, սկզբնատառերը կամ ստացման նախընտրելի ժամը։", submit: "Ուղարկել պատվերը", submitPay: "Ուղարկել պատվերը և վճարել",
+  reviewEmpty: "Լրացրեք վերևի դաշտերը, և այստեղ կտեսնեք ձեր պատվերը։",
+  failSaved: "Ձեր տվյալները պահպանված են ձևում․ կարող եք նորից փորձել։",
+});
+Object.assign(F.ru, {
+  s1: "Гата", s2: "Стоимость", s3: "Получение", s4: "Ваши данные", s5: "Дополнительные пожелания", s6: "Проверьте и отправьте",
+  picked: "Ваш выбор", change: "Изменить",
+  size: "Размер", kind: "Начинка", box: "Упаковка", qty: "Количество", date: "Дата получения", how: "Способ получения", addr: "Адрес доставки",
+  name: "Имя", phone: "Номер телефона", notes: "Дополнительные пожелания", optional: "необязательно",
+  notesPh: "Например: цвет, инициалы или удобное время получения.", submit: "Отправить заказ", submitPay: "Отправить заказ и оплатить",
+  reviewEmpty: "Заполните поля выше — здесь появится ваш заказ.",
+  failSaved: "Ваши данные сохранены в форме — можно попробовать ещё раз.",
+});
+Object.assign(F.en, {
+  s1: "Your gata", s2: "Price", s3: "Receiving", s4: "Your details", s5: "Extra requests", s6: "Check and send",
+  picked: "Your choice", change: "Change",
+  size: "Size", kind: "Filling", box: "Packaging", qty: "Quantity", date: "Date needed", how: "How you'll receive it", addr: "Delivery address",
+  name: "Name", phone: "Phone number", notes: "Extra requests", optional: "optional",
+  notesPh: "For example: colour, initials or preferred pickup time.", submit: "Send order", submitPay: "Send order and pay",
+  reviewEmpty: "Fill in the fields above and your order will appear here.",
+  failSaved: "Your details are kept in the form, so you can try again.",
+});
 
-/* mobile menu */
+/* ================= shared price rules (form and chat use the same) ================= */
+const PACKS = (G.packs && G.packs.length ? G.packs : [{ id: "none", label: { hy: "Առանց տուփի", ru: "Без коробки", en: "No box" }, price: 0 }]);
+const pOpt = (id) => PACKS.find((p) => p.id === id);
+function calc({ fillingId, sizeIdx, qty, packId, deliveryId }) {
+  const f = SHOWN.find((x) => x.id === fillingId), unit = f ? +f.prices[sizeIdx] || 0 : 0, q = qty || 1;
+  const pk = pOpt(packId) || pOpt("none") || { id: "none", price: 0 }, d = dOpt(deliveryId) || {};
+  const pack = pk.id === "none" ? null : { label: pk.id === "box" ? "box" : "pack", known: !(pk.price < 0), amount: pk.price > 0 ? pk.price * q : 0 };
+  const deliv = deliveryId ? { known: !(d.price < 0), amount: d.price > 0 ? +d.price : 0 } : null;
+  const gata = unit * q;
+  const estimate = (pack && !pack.known) || (deliv && !deliv.known);
+  return { unit, q, gata, pack, deliv, total: gata + (pack ? pack.amount : 0) + (deliv ? deliv.amount : 0), estimate: !!estimate };
+}
+/* price lines as [label, value, isUnknown] */
+function priceLines(p, l) {
+  const t = T[l], out = [[t.lineGata, (p.q > 1 ? `${p.q} × ${fmtL(p.unit, l)} = ` : "") + fmtL(p.gata, l)]];
+  if (p.pack) out.push([p.pack.label === "box" ? t.lineBox : t.linePack, p.pack.known ? fmtL(p.pack.amount, l) : t.tbd, !p.pack.known]);
+  if (p.deliv) out.push([t.lineDel, p.deliv.known ? (p.deliv.amount ? fmtL(p.deliv.amount, l) : t.free) : t.tbd, !p.deliv.known]);
+  return out;
+}
+const totalLine = (p, l) => `${p.estimate ? T[l].estLabel : T[l].totLabel}՝ ${fmtL(p.total, l)}`.replace("՝", l === "hy" ? "՝" : ":");
+function priceTextBlock(p, l) {
+  const s = priceLines(p, l).map(([a, b]) => `${a}${l === "hy" ? "՝" : ":"} ${b}`).join("\n") + "\n" + totalLine(p, l);
+  return p.estimate ? s + "\n" + T[l].estNote : s;
+}
+const longDate = (d, l) => (l === "en" ? `${WD.en[d.getDay()]}, ${d.getDate()} ${MON.en[d.getMonth()]} ${d.getFullYear()}` : `${d.getDate()} ${MON[l][d.getMonth()]}, ${d.getFullYear()} (${WD[l][d.getDay()]})`);
+const parseISO = (v) => { const [y, m, dd] = String(v).split("-").map(Number); return new Date(y, m - 1, dd); };
+const newKey = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 12));
+
+/* ================= mobile menu (focus moves into it, Esc returns) ================= */
 const burger = $("burger"), mm = $("mmenu");
 if (burger && mm) {
-  const set = (o) => { mm.hidden = !o; burger.setAttribute("aria-expanded", o); };
+  const set = (o, focusBack) => {
+    mm.hidden = !o; burger.setAttribute("aria-expanded", o);
+    if (o) mm.querySelector("a")?.focus(); else if (focusBack) burger.focus();
+  };
   burger.addEventListener("click", () => set(mm.hidden));
   mm.addEventListener("click", (e) => { if (e.target.closest("a")) set(false); });
-  addEventListener("keydown", (e) => { if (e.key === "Escape") set(false); });
+  addEventListener("keydown", (e) => { if (e.key === "Escape" && !mm.hidden) set(false, true); });
 }
+
+/* ================= gallery: swipe on phones, arrows on computers ================= */
+const gal = $("gal");
+if (gal) document.querySelectorAll(".gbtn").forEach((b) => b.addEventListener("click", () => gal.scrollBy({ left: +b.dataset.dir * gal.clientWidth * 0.8, behavior: reduce ? "auto" : "smooth" })));
 
 /* ================= order form ================= */
 const FL = F[PL];
 const form = $("f");
+let formKey = newKey(), sending = false, picked = { title: "" };
+const touched = new Set();
+const opt = (v, l, s) => `<option value="${v}"${s ? " selected" : ""}>${l}</option>`;
+const fieldHtml = (id, label, input, extra = "") => `<label for="${id}" id="${id}L"${extra}>${label}${input}<span class="err" id="${id}E" hidden></span></label>`;
 function buildForm() {
   if (!form) return;
-  if (!G.accept) { form.innerHTML = `<h3>${FL.title}</h3><div class="closed">${G.closedText || ""}<br>📞 ${PHONES}</div>`; return; }
-  const opt = (v, l, s) => `<option value="${v}"${s ? " selected" : ""}>${l}</option>`;
+  if (!G.accept) { form.innerHTML = `<div class="closed">${G.closedText || ""}<br>📞 ${PHONES}</div>`; return; }
   const mid = Math.min(1, SIZES.length - 1);
   form.innerHTML = `
-    <h3>${FL.title}</h3>
-    <div class="picked" id="fpicked" hidden><span></span><button type="button" aria-label="×" id="fpickedX">×</button></div>
     <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px" aria-hidden="true">
-    <div class="row">
-      <label for="name">${FL.name}<input id="name" required placeholder="${FL.namePh}" autocomplete="name" maxlength="80"></label>
-      <label for="phone">${FL.phone}<input id="phone" required placeholder="+374 …" type="tel" autocomplete="tel" maxlength="30"></label>
-    </div>
-    <div class="row">
-      <label for="fsize">${FL.size}<select id="fsize">${SIZES.map((s, i) => opt(i, sizeL(i, PL), i === mid)).join("")}</select></label>
-      <label for="kind">${FL.kind}<select id="kind">${SHOWN.map((f) => opt(f.id, tx(f.name, PL))).join("")}</select></label>
-    </div>
-    <label for="fchoco" id="fchocoL" hidden>${FL.choco}<select id="fchoco">${Object.keys(CHOCO).map((k) => opt(k, tx(CHOCO[k], PL))).join("")}</select></label>
-    <div class="row">
-      ${MENU.box && MENU.box.enabled ? `<label for="fbox">${FL.box}<select id="fbox">${opt("none", FL.noBox)}${opt("box", FL.withBox)}</select></label>` : ""}
-      <label for="qty">${FL.qty}<input id="qty" type="number" min="1" max="9999" step="1" value="1" inputmode="numeric"></label>
-    </div>
-    <div class="row">
-      <label for="date">${FL.date}<input id="date" type="date" required></label>
-      <label for="how2">${FL.how}<select id="how2">${DELIV.map((d) => opt(d.id, tx(d.label, PL))).join("")}</select></label>
-    </div>
-    <div class="fwarn" id="fsoon" hidden>${T[PL].soon(PHONES).trim()}</div>
-    <label for="faddr" id="faddrL" hidden>${FL.addr}<input id="faddr" placeholder="${FL.addrPh}" maxlength="200"></label>
-    <label for="notes">${FL.notes}<textarea id="notes" rows="2" placeholder="${FL.notesPh}" maxlength="600"></textarea></label>
-    ${G.pay ? `<div class="pay-pick" role="radiogroup" aria-label="${FL.pay}">
-      <label><input type="radio" name="pay" value="online" checked><span>${FL.payOn}<small>${FL.payOnS}</small></span></label>
-      <label><input type="radio" name="pay" value="cash"><span>${FL.payCash}<small>${FL.payCashS}</small></span></label>
-    </div>` : ""}
-    <div class="fprice" id="fprice"></div>
-    <button class="btn btn-gold" type="submit" id="fsubmit">${FL.submit}</button>
-    <div class="done" id="done" hidden></div>`;
-  const md = new Date(today().getTime() + Math.max(1, G.minDays || 0) * 864e5 + 36e5);
+    <div class="picked" id="fpicked" hidden><img alt="" id="fpickedImg"><div><small>${FL.picked}</small><b id="fpickedT"></b></div><button type="button" id="fpickedX">${FL.change}</button></div>
+    <fieldset class="fs"><legend><i>1</i>${FL.s1}</legend>
+      <div class="row">
+        ${fieldHtml("fsize", FL.size, `<select id="fsize">${SIZES.map((s, i) => opt(i, sizeL(i, PL), i === mid)).join("")}</select>`)}
+        ${fieldHtml("kind", FL.kind, `<select id="kind">${SHOWN.map((f) => opt(f.id, tx(f.name, PL))).join("")}</select>`)}
+      </div>
+      ${fieldHtml("fchoco", FL.choco, `<select id="fchoco">${Object.keys(CHOCO).map((k) => opt(k, tx(CHOCO[k], PL))).join("")}</select>`, " hidden")}
+      <div class="row">
+        ${fieldHtml("fpack", FL.box, `<select id="fpack">${PACKS.map((p) => opt(p.id, tx(p.label, PL))).join("")}</select>`)}
+        ${fieldHtml("qty", FL.qty, `<input id="qty" type="number" min="1" max="9999" step="1" value="1" inputmode="numeric" aria-describedby="qtyE">`)}
+      </div>
+    </fieldset>
+    <fieldset class="fs"><legend><i>2</i>${FL.s2}</legend><div class="breakdown" id="fprice" aria-live="polite"></div><p class="note" id="fpaynote" hidden></p></fieldset>
+    <fieldset class="fs"><legend><i>3</i>${FL.s3}</legend>
+      <div class="row">
+        ${fieldHtml("date", FL.date, `<input id="date" type="date" required aria-describedby="dateE">`)}
+        ${fieldHtml("how2", FL.how, `<select id="how2">${DELIV.map((d) => opt(d.id, tx(d.label, PL))).join("")}</select>`)}
+      </div>
+      <p class="note" id="fdnote"></p>
+      <div class="fwarn" id="fsoon" hidden>${T[PL].soon(PHONES).trim()}</div>
+      ${fieldHtml("faddr", FL.addr, `<input id="faddr" autocomplete="street-address" placeholder="${FL.addrPh}" maxlength="200" aria-describedby="faddrE">`, " hidden")}
+    </fieldset>
+    <fieldset class="fs"><legend><i>4</i>${FL.s4}</legend>
+      <div class="row">
+        ${fieldHtml("name", FL.name, `<input id="name" required autocomplete="name" maxlength="80" aria-describedby="nameE">`)}
+        ${fieldHtml("phone", FL.phone, `<input id="phone" required type="tel" inputmode="tel" autocomplete="tel" placeholder="+374 …" maxlength="30" aria-describedby="phoneE">`)}
+      </div>
+    </fieldset>
+    <fieldset class="fs"><legend><i>5</i>${FL.s5}</legend>
+      ${fieldHtml("notes", `${FL.notes} <span class="note">(${FL.optional})</span>`, `<textarea id="notes" rows="2" maxlength="600" aria-describedby="notesH"></textarea><span class="note" id="notesH">${FL.notesPh}</span>`)}
+    </fieldset>
+    <fieldset class="fs"><legend><i>6</i>${FL.s6}</legend>
+      <div class="review" id="freview" aria-live="polite"></div>
+      ${G.pay ? `<div class="pay-pick" id="fpaypick" role="radiogroup" aria-label="${FL.pay}">
+        <label><input type="radio" name="pay" value="cash" checked><span>${FL.payCash}<small>${FL.payCashS}</small></span></label>
+        <label><input type="radio" name="pay" value="online"><span>${FL.payOn}<small>${FL.payOnS}</small></span></label>
+      </div>` : ""}
+      <button class="btn btn-gold btn-submit" type="submit" id="fsubmit">${FL.submit}</button>
+      <p class="note">${G.orderNote || ""}</p>
+      <div class="done" id="done" hidden tabindex="-1"></div>
+    </fieldset>`;
   $("date").min = isoDate(today());
   $("date").max = isoDate(new Date(today().getTime() + 366 * 864e5));
-  $("date").value = isoDate(md);
-  $("fpickedX").addEventListener("click", () => setPicked(null));
-  form.addEventListener("input", fUpdate);
-  form.addEventListener("change", fUpdate);
+  $("date").value = isoDate(new Date(today().getTime() + Math.max(1, G.minDays || 0) * 864e5 + 36e5));
+  $("fpickedX").addEventListener("click", () => document.getElementById("products")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }));
+  form.addEventListener("input", (e) => { if (e.target.id) { touched.add(e.target.id); clearErr(e.target.id); } fUpdate(); });
+  form.addEventListener("change", (e) => { if (e.target.id) touched.add(e.target.id); fUpdate(); });
+  form.addEventListener("focusout", (e) => { if (["name", "phone", "qty", "date", "faddr"].includes(e.target.id) && e.target.value) validateField(e.target.id); });
   form.addEventListener("submit", fSubmit);
   fUpdate();
 }
 function fState() {
-  const si = +$("fsize").value, f = fill($("kind").value), qRaw = $("qty").value.trim(), q = Number(qRaw);
-  const qOk = /^\d+$/.test(qRaw) && q >= 1 && q <= 9999, qq = qOk ? q : 1;
-  const unit = f ? +f.prices[si] || 0 : 0, d = dOpt($("how2").value) || {};
-  const box = !!($("fbox") && $("fbox").value === "box");
-  const boxFee = box && MENU.box.price > 0 ? MENU.box.price * qq : 0;
-  const dFee = d.price > 0 ? +d.price : 0;
+  const si = +$("fsize").value, f = SHOWN.find((x) => x.id === $("kind").value), qRaw = $("qty").value.trim(), q = Number(qRaw);
+  const qOk = /^\d+$/.test(qRaw) && q >= 1 && q <= 9999;
+  const d = dOpt($("how2").value) || {};
+  const packId = $("fpack").value;
   const pay = (form.querySelector("input[name=pay]:checked") || {}).value || "cash";
-  return { si, f, q: qq, qOk, unit, box, d, total: unit * qq + boxFee + dFee, boxLater: box && !(MENU.box.price > 0), dLater: d.price < 0, dFee, boxFee, pay };
-}
-/* price text shared by the form, chat and WhatsApp message */
-function priceText(total, boxLater, dLater, l, unit, q) {
-  const t = T[l], est = boxLater || dLater;
-  const head = (est ? t.estimate : t.total)(fmtL(total, l)) + (q > 1 ? ` (${q} × ${fmtL(unit, l)})` : "");
-  return est ? head + "\n" + t.extras(boxLater, dLater) : head;
+  const p = calc({ fillingId: f && f.id, sizeIdx: si, qty: qOk ? q : 1, packId, deliveryId: d.id });
+  return { si, f, q: qOk ? q : 1, qOk, packId, d, p, pay };
 }
 const dateCheck = (v) => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return "bad";
@@ -399,14 +517,55 @@ const dateCheck = (v) => {
   return (d - today()) / 864e5 < Math.max(1, G.minDays || 0) ? "soon" : "ok";
 };
 function fUpdate() {
-  const s = fState();
-  $("faddrL").hidden = !s.d.address; $("faddr").required = !!s.d.address;
+  const s = fState(), t = T[PL];
+  $("faddrL").hidden = !s.d.address;
   $("fchocoL").hidden = !(s.f && s.f.id === "choco");
-  const [h, x] = priceText(s.total, s.boxLater, s.dLater, PL, s.unit, s.q).split("\n");
-  $("fprice").innerHTML = ""; $("fprice").append("💰 " + h);
-  if (x) { const sm = document.createElement("small"); sm.textContent = x; $("fprice").append(sm); }
+  $("fdnote").textContent = tx(s.d.note, PL);
+  // price breakdown
+  const box = $("fprice"); box.innerHTML = "";
+  for (const [a, b, unk] of priceLines(s.p, PL)) { const r = document.createElement("div"); r.innerHTML = "<span></span><span></span>"; r.firstChild.textContent = a; r.lastChild.textContent = b; if (unk) r.lastChild.className = "tbd"; box.append(r); }
+  const tot = document.createElement("div"); tot.className = "tot"; tot.innerHTML = "<span></span><span></span>";
+  tot.firstChild.textContent = s.p.estimate ? t.estLabel : t.totLabel; tot.lastChild.textContent = fmtL(s.p.total, PL); box.append(tot);
+  if (s.p.estimate) { const sm = document.createElement("small"); sm.textContent = t.estNote; box.append(sm); }
+  // online payment only for final prices
+  const pp = $("fpaypick");
+  if (pp) {
+    pp.querySelector("input[value=online]").disabled = s.p.estimate;
+    if (s.p.estimate) pp.querySelector("input[value=cash]").checked = true;
+    $("fpaynote").hidden = !s.p.estimate; $("fpaynote").textContent = t.payLater;
+  }
   $("fsoon").hidden = dateCheck($("date").value) !== "soon";
-  $("fsubmit").textContent = G.pay && s.pay === "online" ? FL.submitPay : FL.submit;
+  $("fsubmit").textContent = G.pay && fState().pay === "online" ? FL.submitPay : FL.submit;
+  // review
+  $("freview").textContent = reviewText(s);
+}
+function reviewText(s) {
+  const t = T[PL], l = PL, lines = [];
+  if (picked.title) lines.push(t.product(picked.title));
+  lines.push(`${tx(s.f && s.f.short, l)}${t.gataWord}, ${sizeL(s.si, l).toLowerCase()} — ${t.qty(s.q)}`);
+  lines.push(`${FL.box}${l === "hy" ? "՝" : ":"} ${tx((pOpt(s.packId) || {}).label, l)}`);
+  const dc = dateCheck($("date").value);
+  lines.push(`${FL.date}${l === "hy" ? "՝" : ":"} ${dc === "bad" ? "—" : longDate(parseISO($("date").value), l)}`);
+  lines.push(`${FL.how}${l === "hy" ? "՝" : ":"} ${tx(s.d.label, l)}${s.d.address && $("faddr").value.trim() ? ", " + $("faddr").value.trim() : ""}`);
+  if ($("name").value.trim() || $("phone").value.trim()) lines.push(`${$("name").value.trim()} ${$("phone").value.trim()}`.trim());
+  if ($("notes").value.trim()) lines.push(t.note($("notes").value.trim()));
+  lines.push("", totalLine(s.p, l));
+  return lines.join("\n");
+}
+function setErr(id, msg) {
+  const el = $(id), e = $(id + "E"); if (!el || !e) return;
+  el.setAttribute("aria-invalid", "true"); e.textContent = msg; e.hidden = false;
+}
+function clearErr(id) { const el = $(id), e = $(id + "E"); if (el) el.removeAttribute("aria-invalid"); if (e) { e.hidden = true; e.textContent = ""; } }
+function validateField(id) {
+  const t = T[PL], s = fState(), v = ($(id).value || "").trim();
+  clearErr(id);
+  if (id === "name" && !v) return setErr(id, FL.need), false;
+  if (id === "phone") { const dg = v.replace(/\D/g, ""); if (!v) return setErr(id, FL.need), false; if (dg.length < 8 || dg.length > 15) return setErr(id, t.phoneBad), false; }
+  if (id === "qty" && !s.qOk) return setErr(id, t.qtyBad), false;
+  if (id === "date") { const dc = dateCheck(v); if (!v) return setErr(id, FL.need), false; if (dc === "bad") return setErr(id, FL.dateBad), false; if (dc === "past") return setErr(id, t.past.trim()), false; }
+  if (id === "faddr" && s.d.address && v.replace(/\s/g, "").length < 5) return setErr(id, v ? t.addrBad : FL.need), false;
+  return true;
 }
 async function postOrder(body) {
   const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 20000);
@@ -414,81 +573,70 @@ async function postOrder(body) {
     const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: ctl.signal });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) return { ok: false, error: j.error, status: r.status };
+    if (!j.ok || !j.id) return { ok: false, network: true };
     return j;
   } catch (e) { return { ok: false, network: true }; } finally { clearTimeout(tm); }
 }
 function waLink(text) { return G.whatsapp ? `https://wa.me/${G.whatsapp}?text=${encodeURIComponent(text)}` : ""; }
 const telHref = () => "tel:" + String((G.phones || [])[0] || "").replace(/[^\d+]/g, "").replace(/^0/, "+374");
-/* buttons shown when we could not confirm that the order arrived */
 function fallbackButtons(text, l) {
   const t = T[l], w = document.createElement("div"); w.className = "qr keep";
   const link = waLink(text);
   if (link) { const a = document.createElement("a"); a.className = "wa"; a.href = link; a.target = "_blank"; a.rel = "noopener"; a.textContent = t.wa; w.appendChild(a); }
-  if ((G.phones || []).length) { const a = document.createElement("a"); a.className = "call"; a.href = telHref(); a.textContent = t.call; w.appendChild(a); }
-  const b = document.createElement("button"); b.type = "button"; b.className = "qrb"; b.textContent = t.copy;
-  b.addEventListener("click", () => { navigator.clipboard?.writeText(text).then(() => { b.textContent = t.copied; }).catch(() => { b.textContent = t.copyFail; }); });
-  w.appendChild(b);
+  if ((G.phones || []).length) { const a = document.createElement("a"); a.className = "call"; a.href = telHref(); a.textContent = `${t.call} · ${G.phones[0]}`; w.appendChild(a); }
+  if (text) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "qrb"; b.textContent = t.copy;
+    b.addEventListener("click", () => { navigator.clipboard?.writeText(text).then(() => { b.textContent = t.copied; }).catch(() => { b.textContent = t.copyFail; }); });
+    w.appendChild(b);
+  }
   return w;
-}
-function fieldError(id, msg) {
-  const el = $(id); el.focus(); el.setCustomValidity(msg); el.reportValidity();
-  el.addEventListener("input", () => el.setCustomValidity(""), { once: true });
-  setTimeout(() => el.setCustomValidity(""), 4000);
 }
 async function fSubmit(e) {
   e.preventDefault();
-  const t = T[PL];
-  for (const id of ["name", "phone", "qty", "date", "faddr"]) {
-    const el = $(id);
-    if ((el.required || id === "qty") && !el.value.trim()) return fieldError(id, FL.need);
-  }
-  const s = fState();
-  const digits = $("phone").value.replace(/\D/g, "");
-  if (digits.length < 8 || digits.length > 15) return fieldError("phone", t.phoneBad);
-  if (!s.qOk) return fieldError("qty", t.qtyBad);
-  const dc = dateCheck($("date").value);
-  if (dc === "bad") return fieldError("date", FL.dateBad);
-  if (dc === "past") return fieldError("date", t.past.trim());
-  if (s.d.address && $("faddr").value.replace(/\s/g, "").length < 5) return fieldError("faddr", t.addrBad);
+  if (sending) return; // no double orders from repeated clicks
+  const t = T[PL], s = fState();
+  const ids = ["qty", "date", "faddr", "name", "phone"].filter((id) => id !== "faddr" || s.d.address);
+  const bad = ids.filter((id) => !validateField(id));
+  if (bad.length) { $(bad[0]).focus(); return; }
   const d = $("done"), btn = $("fsubmit");
   const body = {
-    lang: PL, source: "form", filling: s.f && s.f.id, choco: s.f && s.f.id === "choco" ? tx(CHOCO[$("fchoco").value], "hy") : "",
-    size: SIZES[s.si] && SIZES[s.si].cm, qty: s.q, box: s.box, date: $("date").value, delivery: s.d.id, address: $("faddr").value,
-    name: $("name").value, phone: $("phone").value, notes: $("notes").value, product: picked.title, pay: s.pay,
+    key: formKey, lang: PL, source: "form", filling: s.f && s.f.id, choco: s.f && s.f.id === "choco" ? tx(CHOCO[$("fchoco").value], "hy") : "",
+    size: SIZES[s.si] && SIZES[s.si].cm, qty: s.q, pack: s.packId, box: s.packId !== "none", date: $("date").value, delivery: s.d.id, address: s.d.address ? $("faddr").value : "",
+    name: $("name").value, phone: $("phone").value, notes: $("notes").value, product: picked.title, pay: s.p.estimate ? "cash" : s.pay,
     website: form.querySelector("input[name=website]").value,
   };
-  btn.disabled = true; d.hidden = false; d.textContent = FL.sending;
+  sending = true; btn.disabled = true; btn.textContent = FL.sending; d.hidden = true; d.className = "done";
   const r = await postOrder(body);
-  btn.disabled = false;
+  sending = false; btn.disabled = false; fUpdate();
+  d.hidden = false;
   if (r.ok) {
+    // success is shown only after the server confirms the order was saved
     if (r.checkoutUrl) { d.textContent = FL.redirect; location.href = r.checkoutUrl; return; }
-    d.textContent = t.received(r.id) + (r.payError ? "\n\n" + t.payFail : "");
-    form.querySelectorAll("input:not([type=radio]):not([name=website]),textarea").forEach((i) => { if (i.id !== "qty" && i.id !== "date") i.value = ""; });
-    setPicked(null); fUpdate();
+    d.className = "done ok"; d.textContent = t.received(r.id) + (r.payError ? "\n\n" + t.payFail : "");
+    formKey = newKey();
+    $("notes").value = ""; setPicked(null); touched.clear(); fUpdate();
   } else if (r.error) {
-    d.textContent = "⚠️ " + r.error;
+    d.className = "done bad"; d.textContent = "⚠️ " + r.error + "\n" + FL.failSaved;
   } else {
-    const lines = [t.plainHead, ""];
-    if (picked.title) lines.push("• " + t.product(picked.title));
-    lines.push(`• ${tx(s.f && s.f.name, PL)}, ${sizeL(s.si, PL)}`, `• ${t.qty(s.q)}`);
-    if ($("fbox")) lines.push(`• ${s.box ? t.withBox : t.noBox}`);
-    lines.push(`• ${t.day(body.date)}`, `• ${tx(s.d.label, PL)}${body.address ? ", " + body.address : ""}`, `• ${body.name}, ${body.phone}`);
-    if (body.notes) lines.push("• " + t.note(body.notes));
-    lines.push("", priceText(s.total, s.boxLater, s.dLater, PL, s.unit, s.q));
-    d.textContent = t.failed;
+    // we don't know if it arrived: keep the same key so a retry can't create a second order
+    d.className = "done bad"; d.textContent = t.failed + "\n" + FL.failSaved;
+    const lines = [t.plainHead, "", reviewText(s), "", priceTextBlock(s.p, PL)];
     d.appendChild(fallbackButtons(lines.join("\n"), PL));
   }
-  d.scrollIntoView({ behavior: "smooth", block: "center" });
+  d.focus({ preventScroll: true });
+  d.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
 }
-/* product cards: remember the chosen product and its packaging */
-let picked = { title: "" };
+/* product cards: remember the choice, show a thumbnail, set the packaging */
 function setPicked(card) {
-  picked = card ? { title: card.dataset.pick, pack: card.dataset.pack || "" } : { title: "" };
+  picked = card ? { title: card.dataset.pick, pack: card.dataset.pack || "", img: card.dataset.img || "" } : { title: "" };
   const box = $("fpicked"); if (!box) return;
   box.hidden = !picked.title;
-  if (picked.title) box.querySelector("span").textContent = T[PL].product(picked.title);
-  if (picked.pack && $("fbox")) $("fbox").value = picked.pack === "box" ? "box" : "none";
-  if (picked.pack && picked.pack !== "box" && $("notes") && !$("notes").value) $("notes").value = picked.title;
+  if (picked.title) {
+    $("fpickedT").textContent = picked.title;
+    $("fpickedImg").hidden = !picked.img; if (picked.img) $("fpickedImg").src = picked.img;
+    if (picked.pack && pOpt(picked.pack)) { $("fpack").value = picked.pack; touched.add("fpack"); }
+    touched.add("picked");
+  }
   fUpdate();
 }
 buildForm();
@@ -596,12 +744,12 @@ const R = {
   size: (t) => (sizeFrom(t) >= 0 ? R.price(t) : L().sizes(SIZES.map((s, i) => sizeL(i, CL).toLowerCase()).join(", ")) + "\n\n" + priceList()),
   delivery: (t) => {
     if (/գյումրի|վանաձոր|մարզ|gyumri|vanadzor|marz|другой|город/.test(norm(t))) return L().delivOther(PHONES);
-    return ans("delivery") + "\n\n" + L().orderHint;
+    return ans("delivery") + (O ? "" : "\n\n" + L().orderHint);
   },
   phone: () => L().phone(G.phones || [], G.instagram),
   where: () => ans("where"),
   order: () => L().orderHint,
-  wedding: () => ans("wedding") + "\n\n" + L().wantOrder,
+  wedding: () => ans("wedding") + (O ? "" : "\n\n" + L().wantOrder),
   khoriz: () => ans("khoriz"),
   fresh: () => ans("fresh"),
   when: () => ans("when"),
@@ -698,67 +846,66 @@ function qtyFrom(t, asked) {
   return null;
 }
 
-let O = null, waiting = null;
-const BOX_ON = !!(MENU.box && MENU.box.enabled);
-const newOrder = () => ({ kind: null, choco: null, pack: BOX_ON ? null : "none", size: null, qty: null, date: null, delivery: null, dGroup: null, address: null, name: null, phone: null, notes: null, pay: G.pay ? null : "cash" });
+
+/* ================= ordering inside the chat (same rules as the form) ================= */
+let O = null, waiting = null, HIST = [];
+const newOrder = () => ({ kind: null, choco: null, pack: PACKS.length === 1 ? PACKS[0].id : null, size: null, qty: null, date: null, delivery: null, dGroup: null, address: null, name: null, phone: null, notes: null, pay: G.pay ? null : "cash", product: "", key: newKey() });
 const STEPS = ["size", "kind", "choco", "pack", "qty", "date", "delivery", "ymode", "address", "name", "phone", "notes", "pay"];
+const chatCalc = () => calc({ fillingId: O.kind, sizeIdx: O.size, qty: O.qty || 1, packId: O.pack || "none", deliveryId: O.delivery });
 function need(k) {
   if (k === "choco") return O.kind === "choco" && !O.choco;
   if (k === "delivery") return !O.delivery && !O.dGroup;
   if (k === "ymode") return !O.delivery && !!O.dGroup;
   if (k === "address") return !!(dOpt(O.delivery) || {}).address && O.address == null;
+  if (k === "pay") return O.pay == null && !chatCalc().estimate;
   return O[k] == null;
 }
-const unitPrice = () => +fill(O.kind).prices[O.size] || 0;
-function totals() {
-  const d = dOpt(O.delivery) || {}, q = O.qty || 1;
-  const boxFee = O.pack === "box" && MENU.box.price > 0 ? MENU.box.price * q : 0;
-  return { total: unitPrice() * q + boxFee + (d.price > 0 ? +d.price : 0), boxLater: O.pack === "box" && !(MENU.box.price > 0), dLater: d.price < 0 };
-}
+const SEPL = () => (CL === "hy" ? "՝ " : ": ");
+const minAt = (i) => Math.min(...SHOWN.map((f) => +f.prices[i] || Infinity));
+const ctlChips = () => [L().ctlBack, L().ctlChange, L().ctlContact];
 function prompt(st) {
   const l = L();
   switch (st) {
-    case "size": return { text: l.askSize, chips: SIZES.map((s, i) => `${sizeL(i, CL)} · ${l.from(fmt(Math.min(...SHOWN.map((f) => +f.prices[i] || 1e9))))}`) };
-    case "kind": return { text: l.askKind(sizeL(O.size, CL)), chips: SHOWN.map((f) => `${tx(f.name, CL)} · ${fmt(f.prices[O.size])}`) };
+    case "size": return { text: l.askSize + "\n\n" + l.sizesHead + "\n" + SIZES.map((s, i) => `${s.cm} ${CM[CL]} — ${l.from(fmt(minAt(i)))}`).join("\n"), chips: SIZES.map((s) => `${s.cm} ${CM[CL]}`) };
+    case "kind": return { text: l.kindHead(`${SIZES[O.size].cm} ${CM[CL]}`) + "\n" + SHOWN.map((f) => `${tx(f.short, CL)} — ${fmt(f.prices[O.size])}`).join("\n") + "\n\n" + l.askKind(), chips: SHOWN.map((f) => tx(f.short, CL)) };
     case "choco": return { text: l.askChoco, chips: l.chocoChips };
-    case "pack": return { text: l.askBox, chips: l.boxChips };
+    case "pack": return { text: l.packHead + "\n" + PACKS.map((p) => `${tx(p.label, CL)} — ${p.price < 0 ? l.tbd.toLowerCase() : p.price > 0 ? fmt(p.price) : l.free.toLowerCase()}`).join("\n"), chips: PACKS.map((p) => tx(p.label, CL)) };
     case "qty": return { text: l.askQty, chips: ["1", "2", "5", "10", "20"] };
     case "date": return { text: l.askDate, chips: l.dateChips };
-    case "delivery": return { text: l.askDelivery, chips: DELIV.map((d) => tx(d.label, CL)) };
+    case "delivery": return { text: l.askDelivery + "\n" + DELIV.map((d) => `• ${tx(d.label, CL)}${tx(d.note, CL) ? " — " + tx(d.note, CL) : ""}`).join("\n"), chips: DELIV.map((d) => tx(d.label, CL)) };
     case "ymode": return { text: l.askYmode, chips: DELIV.filter((d) => d.id === "megamall" || d.id === "yerevan").map((d) => tx(d.label, CL)) };
     case "address": return { text: l.askAddress, chips: [] };
     case "name": return { text: l.askName, chips: [] };
     case "phone": return { text: l.askPhone, chips: [] };
     case "notes": return { text: l.askNotes, chips: [l.notesChip] };
     case "pay": return { text: l.askPay, chips: l.payChips };
-    case "confirm": return { text: summary() + "\n\n" + l.confirmQ, chips: l.confirmChips };
+    case "confirm": return { text: summary() + "\n\n" + l.confirmQ, chips: l.confirmChips, noCtl: true };
   }
 }
 function summary() {
-  const l = L(), f = fill(O.kind), d = dOpt(O.delivery) || {}, tt = totals();
+  const l = L(), f = fill(O.kind), d = dOpt(O.delivery) || {}, p = chatCalc();
   const lines = [l.yourOrder];
   if (O.product) lines.push(`• ${l.product(O.product)}`);
-  lines.push(`• ${tx(f.short, CL)}${L().gataWord}${O.kind === "choco" && O.choco ? ` (${tx(CHOCO[O.choco], CL)})` : ""}, ${sizeL(O.size, CL).toLowerCase()}`,
-    `• ${l.qty(O.qty)}`);
-  if (BOX_ON) lines.push(`• ${O.pack === "box" ? l.withBox : l.noBox}`);
-  lines.push(`• ${l.day(fmtDate(O.date))}`, `• ${tx(d.label, CL)}${O.address ? `, ${O.address}` : ""}`, `• ${O.name}, ${O.phone}`);
+  lines.push(`• ${tx(f.short, CL)}${l.gataWord}${O.kind === "choco" && O.choco ? ` (${tx(CHOCO[O.choco], CL)})` : ""}, ${sizeL(O.size, CL).toLowerCase()}`, `• ${l.qty(O.qty)}`);
+  lines.push(`• ${tx((pOpt(O.pack) || {}).label, CL)}`);
+  lines.push(`• ${l.day(longDate(O.date, CL))}`, `• ${tx(d.label, CL)}${O.address ? `, ${O.address}` : ""}`, `• ${O.name}, ${O.phone}`);
   if (O.notes) lines.push(`• ${l.note(O.notes)}`);
-  if (G.pay) lines.push(`• ${O.pay === "online" ? l.payOnline : l.payCash}`);
-  lines.push("", priceText(tt.total, tt.boxLater, tt.dLater, CL, unitPrice(), O.qty));
+  if (G.pay && !p.estimate) lines.push(`• ${O.pay === "online" ? l.payOnline : l.payCash}`);
+  lines.push("", priceTextBlock(p, CL));
   return lines.join("\n");
 }
 const CHANGE = [
-  ["kind", /միջուկ|mijuk|տեսակ|tesak|начин|вид|kind|filling/, () => { O.kind = null; O.choco = null; }],
-  ["pack", /տուփ|tup|box|короб/, () => { O.pack = null; }],
   ["size", /չափ|chap|size|размер/, () => { O.size = null; }],
+  ["kind", /միջուկ|mijuk|տեսակ|tesak|начин|вид|kind|filling/, () => { O.kind = null; O.choco = null; }],
+  ["pack", /փաթեթ|տուփ|tup|box|pack|упак|короб/, () => { O.pack = null; }],
   ["qty", /քանակ|qanak|qty|quantity|колич/, () => { O.qty = null; }],
   ["date", /օր|ամսաթ|or\b|date|дат|день/, () => { O.date = null; }],
-  ["delivery", /առաք|araq|deliv|достав|получ|վերցն/, () => { O.delivery = null; O.dGroup = null; O.address = null; }],
+  ["delivery", /առաք|araq|deliv|достав|получ|վերցն|եղանակ/, () => { O.delivery = null; O.dGroup = null; O.address = null; }],
   ["name", /անուն|anun|name|имя/, () => { O.name = null; }],
   ["phone", /հեռախ|herax|phone|телеф/, () => { O.phone = null; }],
-  ["notes", /նշում|nshum|note|пожел|примеч/, () => { O.notes = null; }],
+  ["notes", /նշում|ցանկ|nshum|note|request|пожел|примеч/, () => { O.notes = null; }],
   ["pay", /վճար|vchar|pay|оплат/, () => { O.pay = null; }],
-].filter((c) => (c[0] !== "pack" || BOX_ON) && (c[0] !== "pay" || G.pay));
+].filter((c) => (c[0] !== "pack" || PACKS.length > 1) && (c[0] !== "pay" || G.pay));
 const changeChips = () => CHANGE.map((c) => L().fields[c[0]]);
 let ackI = 0;
 function nextAsk(pre) {
@@ -767,24 +914,52 @@ function nextAsk(pre) {
   const st = STEPS.find(need) || "confirm";
   waiting = st; const p = prompt(st);
   if ((st === "delivery" || st === "confirm") && O.date && (O.date - today()) / 864e5 < Math.max(1, G.minDays || 0) && !O._warned) { extra = L().soon(PHONES); O._warned = true; }
-  return { text: (pre ? pre + "\n\n" : "") + note + extra + p.text, chips: p.chips };
+  return { text: (pre ? pre + "\n\n" : "") + note + extra + p.text, chips: p.chips, ctl: !p.noCtl };
+}
+/* reuse what the customer already chose in the order form (only fields they touched) */
+function fromForm() {
+  if (!form || !$("fsize") || !touched.size) return [];
+  const got = [], l = L();
+  if (touched.has("fsize") || touched.has("picked")) { O.size = +$("fsize").value; got.push(`${SIZES[O.size].cm} ${CM[CL]}`); }
+  if (touched.has("kind")) { O.kind = $("kind").value; got.push(tx(fill(O.kind).short, CL).toLowerCase()); }
+  if (touched.has("fpack") && pOpt($("fpack").value)) { O.pack = $("fpack").value; got.push(tx(pOpt(O.pack).label, CL).toLowerCase()); }
+  if (touched.has("qty") && /^\d+$/.test($("qty").value) && +$("qty").value >= 1) { O.qty = +$("qty").value; got.push(l.pcs(O.qty)); }
+  if (touched.has("date") && ["ok", "soon"].includes(dateCheck($("date").value))) { O.date = parseISO($("date").value); got.push(fmtDate(O.date)); }
+  if (touched.has("how2")) { O.delivery = $("how2").value; got.push(tx(dOpt(O.delivery).label, CL)); }
+  if (touched.has("faddr") && $("faddr").value.replace(/\s/g, "").length >= 5 && (dOpt(O.delivery) || {}).address) O.address = $("faddr").value.trim();
+  if (touched.has("name") && $("name").value.trim().length >= 2) { O.name = $("name").value.trim(); got.push(O.name); }
+  if (touched.has("phone")) { const dg = $("phone").value.replace(/\D/g, ""); if (dg.length >= 8 && dg.length <= 15) O.phone = $("phone").value.trim(); }
+  if (picked.title) O.product = picked.title;
+  return got;
 }
 function startOrder(t) {
   if (!G.accept) return { text: (G.closedText || "") + "\n📞 " + PHONES, chips: [] };
-  O = newOrder(); waiting = null; extract(t, null);
+  O = newOrder(); waiting = null; HIST = [];
+  const reused = fromForm();
+  extract(t, null);
   const got = [];
-  if (O.kind) got.push(tx(fill(O.kind).short, CL).toLowerCase() + L().gataWord);
-  if (O.qty) got.push(L().pcs(O.qty));
-  if (O.size != null) got.push(sizeL(O.size, CL).toLowerCase());
-  if (O.date) got.push(fmtDate(O.date));
-  if (O.delivery) got.push(tx(dOpt(O.delivery).label, CL).toLowerCase());
-  return nextAsk(L().intro + (got.length ? L().introGot(got.join(", ")) : L().introNone));
+  if (O.kind && !reused.length) got.push(tx(fill(O.kind).short, CL).toLowerCase() + L().gataWord);
+  if (O.qty && !reused.length) got.push(L().pcs(O.qty));
+  if (O.size != null && !reused.length) got.push(sizeL(O.size, CL).toLowerCase());
+  if (O.date && !reused.length) got.push(fmtDate(O.date));
+  let pre = L().intro + (got.length ? L().introGot(got.join(", ")) : L().introNone);
+  if (reused.length) pre += "\n" + L().fromForm(reused.join(", "));
+  return nextAsk(pre);
+}
+function packFrom(h, asked) {
+  for (const p of PACKS) for (const l of ["hy", "ru", "en"]) if (norm(tx(p.label, l)) === h) return p.id;
+  if (/պայուսակ|payusak|(^|\s)bag|пакет/.test(h) && pOpt("bag")) return "bag";
+  if (/շղարշ|tul|фатин|tulle|wrap|լենտ|ժապավեն/.test(h) && pOpt("wrap")) return "wrap";
+  const b = boxFrom(h, asked);
+  if (b === "box" && pOpt("box")) return "box";
+  if (b === "none") return "none";
+  return null;
 }
 function extract(t, step) {
   const h = norm(t);
   if (!O.kind) { const f = fillFrom(h); if (f) O.kind = f; }
   if (O.kind === "choco" && !O.choco) { const c = chocoFrom(h); if (c) O.choco = c; }
-  if (BOX_ON && !O.pack) { const p = boxFrom(h, step === "pack"); if (p) O.pack = p; }
+  if (!O.pack) { const p = packFrom(h, step === "pack"); if (p) O.pack = p; }
   if (O.size == null) { const s = sizeFrom(t.replace(/մեծ պատվեր|mec patver|mets patver|большой заказ|big order/gi, "")); if (s >= 0 && (step === "size" || /սմ|sm|см|cm|փոքր|միջին|մեծ|poqr|pokr|mijin|mec|mets|small|medium|large|big|маленьк|средн|больш/.test(h))) O.size = s; }
   if (!O.date) { const d = dateFrom(t); if (d && d !== "bad" && (d - today()) / 864e5 <= 366) O.date = d; }
   if (O.qty == null) { const q = qtyFrom(t, step === "qty"); if (q && q >= 1 && q <= 9999) O.qty = q; }
@@ -792,44 +967,46 @@ function extract(t, step) {
 }
 function plainOrder() { return L().plainHead + "\n\n" + summary().split("\n").slice(1).join("\n"); }
 function finish() {
-  const msg = plainOrder();
-  const f = fill(O.kind);
+  const msg = plainOrder(), p = chatCalc();
   const body = {
-    lang: CL, source: "chat", filling: O.kind, choco: O.choco ? tx(CHOCO[O.choco], "hy") : "", size: SIZES[O.size].cm, qty: O.qty,
-    box: O.pack === "box", date: isoDate(O.date), delivery: O.delivery, address: O.address || "", name: O.name, phone: O.phone, notes: O.notes || "", product: O.product || "", pay: O.pay,
+    key: O.key, lang: CL, source: "chat", filling: O.kind, choco: O.choco ? tx(CHOCO[O.choco], "hy") : "", size: SIZES[O.size].cm, qty: O.qty,
+    pack: O.pack || "none", box: (O.pack || "none") !== "none", date: isoDate(O.date), delivery: O.delivery, address: O.address || "", name: O.name, phone: O.phone,
+    notes: O.notes || "", product: O.product || "", pay: p.estimate ? "cash" : O.pay,
   };
   const saved = O;
-  O = null; waiting = null;
-  return { text: L().sending, chips: [], submit: { body, msg, saved, f } };
+  waiting = "sending";
+  return { text: L().sending, chips: [], submit: { body, msg, saved } };
 }
+const isCtl = (h, key) => ["hy", "ru", "en"].some((l) => norm(T[l][key]) === h);
 function orderTurn(t) {
   const h = norm(t), l = L();
-  if (/չեղարկ|cheghark|chexark|cancel|отмен|(^|\s)stop|стоп/.test(h)) { O = null; waiting = null; return { text: l.cancelled, chips: [l.orderChip] }; }
+  if (waiting === "sending") return { text: L().sending, chips: [] };
+  // controls shown during ordering
+  if (isCtl(h, "ctlBack")) {
+    if (!HIST.length) { const p = prompt(waiting); return { text: l.backNone + "\n\n" + p.text, chips: p.chips, ctl: true }; }
+    O = HIST.pop(); return nextAsk("");
+  }
+  if (isCtl(h, "ctlChange")) { waiting = "change"; return { text: l.changeWhat, chips: changeChips(), ctl: true }; }
+  if (isCtl(h, "ctlContact")) { const p = prompt(waiting === "change" ? "confirm" : waiting); return { text: l.contactText(PHONES) + "\n\n" + p.text, chips: p.chips, ctl: true, contact: true }; }
+  if (/չեղարկ|cheghark|chexark|cancel|отмен|(^|\s)stop|стоп/.test(h)) { O = null; waiting = null; HIST = []; return { text: l.cancelled, chips: [l.orderChip] }; }
   if (waiting === "confirm") {
-    if (/հաստատ|hastat|ուղարկ|uxark|ughark|այո|ayo|^ha$|^да|подтвер|отправ|yes|^ok|confirm|send/.test(h)) return finish();
-    if (/փոխ|pox|poch|change|измен/.test(h)) { waiting = "change"; return { text: l.changeWhat, chips: changeChips() }; }
+    if (/ուղարկ|uxark|ughark|հաստատ|hastat|^այո|ayo|^ha$|^да|подтвер|отправ|yes|^ok|confirm|send/.test(h)) return finish();
+    if (/փոխ|pox|poch|change|измен/.test(h)) { waiting = "change"; return { text: l.changeWhat, chips: changeChips(), ctl: true }; }
   }
   if (waiting === "change") {
-    const c = CHANGE.find((c) => c[1].test(h) || norm(l.fields[c[0]]) === h);
-    if (!c) return { text: l.changeChoose, chips: changeChips() };
+    const c = CHANGE.find((c) => norm(l.fields[c[0]]) === h) || CHANGE.find((c) => c[1].test(h));
+    if (!c) return { text: l.changeChoose, chips: changeChips(), ctl: true };
+    HIST.push(JSON.parse(JSON.stringify(O), (k, v) => (k === "date" && v ? new Date(v) : v)));
     c[2](); return nextAsk(l.changeAck);
   }
-  const before = JSON.stringify(O);
-  const sc = score(t), isQ = /[?՞]/.test(t) || ["price", "choco", "delivery", "phone", "where", "khoriz", "fresh", "when", "hours", "pay", "types", "wedding"].some((k) => sc[k] && !(waiting === "address" && k === "delivery") && !(waiting === "pay" && k === "pay"));
+  const snap = JSON.stringify(O);
+  const sc = score(t), isQ = /[?՞]/.test(t) || ["price", "choco", "delivery", "phone", "where", "khoriz", "fresh", "when", "hours", "pay", "types", "wedding"].some((k) => sc[k] && !(waiting === "address" && k === "delivery") && !(waiting === "pay" && k === "pay") && !(waiting === "pack" && k === "wedding"));
   if (["address", "name", "notes"].includes(waiting) && isQ && !(waiting === "notes" && /սկզբնատառ|skzbnatar|initial|инициал/.test(h))) {
-    const p = prompt(waiting);
-    if (sc.price && O.kind && O.size != null) {
-      const u = unitPrice(), q = O.qty || 1;
-      return { text: `${tx(fill(O.kind).short, CL)}, ${sizeL(O.size, CL)}: ${fmt(u)}` + (O.qty ? ` × ${q} = ${fmt(u * q)}` : "") + "\n\n" + l.cont + p.text, chips: p.chips };
-    }
-    const r = reply(t);
-    return { text: r.text + "\n\n" + l.cont + p.text, chips: p.chips };
+    const p = prompt(waiting), r = reply(t);
+    return { text: r.text + "\n\n" + l.cont + p.text, chips: p.chips, ctl: true };
   }
-  if (waiting === "pack" && (sc.price || /[?՞]/.test(t)) && BOX_RE.test(h)) {
-    if (NO_RE.test(h)) return { text: l.boxInfo + "\n\n" + prompt("pack").text, chips: prompt("pack").chips };
-    O.pack = "box"; return nextAsk(l.boxInfo + " " + l.boxGot);
-  }
-  if (waiting === "pack" && !/[?՞]/.test(t) && !sc.price) { const p = boxFrom(h, true); if (p) O.pack = p; else extract(t, waiting); }
+  if (waiting === "pack") { const p = packFrom(h, true); if (p) O.pack = p; else extract(t, waiting); }
+  else if (waiting === "size" && SIZES.findIndex((s) => norm(`${s.cm} ${CM[CL]}`) === h) >= 0) O.size = SIZES.findIndex((s) => norm(`${s.cm} ${CM[CL]}`) === h);
   else if (waiting === "ymode") {
     for (const d of DELIV) if (norm(tx(d.label, CL)) === h) { O.delivery = d.id; O.dGroup = null; }
     if (!O.delivery) {
@@ -839,7 +1016,7 @@ function orderTurn(t) {
   }
   else if (waiting === "address") {
     if (t.replace(/\s/g, "").length >= 5) O.address = t.trim().slice(0, 200);
-    else return { text: l.addrBad, chips: [] };
+    else return { text: l.addrBad, chips: [], ctl: true };
   }
   else if (waiting === "name") {
     const n = t.trim().replace(/^(իմ անունը|anuns|anunu|menya zovut|меня зовут|my name is|i am|i'm|ես)\s*/i, "").replace(/\s+(է|e|em|եմ)$/i, "");
@@ -852,14 +1029,15 @@ function orderTurn(t) {
     else if (/ստանալիս|կանխիկ|stanalis|kanxik|cash|налич|получен|receipt|delivery|pickup|later|հետո|потом/.test(h)) O.pay = "cash";
   }
   else extract(t, waiting);
-  if (JSON.stringify(O) === before) {
-    if (waiting === "qty" && /\d/.test(t)) return { text: l.qtyBad, chips: prompt("qty").chips };
-    if (waiting === "date" && /\d/.test(t)) return { text: l.dateBad, chips: prompt("date").chips };
-    if (waiting === "phone") return { text: l.phoneBad, chips: [] };
+  if (JSON.stringify(O) === snap) {
+    if (waiting === "qty" && /\d/.test(t)) return { text: l.qtyBad, chips: prompt("qty").chips, ctl: true };
+    if (waiting === "date" && /\d/.test(t)) return { text: l.dateBad, chips: prompt("date").chips, ctl: true };
+    if (waiting === "phone") return { text: l.phoneBad, chips: [], ctl: true };
     const r = reply(t), p = prompt(waiting);
-    if (r.topic && !["yes", "no", "greet", "order"].includes(r.topic)) return { text: r.text + "\n\n" + l.cont + p.text, chips: p.chips };
-    return { text: l.sorry + p.text, chips: p.chips };
+    if (r.topic && !["yes", "no", "greet", "order"].includes(r.topic)) return { text: r.text + "\n\n" + l.cont + p.text, chips: p.chips, ctl: true };
+    return { text: l.sorry + p.text, chips: p.chips, ctl: true };
   }
+  HIST.push(JSON.parse(snap, (k, v) => (k === "date" && v ? new Date(v) : v)));
   return nextAsk(l.acks[ackI++ % l.acks.length]);
 }
 /* quick-reply buttons: the same action whatever the button text says */
@@ -868,13 +1046,10 @@ document.querySelectorAll(".chip[data-act]").forEach((c) => (QUICK[norm(c.textCo
 const ACT = { price: () => R.price(""), delivery: () => R.delivery(""), wedding: () => R.wedding(), khoriz: () => R.khoriz(), phone: () => R.phone() };
 function respond(t, act) {
   if (/[а-яё]/i.test(t)) CL = "ru"; else if (/[Ա-և]/.test(t)) CL = "hy";
-  act = act || (!O && QUICK[norm(t)]);
-  if (act === "order") { O = null; return startOrder(""); }
-  if (act && ACT[act]) {
-    if (O) { const p = prompt(waiting); return { text: ACT[act]() + "\n\n" + L().cont + p.text, chips: p.chips }; }
-    return { text: ACT[act](), topic: act, chips: act === "price" || act === "wedding" ? [L().orderChip] : [] };
-  }
   if (O) return orderTurn(t);
+  act = act || QUICK[norm(t)];
+  if (act === "order") return startOrder("");
+  if (act && ACT[act]) return { text: ACT[act](), topic: act, chips: act === "price" || act === "wedding" ? [L().orderChip] : [] };
   const h = score(t), n = norm(t);
   // "wedding order" is a question about wedding orders, not the start of an order
   if (h.wedding && h.order && !qtyFrom(t, false) && !h.price) { const r = reply(t.replace(/պատվեր\S*|заказ\S*|order\S*|patver\S*/gi, "")); return { text: r.text, topic: "wedding", chips: [L().orderChip] }; }
@@ -883,47 +1058,46 @@ function respond(t, act) {
   return { text: r.text, topic: r.topic, unknown: r.unknown, chips: ["price", "choco", "wedding", "types", "size"].includes(r.topic) ? [L().orderChip] : [] };
 }
 
-/* conversation UI: typing indicator, quick replies, human-like pace */
+/* conversation UI */
 let busy = false;
 function add(text, who) {
   const m = document.createElement("div"); m.className = "m " + who; m.textContent = text;
   $("msgs").appendChild(m); $("msgs").scrollTop = 1e6; return m;
 }
 function typing() {
-  const t = document.createElement("div"); t.className = "m bot typing"; t.setAttribute("aria-label", L().typing);
+  const t = document.createElement("div"); t.className = "m bot typing"; t.setAttribute("role", "status");
   t.innerHTML = "<i></i><i></i><i></i><span></span>"; t.lastChild.textContent = L().typing; $("msgs").appendChild(t); $("msgs").scrollTop = 1e6; return t;
 }
 function addExtras(r) {
-  if (r.link || r.copy || r.pay) {
-    const w = document.createElement("div"); w.className = "qr keep";
-    if (r.pay) { const a = document.createElement("a"); a.className = "pay"; a.href = r.pay; a.textContent = L().payNow; w.appendChild(a); }
-    if (r.link) { const a = document.createElement("a"); a.className = "wa"; a.href = r.link; a.target = "_blank"; a.rel = "noopener"; a.textContent = L().wa; w.appendChild(a); }
-    if (r.copy) {
-      const b = document.createElement("button"); b.type = "button"; b.className = "qrb"; b.textContent = L().copy;
-      b.addEventListener("click", () => { navigator.clipboard?.writeText(r.copy).then(() => { b.textContent = L().copied; }).catch(() => { b.textContent = L().copyFail; }); });
-      w.appendChild(b);
-    }
-    $("msgs").appendChild(w);
-  }
-  if (r.chips && r.chips.length) {
+  if (r.pay) { const w = document.createElement("div"); w.className = "qr keep"; const a = document.createElement("a"); a.className = "pay"; a.href = r.pay; a.textContent = L().payNow; w.appendChild(a); $("msgs").appendChild(w); }
+  if (r.contact) $("msgs").appendChild(fallbackButtons("", CL));
+  const chips = [...(r.chips || []), ...(r.ctl && O ? ctlChips() : [])];
+  if (chips.length) {
     const w = document.createElement("div"); w.className = "qr";
-    r.chips.forEach((c) => { const b = document.createElement("button"); b.type = "button"; b.className = "qrb"; b.textContent = c; b.addEventListener("click", () => send(c)); w.appendChild(b); });
+    const ctl = r.ctl && O ? ctlChips() : [];
+    chips.forEach((c) => { const b = document.createElement("button"); b.type = "button"; b.className = "qrb" + (ctl.includes(c) ? " ctl" : ""); b.textContent = c; b.addEventListener("click", () => send(c)); w.appendChild(b); });
     $("msgs").appendChild(w);
   }
+  // the general suggestion row is hidden while an order is being filled in
+  const row = document.querySelector(".chat-body .chips"); if (row) row.hidden = !!O;
   $("msgs").scrollTop = 1e6;
 }
 async function submitChat(s) {
   const r = await postOrder(s.body);
   if (r.ok) {
+    O = null; waiting = null; HIST = [];
     add(L().received(r.id), "bot");
     if (r.checkoutUrl) { add(L().payInfo, "bot"); addExtras({ pay: r.checkoutUrl }); }
     else if (r.payError) add(L().payFail, "bot");
+    addExtras({});
   } else if (r.error) {
     O = s.saved; waiting = "change";
-    add("⚠️ " + r.error + "\n\n" + L().changeWhat, "bot"); addExtras({ chips: changeChips() });
+    add("⚠️ " + r.error + "\n\n" + L().changeWhat, "bot"); addExtras({ chips: changeChips(), ctl: true });
   } else {
+    // unknown result: keep the order (same key) so "send" again can't create a duplicate
+    O = s.saved; waiting = "confirm";
     add(L().failed, "bot");
-    $("msgs").appendChild(fallbackButtons(s.msg, CL)); $("msgs").scrollTop = 1e6;
+    $("msgs").appendChild(fallbackButtons(s.msg, CL)); addExtras({ chips: L().confirmChips });
   }
 }
 async function aiAnswer(q) {
@@ -939,23 +1113,20 @@ function send(q, act) {
   document.querySelectorAll("#msgs .qr:not(.keep)").forEach((x) => x.remove());
   add(q, "me"); busy = true;
   let r; try { r = respond(q, act); } catch (e) { console.error(e); r = { text: R.unknown(), chips: [] }; }
-  const wait = Math.min(1800, 600 + r.text.length * 4);
+  const wait = reduce ? 200 : Math.min(1200, 400 + r.text.length * 3);
   setTimeout(async () => {
     const t = typing();
-    if (r.unknown && G.ai) {
-      const a = await aiAnswer(q);
-      if (a) r = { text: a, chips: [L().orderChip] };
-    }
+    if (r.unknown && G.ai) { const a = await aiAnswer(q); if (a) r = { text: a, chips: [L().orderChip] }; }
     setTimeout(async () => {
       t.remove(); add(r.text, "bot"); addExtras(r);
       if (r.topic && !["yes", "no", "thanks", "greet"].includes(r.topic)) lastTopic = r.topic;
       if (r.submit) { const t2 = typing(); await submitChat(r.submit); t2.remove(); }
       busy = false;
-    }, r.unknown && G.ai ? 200 : wait);
-  }, 300);
+    }, r.unknown && G.ai ? 150 : wait);
+  }, 200);
 }
 
-/* floating chat */
+/* chat launcher + panel */
 const chatBtn = $("chatBtn"), chatPanel = $("chatPanel");
 if (chatBtn && chatPanel) {
   document.querySelectorAll(".chip").forEach((c) => c.addEventListener("click", () => send(c.textContent, c.dataset.act)));
@@ -966,28 +1137,54 @@ if (chatBtn && chatPanel) {
     const p = chatPanel;
     if (p.hidden || !isPhone() || !kbOpen) { p.classList.remove("kb"); p.style.top = p.style.height = p.style.bottom = ""; document.body.classList.remove("chat-typing"); return; }
     const vv = window.visualViewport;
-    if (vv && innerHeight - vv.height > 120) {
-      p.classList.add("kb"); document.body.classList.add("chat-typing");
-      p.style.top = vv.offsetTop + 8 + "px"; p.style.bottom = "auto"; p.style.height = Math.max(220, vv.height - 16) + "px";
-    } else {
-      p.classList.add("kb"); document.body.classList.add("chat-typing");
-      p.style.top = "auto"; p.style.bottom = ""; p.style.height = Math.min(330, Math.round(innerHeight * 0.46)) + "px";
-    }
+    p.classList.add("kb"); document.body.classList.add("chat-typing");
+    if (vv && innerHeight - vv.height > 120) { p.style.top = vv.offsetTop + 8 + "px"; p.style.bottom = "auto"; p.style.height = Math.max(220, vv.height - 16) + "px"; }
+    else { p.style.top = "auto"; p.style.bottom = ""; p.style.height = Math.min(340, Math.round(innerHeight * 0.48)) + "px"; }
     $("msgs").scrollTop = 1e6;
   };
+  const isOpen = () => !chatPanel.hidden;
   const setChat = (open) => {
     chatPanel.hidden = !open; chatBtn.setAttribute("aria-expanded", open);
-    document.body.classList.toggle("chat-open", open);
-    if (!open) { kbOpen = false; fitChat(); }
-    if (open) { chatBtn.classList.add("seen"); $("msgs").scrollTop = 1e6; if (matchMedia("(hover:hover)").matches) $("q").focus(); }
+    chatBtn.setAttribute("aria-label", open ? T[PL].closeChat || "×" : chatBtn.dataset.label || chatBtn.getAttribute("aria-label"));
+    if (!open) { kbOpen = false; fitChat(); chatBtn.focus(); }
+    if (open) { $("msgs").scrollTop = 1e6; (matchMedia("(hover:hover)").matches ? $("q") : $("chatX")).focus(); }
+    placeLauncher();
   };
+  chatBtn.dataset.label = chatBtn.getAttribute("aria-label");
   $("q").addEventListener("focus", () => { kbOpen = true; fitChat(); setTimeout(fitChat, 250); setTimeout(fitChat, 600); });
   $("q").addEventListener("blur", () => { kbOpen = false; setTimeout(fitChat, 80); });
   document.querySelector("#cf button").addEventListener("pointerdown", (e) => { if (kbOpen) e.preventDefault(); });
   if (window.visualViewport) { visualViewport.addEventListener("resize", fitChat); visualViewport.addEventListener("scroll", fitChat); }
-  chatBtn.addEventListener("click", () => setChat(chatPanel.hidden));
+  chatBtn.addEventListener("click", () => setChat(!isOpen()));
   $("chatX").addEventListener("click", () => setChat(false));
-  addEventListener("keydown", (e) => { if (e.key === "Escape" && !chatPanel.hidden) setChat(false); });
+  // keep keyboard focus inside the open chat; Esc closes it
+  chatPanel.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { e.stopPropagation(); setChat(false); return; }
+    if (e.key !== "Tab") return;
+    const f = [...chatPanel.querySelectorAll("button:not([disabled]),input,a[href]")].filter((x) => x.offsetParent);
+    if (!f.length) return;
+    if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+  });
+  // the launcher steps aside while the order form or any page field is on screen
+  let formVisible = false, fieldFocus = false;
+  // also step aside when a button or question sits in the bottom-right corner where the launcher is
+  const inZone = new Set();
+  const placeLauncher = () => chatBtn.classList.toggle("away", !isOpen() && (formVisible || fieldFocus || inZone.size > 0));
+  let zoneObs = null;
+  const watchZone = () => {
+    if (!("IntersectionObserver" in window)) return;
+    if (zoneObs) zoneObs.disconnect();
+    inZone.clear();
+    zoneObs = new IntersectionObserver((es) => { es.forEach((e) => (e.isIntersecting ? inZone.add(e.target) : inZone.delete(e.target))); placeLauncher(); },
+      { rootMargin: `-${Math.max(0, innerHeight - 96)}px 0px 0px 0px` });
+    document.querySelectorAll("[data-avoid]").forEach((el) => zoneObs.observe(el));
+  };
+  watchZone(); addEventListener("resize", () => { clearTimeout(watchZone.t); watchZone.t = setTimeout(watchZone, 200); });
+  const orderSec = $("order");
+  if (orderSec && "IntersectionObserver" in window) new IntersectionObserver((es) => { formVisible = es[0].isIntersecting; placeLauncher(); }, { rootMargin: "0px 0px -60px 0px" }).observe(orderSec);
+  document.addEventListener("focusin", (e) => { if (e.target.matches("input,select,textarea") && !chatPanel.contains(e.target)) { fieldFocus = true; placeLauncher(); } });
+  document.addEventListener("focusout", (e) => { if (e.target.matches("input,select,textarea")) { fieldFocus = false; setTimeout(placeLauncher, 50); } });
   window.ggChat = { send, open: () => setChat(true) };
 }
 
@@ -1012,60 +1209,4 @@ if (chatBtn && chatPanel) {
   }
   show(P.bad, P.badT, `<button class="btn btn-gold" data-close>${P.close}</button>`);
 })();
-
-/* ================= scroll scenes ================= */
-const sceneP = (el) => { const r = el.getBoundingClientRect(); return clamp(-r.top / (r.height - innerHeight)); };
-const words = [...document.querySelectorAll("#wordP span")];
-const pearls = [...document.querySelectorAll(".pearl")];
-let px = 0, py = 0;
-function frame() {
-  const vh = innerHeight, hp = clamp(scrollY / vh);
-  if ($("heroGata")) $("heroGata").style.transform = `rotateX(${hp * 40 - py * 8}deg) rotateY(${px * 12}deg) rotateZ(${hp * 60}deg) scale(${1 - hp * 0.12})`;
-  pearls.forEach((p) => { const d = +p.style.getPropertyValue("--d"); p.style.transform = `translate3d(${px * d * -12}px,${-hp * d * 110 - py * d * 8}px,0)`; });
-  if ($("expand")) {
-    const sp = sceneP($("expand")), ep = ease(clamp(sp / 0.7)), fr = $("expFrame");
-    fr.style.width = 72 + 28 * ep + "%"; fr.style.height = 78 + 22 * ep + "%"; fr.style.borderRadius = 24 * (1 - ep) + "px";
-    $("expImg").style.transform = `scale(${1.15 - 0.15 * ep})`;
-    const cp = clamp((sp - 0.45) / 0.3);
-    $("expCap").style.opacity = cp; $("expCap").style.transform = `translateY(${20 * (1 - cp)}px)`;
-  }
-  if ($("ring")) $("cyl").style.transform = `rotateX(-6deg) rotateY(${-sceneP($("ring")) * 324}deg)`;
-  if ($("words")) { const wp = sceneP($("words")); words.forEach((w, i) => w.classList.toggle("on", wp > (i + 0.6) / (words.length + 1))); }
-  if ($("storyImg")) { const sr = $("storyImg").parentNode.getBoundingClientRect(); $("storyImg").style.transform = `translateY(${-clamp((vh - sr.top) / (vh + sr.height)) * 12}%)`; }
-}
-if (!reduce) {
-  let tick = false;
-  const req = () => { if (!tick) { tick = true; requestAnimationFrame(() => { frame(); tick = false; }); } };
-  addEventListener("scroll", req, { passive: true });
-  addEventListener("resize", () => { layoutRing(); req(); });
-  layoutRing(); frame();
-  if (matchMedia("(hover:hover) and (pointer:fine)").matches) {
-    addEventListener("pointermove", (e) => { px = e.clientX / innerWidth - 0.5; py = e.clientY / innerHeight - 0.5; req(); }, { passive: true });
-    document.querySelectorAll(".card,.feat").forEach((el) => {
-      el.insertAdjacentHTML("beforeend", '<span class="shine"></span>');
-      el.addEventListener("pointermove", (e) => {
-        const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-        el.style.transform = `perspective(900px) rotateX(${(0.5 - y) * 9}deg) rotateY(${(x - 0.5) * 11}deg) translateY(-4px)`;
-        el.style.setProperty("--mx", x * 100 + "%"); el.style.setProperty("--my", y * 100 + "%");
-      });
-      el.addEventListener("pointerleave", () => { el.style.transform = ""; });
-    });
-  }
-  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.remove("pre"); io.unobserve(e.target); } }), { threshold: 0.12 });
-  document.querySelectorAll(".section .kicker,.section .h2,.section .lead,.card,.feat,.step,.story .photo,.story h2,.story p,.box,.qa").forEach((el) => {
-    if (el.getBoundingClientRect().top > innerHeight) {
-      el.classList.add("rv", "pre");
-      const i = [...el.parentNode.children].indexOf(el);
-      el.style.transitionDelay = (i % 4) * 0.08 + "s";
-      el.addEventListener("transitionend", () => { el.style.transitionDelay = ""; }, { once: true });
-      io.observe(el);
-    }
-  });
-  const cio = new IntersectionObserver((es) => es.forEach((e) => {
-    if (!e.isIntersecting) return; cio.unobserve(e.target);
-    const el = e.target, end = +el.dataset.count, suf = el.dataset.suffix || "", t0 = performance.now();
-    (function step(t) { const k = clamp((t - t0) / 1300); el.textContent = Math.round(end * ease(k)) + suf; if (k < 1) requestAnimationFrame(step); })(t0);
-  }), { threshold: 0.6 });
-  document.querySelectorAll("[data-count]").forEach((b) => cio.observe(b));
-}
 })();
