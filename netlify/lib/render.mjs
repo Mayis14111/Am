@@ -92,7 +92,7 @@ ${/^G-[A-Z0-9]+$/.test(c.seo.googleTag || "") ? `<script async src="https://www.
 <body>
 <div class="root">`;
 }
-export const ASSET_V = "7";
+export const ASSET_V = "8";
 
 function logo(c, lang, id, href, light) {
   const src = light ? c.brand.logoLight || c.brand.logo : c.brand.logo;
@@ -276,20 +276,29 @@ const secHead = (kicker, title, lead, tag = "h2") => `<div class="sec-head">${ki
 
 function heroHtml(c, lang) {
   const pearl = (x, y, sz, d) => `<span class="pearl" style="--x:${x}%;--y:${y}%;--s:${sz}px;--d:${d}"></span>`;
+  const ringTxt = `${t(c.brand.logoText, lang)} · ${t(c.brand.sub, lang).toUpperCase().replace(/\s*·\s*/g, " · ")} · `;
+  const hint = { hy: "Պտտեք գաթան", ru: "Покрутите гату", en: "Spin the gata" }[lang];
   return `<header class="hero" id="top">
-  <div class="wrap hero-text">
-    <span class="kicker load">${esc(t(c.hero.title, lang))} · ${esc(t(c.brand.sub, lang).split("·")[0].trim())}</span>
-    <h1 class="load d1">${esc(t(c.hero.kicker, lang))}</h1>
-    <p class="lead load d2">${inline(t(c.hero.lead, lang))}</p>
-    <div class="btns hero-btns load d3" data-avoid>
-      <a class="btn btn-gold" href="${siteUrl_(lang, "order")}">${esc(t(c.hero.btnOrder, lang))}</a>
-      <a class="btn btn-line" href="${siteUrl_(lang, "menu")}">${esc(t(c.hero.btnMenu, lang))}</a>
+  <div class="wrap hero-grid">
+    <div class="hero-text">
+      <span class="kicker load">${esc(t(c.hero.title, lang))} · ${esc(t(c.brand.sub, lang).split("·")[0].trim())}</span>
+      <h1 class="load d1">${esc(t(c.hero.kicker, lang))}</h1>
+      <p class="lead load d2">${inline(t(c.hero.lead, lang))}</p>
+      <div class="btns hero-btns load d3" data-avoid>
+        <a class="btn btn-gold" href="${siteUrl_(lang, "order")}">${esc(t(c.hero.btnOrder, lang))}</a>
+        <a class="btn btn-line" href="${siteUrl_(lang, "menu")}">${esc(t(c.hero.btnMenu, lang))}</a>
+      </div>
     </div>
-  </div>
-  <div class="hero-stage load" id="heroStage" aria-hidden="true">
-    <div class="hero-glow"></div>
-    <div class="hero-gata" id="heroGata"><img src="${esc(c.hero.image)}" alt="" width="600" height="600" fetchpriority="high"></div>
-    ${pearl(2, 18, 34, 1.6)}${pearl(88, 10, 22, 2.2)}${pearl(92, 66, 40, 1.2)}${pearl(0, 72, 20, 2.6)}${pearl(20, 94, 26, 1.9)}${pearl(74, 96, 16, 2.8)}
+    <div class="hero-stage load" id="heroStage">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <svg class="hero-ring" id="heroRing" viewBox="0 0 400 400" aria-hidden="true"><defs><path id="ringPath" d="M200,200 m-176,0 a176,176 0 1,1 352,0 a176,176 0 1,1 -352,0"/></defs>
+        <circle cx="200" cy="200" r="194" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-dasharray="2 7"/>
+        <text><textPath href="#ringPath" textLength="1100" lengthAdjust="spacing">${esc(ringTxt + ringTxt)}</textPath></text></svg>
+      <div class="hero-tilt" id="heroTilt"><div class="hero-gata" id="heroGata" role="img" aria-label="${esc(t(c.hero.alt, lang))}"><img src="${esc(c.hero.image)}" alt="" width="600" height="600" fetchpriority="high" draggable="false"></div></div>
+      <div class="orbit" aria-hidden="true">${pearl(50, -2, 26, 1.6)}${pearl(98, 50, 18, 2.2)}${pearl(50, 98, 30, 1.2)}${pearl(-2, 50, 16, 2.6)}</div>
+      <div class="orbit o2" aria-hidden="true">${pearl(14, 14, 14, 1.9)}${pearl(86, 86, 22, 2.8)}${pearl(86, 14, 12, 1.4)}</div>
+      <span class="spin-hint" id="spinHint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M18 3v4h-4M6 21v-4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>${hint}</span>
+    </div>
   </div>
 </header>
 ${c.expand && c.expand.show !== false && c.expand.image ? `<section class="expand" id="expand" aria-label="${esc(t(c.expand.title, lang))}">

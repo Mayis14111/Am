@@ -1219,15 +1219,39 @@ if (chatBtn && chatPanel) {
 /* ================= interactive header + scroll scenes ================= */
 (() => {
   if (reduce) return;
-  const gata = $("heroGata"), exp = $("expand"), pearls = [...document.querySelectorAll(".hero .pearl")];
+  const stage = $("heroStage"), tilt = $("heroTilt"), gata = $("heroGata"), ring = $("heroRing"), hint = $("spinHint"), exp = $("expand");
   const sceneP = (el) => { const r = el.getBoundingClientRect(); return clamp(-r.top / (r.height - innerHeight)); };
   let px = 0, py = 0, tick = false;
+  /* spin: slow idle spin + drag/swipe with momentum */
+  let ang = 0, vel = 0.12, dragging = false, lastX = 0, lastA = 0, lastT = 0, moved = false;
+  const IDLE = 0.12;
+  if (stage) {
+    const angAt = (e) => { const r = stage.getBoundingClientRect(); return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180 / Math.PI; };
+    stage.addEventListener("pointerdown", (e) => { dragging = true; moved = false; lastA = angAt(e); lastX = e.clientX; lastT = performance.now(); vel = 0; stage.classList.add("dragging"); stage.setPointerCapture(e.pointerId); });
+    stage.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      let a = angAt(e), d = a - lastA; if (d > 180) d -= 360; if (d < -180) d += 360;
+      const now = performance.now(), dt = Math.max(1, now - lastT);
+      ang += d; vel = (d / dt) * 16; lastA = a; lastT = now;
+      if (Math.abs(e.clientX - lastX) > 4) moved = true;
+      if (hint) hint.classList.add("gone");
+    });
+    const end = () => { dragging = false; stage.classList.remove("dragging"); };
+    stage.addEventListener("pointerup", end); stage.addEventListener("pointercancel", end);
+    let tapT = 0;
+    stage.addEventListener("click", () => { if (!moved && performance.now() - tapT > 300) { vel += 14; tapT = performance.now(); if (hint) hint.classList.add("gone"); } });
+    (function spin() {
+      if (!dragging) { vel += (IDLE - vel) * 0.02; ang += vel; }
+      gata.style.transform = `rotate(${ang}deg)`;
+      if (ring) ring.style.transform = `rotate(${-ang * 0.35}deg)`;
+      requestAnimationFrame(spin);
+    })();
+  }
   function frame() {
     tick = false;
     const hp = clamp(scrollY / innerHeight);
-    if (gata) gata.style.transform = `rotateX(${hp * 40 - py * 10}deg) rotateY(${px * 14}deg) rotateZ(${hp * 60}deg) scale(${1 - hp * 0.12})`;
-    pearls.forEach((p) => { const d = +p.style.getPropertyValue("--d") || 1; p.style.transform = `translate3d(${px * d * -14}px,${-hp * d * 110 - py * d * 10}px,0)`; });
-    if (exp) {
+    if (tilt) tilt.style.transform = `rotateX(${hp * 35 - py * 18}deg) rotateY(${px * 22}deg) scale(${1 - hp * 0.1})`;
+  if (exp) {
       const sp = sceneP(exp), ep = ease(clamp(sp / 0.7));
       $("expFrame").style.width = 72 + 28 * ep + "%"; $("expFrame").style.height = 78 + 22 * ep + "%"; $("expFrame").style.borderRadius = 24 * (1 - ep) + "px";
       $("expImg").style.transform = `scale(${1.15 - 0.15 * ep})`;
