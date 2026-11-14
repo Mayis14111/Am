@@ -492,7 +492,7 @@ function buildForm() {
   $("date").min = isoDate(today());
   $("date").max = isoDate(new Date(today().getTime() + 366 * 864e5));
   $("date").value = isoDate(new Date(today().getTime() + Math.max(1, G.minDays || 0) * 864e5 + 36e5));
-  $("fpickedX").addEventListener("click", () => document.getElementById("products")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }));
+  $("fpickedX").addEventListener("click", () => { const p = document.getElementById("products"); if (p) p.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); else location.href = G.menuUrl || "/menu"; });
   form.addEventListener("input", (e) => { if (e.target.id) { touched.add(e.target.id); clearErr(e.target.id); } fUpdate(); });
   form.addEventListener("change", (e) => { if (e.target.id) touched.add(e.target.id); fUpdate(); });
   form.addEventListener("focusout", (e) => { if (["name", "phone", "qty", "date", "faddr"].includes(e.target.id) && e.target.value) validateField(e.target.id); });
@@ -641,6 +641,12 @@ function setPicked(card) {
 }
 buildForm();
 document.querySelectorAll("[data-pick]").forEach((a) => a.addEventListener("click", () => setPicked(a)));
+/* /order?product=wedding-box — the product chosen on the menu or a product page */
+(() => {
+  const slug = new URL(location.href).searchParams.get("product");
+  const pr = slug && (G.products || []).find((x) => x.slug === slug);
+  if (pr && form && $("fpack")) setPicked({ dataset: { pick: pr.title, pack: pr.pack, img: pr.img } });
+})();
 
 /* ================= chat assistant ================= */
 /* keyword stems; a word matches if it starts with the stem (stems of 5+ letters also allow one typo) */

@@ -1,5 +1,5 @@
 import { getContent, listPages, siteUrl, LANGS, t } from "../lib/store.mjs";
-import { renderHome, renderPage, render404, PREFIX, pageUrl } from "../lib/render.mjs";
+import { renderHome, renderPage, render404, renderSitePage, renderProduct, PREFIX, pageUrl, SITE_PAGES, siteUrl_, productUrl, cardSlug } from "../lib/render.mjs";
 
 const HTML_HEADERS = {
   "content-type": "text/html; charset=utf-8",
@@ -25,6 +25,8 @@ export default async (req) => {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${entry((l) => PREFIX[l], "1.0")}
+${SITE_PAGES.filter((k) => k !== "order").map((k) => entry((l) => siteUrl_(l, k), "0.8")).join("\n")}
+${c.products.cards.map((k, i) => (k.show === false ? "" : entry((l) => productUrl(l, cardSlug(k, i)), "0.7"))).join("\n")}
 ${pages.map((p) => entry((l) => pageUrl(l, p.slug), "0.6")).join("\n")}
 </urlset>`;
     return new Response(xml, { headers: { ...HTML_HEADERS, "content-type": "application/xml; charset=utf-8" } });
@@ -36,6 +38,11 @@ ${pages.map((p) => entry((l) => pageUrl(l, p.slug), "0.6")).join("\n")}
 
   if (rest === "/") return new Response(renderHome(c, lang, pages, base), { headers: HTML_HEADERS });
 
+  if ((m = /^\/([a-z]+)$/.exec(rest)) && SITE_PAGES.includes(m[1])) return new Response(renderSitePage(c, lang, m[1], pages, base), { headers: HTML_HEADERS });
+  if ((m = /^\/product\/([a-z0-9-]+)$/.exec(rest))) {
+    const html = renderProduct(c, lang, m[1], pages, base);
+    if (html) return new Response(html, { headers: HTML_HEADERS });
+  }
   if ((m = /^\/p\/([a-z0-9-]+)$/.exec(rest))) {
     const p = pages.find((x) => x.slug === m[1]);
     if (p) return new Response(renderPage(c, lang, p, pages, base), { headers: HTML_HEADERS });
@@ -44,5 +51,7 @@ ${pages.map((p) => entry((l) => pageUrl(l, p.slug), "0.6")).join("\n")}
 };
 
 export const config = {
-  path: ["/", "/ru", "/ru/", "/en", "/en/", "/p/*", "/ru/p/*", "/en/p/*", "/sitemap.xml", "/robots.txt"],
+  path: ["/", "/ru", "/ru/", "/en", "/en/", "/p/*", "/ru/p/*", "/en/p/*", "/product/*", "/ru/product/*", "/en/product/*",
+    "/menu", "/delivery", "/order", "/about", "/faq", "/contact", "/ru/menu", "/ru/delivery", "/ru/order", "/ru/about", "/ru/faq", "/ru/contact",
+    "/en/menu", "/en/delivery", "/en/order", "/en/about", "/en/faq", "/en/contact", "/sitemap.xml", "/robots.txt"],
 };

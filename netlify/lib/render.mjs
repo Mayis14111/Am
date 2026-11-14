@@ -92,19 +92,32 @@ ${/^G-[A-Z0-9]+$/.test(c.seo.googleTag || "") ? `<script async src="https://www.
 <body>
 <div class="root">`;
 }
-export const ASSET_V = "5";
+export const ASSET_V = "6";
 
 function logo(c, lang, id, href, light) {
   const src = light ? c.brand.logoLight || c.brand.logo : c.brand.logo;
   return `<a class="logo" href="${href}" id="${id}">${src ? `<img src="${esc(src)}" alt="${esc(t(c.brand.name, lang))}">` : `<b>${esc(t(c.brand.logoText, lang))}</b><small>${esc(t(c.brand.sub, lang))}</small>`}</a>`;
 }
 
-function navLinks(c, lang, pages, onHome) {
+/* ---------- site pages (each has its own link, like SellTo.us) ---------- */
+export const SITE_PAGES = ["menu", "delivery", "order", "about", "faq", "contact"];
+export const siteUrl_ = (lang, key) => PREFIX[lang] + key;
+const CARD_SLUGS = ["wedding-box", "gift-bag", "bride-suitcase", "initials-boxes"];
+export const cardSlug = (k, i) => (k.slug && /^[a-z0-9-]+$/.test(k.slug) ? k.slug : CARD_SLUGS[i] || "product-" + (i + 1));
+export const productUrl = (lang, slug) => PREFIX[lang] + "product/" + slug;
+const visibleCards = (c) => c.products.cards.map((k, i) => ({ ...k, _slug: cardSlug(k, i) })).filter((k) => k.show !== false);
+const FT = {
+  hy: { pages: "Էջեր", products: "Տեսականի", contact: "Կապ", lang: "Լեզու", home: "Գլխավոր", all: "Տեսնել բոլորը", more: "Մանրամասն", crumbs: "Դուք այստեղ եք" },
+  ru: { pages: "Страницы", products: "Ассортимент", contact: "Контакты", lang: "Язык", home: "Главная", all: "Смотреть все", more: "Подробнее", crumbs: "Вы здесь" },
+  en: { pages: "Pages", products: "Our gata", contact: "Contact", lang: "Language", home: "Home", all: "See all", more: "Learn more", crumbs: "You are here" },
+};
+
+function navLinks(c, lang, pages) {
   const home = PREFIX[lang];
   const links = c.nav.filter((n) => n.show !== false).map((n) => {
     let href = n.href || "#";
-    if (href.startsWith("#") && !onHome) href = home + href;
-    if (/^\/p\//.test(href)) href = PREFIX[lang] + href.slice(1);
+    if (href.startsWith("#")) href = home + href;
+    else if (href.startsWith("/")) href = PREFIX[lang] + href.slice(1);
     return { href, label: t(n.label, lang), ext: /^https?:/.test(href) };
   });
   if (c.pagesInNav !== false) for (const p of pages.filter((p) => p.published && p.showInNav)) links.push({ href: pageUrl(lang, p.slug), label: t(p.title, lang) });
@@ -115,37 +128,51 @@ function langSwitch(lang, paths) {
   return `<div class="langs" aria-label="Language">${LANGS.map((l) => `<a href="${paths[l]}" hreflang="${l}" lang="${l}"${l === lang ? ' class="on" aria-current="true"' : ""}>${LANG_NAME[l]}</a>`).join("")}</div>`;
 }
 
-function nav(c, lang, pages, onHome, paths) {
+function nav(c, lang, pages, current, paths) {
   const u = UI[lang];
-  const links = navLinks(c, lang, pages, onHome);
-  const a = (l) => `<a href="${esc(l.href)}"${l.ext ? ' target="_blank" rel="noopener"' : ""}>${esc(l.label)}</a>`;
+  const links = navLinks(c, lang, pages);
+  const a = (l) => `<a href="${esc(l.href)}"${l.ext ? ' target="_blank" rel="noopener"' : ""}${current && l.href === current ? ' aria-current="page"' : ""}>${esc(l.label)}</a>`;
   return `<nav class="nav" aria-label="${u.main}">
   <div class="wrap">
-    ${logo(c, lang, "logo", onHome ? "#top" : PREFIX[lang])}
+    ${logo(c, lang, "logo", PREFIX[lang])}
     <ul>${links.map((l) => `<li>${a(l)}</li>`).join("")}</ul>
     <div class="nav-r">
       ${langSwitch(lang, paths)}
-      <a class="btn btn-gold" href="${onHome ? "" : PREFIX[lang]}#order">${u.order}</a>
+      <a class="btn btn-gold" href="${siteUrl_(lang, "order")}">${u.order}</a>
       <button class="burger" id="burger" type="button" aria-label="${u.menu}" aria-expanded="false" aria-controls="mmenu"><span></span></button>
     </div>
   </div>
 </nav>
-<div class="mmenu" id="mmenu" hidden>${langSwitch(lang, paths).replace('class="langs"', 'class="langs mlangs"')}${links.map(a).join("")}<a href="${onHome ? "" : PREFIX[lang]}#order">${u.order} →</a></div>`;
+<div class="mmenu" id="mmenu" hidden>${langSwitch(lang, paths).replace('class="langs"', 'class="langs mlangs"')}${links.map(a).join("")}<a href="${siteUrl_(lang, "order")}">${u.order} →</a></div>`;
 }
 
-function footer(c, lang, pages) {
-  const u = UI[lang], ct = c.contact;
+function footer(c, lang, pages, paths) {
+  const u = UI[lang], ct = c.contact, F_ = FT[lang], SP = c.sitePages || {};
   const fl = pages.filter((p) => p.published && p.showInFooter);
   const social = [["Instagram", ct.instagram], ["Facebook", ct.facebook], ["TikTok", ct.tiktok], ["Telegram", ct.telegram]].filter((x) => x[1]);
+  const tel = (p) => p.replace(/[^\d+]/g, "").replace(/^0/, "+374");
+  const li = (href, label) => `<li><a href="${esc(href)}">${esc(label)}</a></li>`;
   return `<footer class="dark">
-  ${logo(c, lang, "logo2", PREFIX[lang], true)}
-  <div class="rule"></div>
-  <div class="fcols">
-    <div><div class="fh">${u.address}</div>${inline(t(ct.address, lang))}${ct.mapUrl ? `<br><a href="${esc(ct.mapUrl)}" target="_blank" rel="noopener">Google Maps</a>` : ""}</div>
-    <div><div class="fh">${u.orders}</div>${ct.phones.map((p) => `<a href="tel:${esc(p.replace(/[^\d+]/g, "").replace(/^0/, "+374"))}">${esc(p)}</a>`).join("<br>")}${ct.email ? `<br><a href="mailto:${esc(ct.email)}">${esc(ct.email)}</a>` : ""}<div class="social">${social.map(([n, h]) => `<a href="${esc(h)}" target="_blank" rel="noopener">${n}</a>`).join(" · ")}</div></div>
-    <div><div class="fh">${u.delivery}</div>${esc(u.deliveryTxt)}<br>${esc(ct.domain || "")}</div>
+  <div class="wrap fgrid">
+    <div class="fbrand">
+      ${logo(c, lang, "logo2", PREFIX[lang], true)}
+      <p>${inline(t(ct.address, lang))}${ct.mapUrl ? ` · <a href="${esc(ct.mapUrl)}" target="_blank" rel="noopener">Google Maps</a>` : ""}</p>
+    </div>
+    <div><div class="fh">${F_.pages}</div><ul class="fl">
+      ${li(PREFIX[lang], F_.home)}${SITE_PAGES.map((k) => li(siteUrl_(lang, k), t((SP[k] || {}).nav || (SP[k] || {}).title, lang))).join("")}
+      ${fl.map((p) => li(pageUrl(lang, p.slug), t(p.title, lang))).join("")}
+    </ul></div>
+    <div><div class="fh">${F_.products}</div><ul class="fl">
+      ${visibleCards(c).map((k) => li(productUrl(lang, k._slug), t(k.title, lang))).join("")}
+    </ul></div>
+    <div><div class="fh">${F_.contact}</div><ul class="fl">
+      ${ct.phones.map((p) => `<li><a href="tel:${esc(tel(p))}">${esc(p)}</a></li>`).join("")}
+      ${ct.whatsapp ? `<li><a href="https://wa.me/${esc(ct.whatsapp)}" target="_blank" rel="noopener">WhatsApp</a></li>` : ""}
+      ${social.map(([n, h]) => `<li><a href="${esc(h)}" target="_blank" rel="noopener">${n}</a></li>`).join("")}
+      ${ct.email ? `<li><a href="mailto:${esc(ct.email)}">${esc(ct.email)}</a></li>` : ""}
+    </ul>
+    <div class="fh" style="margin-top:16px">${F_.lang}</div>${langSwitch(lang, paths).replace('class="langs"', 'class="langs flangs"')}</div>
   </div>
-  ${fl.length ? `<div class="flinks">${fl.map((p) => `<a href="${pageUrl(lang, p.slug)}">${esc(t(p.title, lang))}</a>`).join("")}</div>` : ""}
   <div class="copy">${esc(t(c.footer.copy, lang))}</div>
 </footer>`;
 }
@@ -188,6 +215,8 @@ function clientData(c, lang) {
     minDays: +c.order.minDays || 0,
     packs: packsOf(c),
     orderNote: t(c.order.note, lang),
+    menuUrl: PREFIX[lang] + "menu",
+    products: c.products.cards.map((k, i) => ({ slug: cardSlug(k, i), title: t(k.title, lang), pack: k.packaging || "", img: k.image })),
   };
 }
 
@@ -224,42 +253,38 @@ function jsonLd(c, lang, base) {
 }
 
 const HL = {
-  hy: { sizesPrices: "Չափսեր և գներ", from: (p) => `${p} դրամից`, cur: "դրամ", cm: "սմ", packIncluded: "Տուփը ներառված է գնի մեջ", packSeparateBox: "Տուփի արժեքը հաշվարկվում է առանձին", packSeparate: "Փաթեթավորման արժեքը հաշվարկվում է առանձին", packVariable: "Գինը՝ ըստ ընտրված տարբերակի", fixed: (p) => ` (${p} դրամ՝ մեկ հատի համար)`, sizesFact: (s) => `Չափսեր՝ ${s} սմ`, fromFact: (p) => `Գինը՝ ${p} դրամից`, prev: "Նախորդ լուսանկարը", next: "Հաջորդ լուսանկարը", filling: "Միջուկ", deliveryFree: "Առանց առաքման վճարի", deliveryLater: "Առաքման արժեքը՝ ենթակա է ճշտման", orderNow: "Պատվիրել" },
-  ru: { sizesPrices: "Размеры и цены", from: (p) => `от ${p} драм`, cur: "драм", cm: "см", packIncluded: "Коробка входит в цену", packSeparateBox: "Стоимость коробки считается отдельно", packSeparate: "Стоимость упаковки считается отдельно", packVariable: "Цена — в зависимости от выбранного варианта", fixed: (p) => ` (${p} драм за штуку)`, sizesFact: (s) => `Размеры: ${s} см`, fromFact: (p) => `Цена: от ${p} драм`, prev: "Предыдущее фото", next: "Следующее фото", filling: "Начинка", deliveryFree: "Без оплаты доставки", deliveryLater: "Стоимость доставки уточняется", orderNow: "Заказать" },
-  en: { sizesPrices: "Sizes and prices", from: (p) => `from ${p} AMD`, cur: "AMD", cm: "cm", packIncluded: "Box included in the price", packSeparateBox: "Box price is charged separately", packSeparate: "Packaging price is charged separately", packVariable: "Price depends on the chosen option", fixed: (p) => ` (${p} AMD each)`, sizesFact: (s) => `Sizes: ${s} cm`, fromFact: (p) => `From ${p} AMD`, prev: "Previous photo", next: "Next photo", filling: "Filling", deliveryFree: "No delivery fee", deliveryLater: "Delivery price to be confirmed", orderNow: "Order" },
+  hy: { sizesPrices: "Չափսեր և գներ", from: (p) => `${p} դրամից`, cur: "դրամ", cm: "սմ", packIncluded: "Տուփը ներառված է գնի մեջ", packSeparateBox: "Տուփի արժեքը հաշվարկվում է առանձին", packSeparate: "Փաթեթավորման արժեքը հաշվարկվում է առանձին", packVariable: "Գինը՝ ըստ ընտրված տարբերակի", fixed: (p) => ` (${p} դրամ՝ մեկ հատի համար)`, sizesFact: (s) => `Չափսեր՝ ${s} սմ`, fromFact: (p) => `Գինը՝ ${p} դրամից`, prev: "Նախորդ լուսանկարը", next: "Հաջորդ լուսանկարը", filling: "Միջուկ", deliveryFree: "Առանց առաքման վճարի", deliveryLater: "Առաքման արժեքը՝ ենթակա է ճշտման", orderNow: "Պատվիրել", orderThis: "Պատվիրել այս տարբերակը", allPrices: "Բոլոր գները", deliveryMore: "Առաքման մանրամասներ", aboutMore: "Ավելին մեր մասին", faqMore: "Բոլոր հարցերը", otherProducts: "Այլ տարբերակներ", ctaTitle: "Պատրա՞ստ եք պատվիրելու", ctaText: "Լրացրեք պատվերի ձևը կամ գրեք մեր չատում։", call: "Զանգահարել", write: "Գրել WhatsApp-ով", hoursUnknown: "Աշխատանքային ժամերը և վերցնելու հասցեն ճշտեք զանգահարելով։" },
+  ru: { sizesPrices: "Размеры и цены", from: (p) => `от ${p} драм`, cur: "драм", cm: "см", packIncluded: "Коробка входит в цену", packSeparateBox: "Стоимость коробки считается отдельно", packSeparate: "Стоимость упаковки считается отдельно", packVariable: "Цена — в зависимости от выбранного варианта", fixed: (p) => ` (${p} драм за штуку)`, sizesFact: (s) => `Размеры: ${s} см`, fromFact: (p) => `Цена: от ${p} драм`, prev: "Предыдущее фото", next: "Следующее фото", filling: "Начинка", deliveryFree: "Без оплаты доставки", deliveryLater: "Стоимость доставки уточняется", orderNow: "Заказать", orderThis: "Заказать этот вариант", allPrices: "Все цены", deliveryMore: "Подробнее о доставке", aboutMore: "Подробнее о нас", faqMore: "Все вопросы", otherProducts: "Другие варианты", ctaTitle: "Готовы заказать?", ctaText: "Заполните форму заказа или напишите в чат.", call: "Позвонить", write: "Написать в WhatsApp", hoursUnknown: "Часы работы и адрес самовывоза уточните по телефону." },
+  en: { sizesPrices: "Sizes and prices", from: (p) => `from ${p} AMD`, cur: "AMD", cm: "cm", packIncluded: "Box included in the price", packSeparateBox: "Box price is charged separately", packSeparate: "Packaging price is charged separately", packVariable: "Price depends on the chosen option", fixed: (p) => ` (${p} AMD each)`, sizesFact: (s) => `Sizes: ${s} cm`, fromFact: (p) => `From ${p} AMD`, prev: "Previous photo", next: "Next photo", filling: "Filling", deliveryFree: "No delivery fee", deliveryLater: "Delivery price to be confirmed", orderNow: "Order", orderThis: "Order this option", allPrices: "All prices", deliveryMore: "Delivery details", aboutMore: "More about us", faqMore: "All questions", otherProducts: "Other options", ctaTitle: "Ready to order?", ctaText: "Fill in the order form or message us in the chat.", call: "Call", write: "Message on WhatsApp", hoursUnknown: "Please call to check opening hours and the pickup address." },
 };
 const num = (n) => (+n || 0).toLocaleString("en-US").replace(/,/g, " ");
-
-export function renderHome(c, lang, pages, base) {
-  const u = UI[lang], H = HL[lang];
-  const paths = Object.fromEntries(LANGS.map((l) => [l, PREFIX[l]]));
+const allPaths = (fn) => Object.fromEntries(LANGS.map((l) => [l, fn(l)]));
+const more = (href, label) => `<p class="more"><a class="btn btn-line" href="${esc(href)}">${esc(label)} →</a></p>`;
+function priceData(c) {
   const m = c.menu, sizes = m.sizes, shown = m.fillings.filter((f) => f.show !== false);
   const minAt = (i) => Math.min(...shown.map((f) => +f.prices[i] || Infinity));
-  const minAll = Math.min(...sizes.map((s, i) => minAt(i)));
-  const packs = packsOf(c);
-  const packNote = (k) => {
-    if (k.packNote === "included") return H.packIncluded;
-    if (k.packNote === "variable") return H.packVariable;
-    const pk = packs.find((p) => p.id === k.packaging);
-    const base_ = k.packaging === "box" ? H.packSeparateBox : H.packSeparate;
-    return base_ + (pk && pk.price > 0 ? H.fixed(num(pk.price)) : "");
-  };
-  const gal = c.gallery.images;
-  const igLink = c.contact.instagram ? `<a href="${esc(c.contact.instagram)}" target="_blank" rel="noopener">${esc(c.contact.instagramHandle || "Instagram")}</a>` : "";
-  const delivery = c.delivery.options.filter((d) => d.show !== false);
+  return { sizes, shown, minAt, minAll: Math.min(...sizes.map((s, i) => minAt(i))) };
+}
+function packNoteOf(c, lang, k) {
+  const H = HL[lang], packs = packsOf(c);
+  if (k.packNote === "included") return H.packIncluded;
+  if (k.packNote === "variable") return H.packVariable;
+  const pk = packs.find((p) => p.id === k.packaging);
+  return (k.packaging === "box" ? H.packSeparateBox : H.packSeparate) + (pk && pk.price > 0 ? H.fixed(num(pk.price)) : "");
+}
+const secHead = (kicker, title, lead, tag = "h2") => `<div class="sec-head">${kicker ? `<span class="kicker">${esc(kicker)}</span>` : ""}<${tag} class="h2">${esc(title)}</${tag}>${lead ? `<p class="lead">${inline(lead)}</p>` : ""}</div>`;
 
-  const body = `
-${nav(c, lang, pages, true, paths)}
-
-<header class="hero" id="top">
+function heroHtml(c, lang) {
+  const H = HL[lang], { sizes, minAll } = priceData(c);
+  return `<header class="hero" id="top">
   <div class="wrap hero-grid">
     <div class="hero-text">
       <span class="kicker">${esc(t(c.hero.title, lang))} · ${esc(t(c.brand.sub, lang).split("·")[0].trim())}</span>
       <h1>${esc(t(c.hero.kicker, lang))}</h1>
       <p class="lead">${inline(t(c.hero.lead, lang))}</p>
       <div class="btns hero-btns" data-avoid>
-        <a class="btn btn-gold" href="#order">${esc(t(c.hero.btnOrder, lang))}</a>
-        <a class="btn btn-line" href="#products">${esc(t(c.hero.btnMenu, lang))}</a>
+        <a class="btn btn-gold" href="${siteUrl_(lang, "order")}">${esc(t(c.hero.btnOrder, lang))}</a>
+        <a class="btn btn-line" href="${siteUrl_(lang, "menu")}">${esc(t(c.hero.btnMenu, lang))}</a>
       </div>
       <p class="facts"><b>${esc(H.sizesFact(sizes.map((s) => s.cm).join(", ")))}</b>${isFinite(minAll) ? `<span aria-hidden="true">·</span><b>${esc(H.fromFact(num(minAll)))}</b>` : ""}</p>
       ${t(c.hero.advice, lang) ? `<p class="advice"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>${inline(t(c.hero.advice, lang))}</span></p>` : ""}
@@ -273,29 +298,29 @@ ${nav(c, lang, pages, true, paths)}
       <span class="pearl" style="--x:8%;--y:84%;--s:18px"></span>
     </div>
   </div>
-</header>
+</header>`;
+}
 
-<section class="section" id="products">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="kicker">${esc(t(c.products.kicker, lang))}</span>
-      <h2 class="h2">${esc(t(c.products.title, lang))}</h2>
-      <p class="lead">${inline(t(c.products.lead, lang))}</p>
-    </div>
-    <div class="products">
-      ${c.products.cards.filter((k) => k.show !== false).map((k) => `<article class="card" data-avoid>
-        <div class="pic"><img src="${esc(k.image)}" alt="${esc(t(k.title, lang))}" loading="lazy" width="400" height="400"></div>
+function cardsHtml(c, lang, list) {
+  const H = HL[lang], { sizes, minAt } = priceData(c);
+  return `<div class="products">
+      ${list.map((k) => `<article class="card" data-avoid>
+        <a class="pic" href="${productUrl(lang, k._slug)}" tabindex="-1" aria-hidden="true"><img src="${esc(k.image)}" alt="" loading="lazy" width="400" height="400"></a>
         <div class="body">
           <span class="tag">${esc(t(k.tag, lang))}</span>
-          <h3>${esc(t(k.title, lang))}</h3>
+          <h3><a href="${productUrl(lang, k._slug)}">${esc(t(k.title, lang))}</a></h3>
           <p>${inline(t(k.text, lang))}</p>
           <div class="sp"><b>${H.sizesPrices}</b><ul>${sizes.map((s, i) => isFinite(minAt(i)) ? `<li><span>${s.cm} ${H.cm}</span><span>${esc(H.from(num(minAt(i))))}</span></li>` : "").join("")}</ul></div>
-          <p class="packnote">${esc(packNote(k))}</p>
+          <p class="packnote">${esc(packNoteOf(c, lang, k))}</p>
         </div>
-        <div class="act"><a class="btn btn-gold" data-avoid href="#order" data-pick="${esc(t(k.title, lang))}" data-pack="${esc(k.packaging || "")}" data-img="${esc(k.image)}">${esc(t(c.products.btn, lang))}</a></div>
+        <div class="act"><a class="btn btn-gold" data-avoid href="${siteUrl_(lang, "order")}?product=${esc(k._slug)}">${esc(t(c.products.btn, lang))}</a></div>
       </article>`).join("\n      ")}
-    </div>
-    <div class="price-table">
+    </div>`;
+}
+
+function priceTableHtml(c, lang) {
+  const H = HL[lang], { sizes, shown } = priceData(c);
+  return `<div class="price-table">
       <h3>${esc(t(c.products.pricesTitle, lang))}</h3>
       <div class="pt-scroll"><table>
         <caption>${H.cur}</caption>
@@ -303,85 +328,191 @@ ${nav(c, lang, pages, true, paths)}
         <tbody>${shown.map((f) => `<tr><th scope="row">${esc(t(f.short, lang))}</th>${sizes.map((s, i) => `<td>${num(f.prices[i])}</td>`).join("")}</tr>`).join("")}</tbody>
       </table></div>
       <p class="note">${esc(t(c.products.pricesNote, lang))}</p>
-    </div>
-  </div>
-</section>
+    </div>`;
+}
 
-<section class="section alt" id="delivery">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="kicker">${esc(t(c.deliveryInfo.kicker, lang))}</span>
-      <h2 class="h2">${esc(t(c.deliveryInfo.title, lang))}</h2>
-      <p class="lead">${esc(t(c.deliveryInfo.lead, lang))}</p>
-    </div>
-    <div class="deliv">
-      ${delivery.map((d) => `<div class="dcard"><h3>${esc(t(d.label, lang))}</h3><p class="fee">${d.price > 0 ? num(d.price) + " " + H.cur : d.price < 0 ? H.deliveryLater : H.deliveryFree}</p>${t(d.note, lang) ? `<p>${esc(t(d.note, lang))}</p>` : ""}</div>`).join("\n      ")}
-    </div>
-  </div>
-</section>
+function deliveryCards(c, lang) {
+  const H = HL[lang];
+  return `<div class="deliv">
+      ${c.delivery.options.filter((d) => d.show !== false).map((d) => `<div class="dcard"><h3>${esc(t(d.label, lang))}</h3><p class="fee">${d.price > 0 ? num(d.price) + " " + H.cur : d.price < 0 ? H.deliveryLater : H.deliveryFree}</p>${t(d.note, lang) ? `<p>${esc(t(d.note, lang))}</p>` : ""}</div>`).join("\n      ")}
+    </div>`;
+}
 
-<section class="section order" id="order">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="kicker">${esc(t(c.order.kicker, lang))}</span>
-      <h2 class="h2">${esc(t(c.order.title, lang))}</h2>
-      <p class="lead">${inline(t(c.order.lead, lang))}</p>
-    </div>
-    <form class="box" id="f" novalidate></form>
-  </div>
-</section>
-
-<section class="section dark" id="story">
+function storyHtml(c, lang, { gallery = true, button = true, tag = "h2" } = {}) {
+  const H = HL[lang], gal = c.gallery.images;
+  const igLink = c.contact.instagram ? `<a href="${esc(c.contact.instagram)}" target="_blank" rel="noopener">${esc(c.contact.instagramHandle || "Instagram")}</a>` : "";
+  return `<section class="section dark" id="story">
   <div class="wrap story">
     <div class="photo"><img src="${esc(c.story.image)}" alt="${esc(t(c.story.title, lang))}" loading="lazy" width="600" height="750"></div>
     <div>
       <span class="kicker">${esc(t(c.story.kicker, lang))}</span>
-      <h2>${esc(t(c.story.title, lang))}</h2>
+      <${tag}>${esc(t(c.story.title, lang))}</${tag}>
       <p>${inline(t(c.story.p1, lang))}</p>
       ${t(c.story.p2, lang) ? `<p>${inline(t(c.story.p2, lang))}</p>` : ""}
-      <div class="btns on-dark" data-avoid><a class="btn btn-gold" href="#order">${H.orderNow}</a>${c.contact.instagram ? `<a class="btn btn-line" href="${esc(c.contact.instagram)}" target="_blank" rel="noopener">Instagram</a>` : ""}</div>
+      <div class="btns on-dark" data-avoid>${button ? `<a class="btn btn-gold" href="${siteUrl_(lang, "about")}">${H.aboutMore}</a>` : `<a class="btn btn-gold" href="${siteUrl_(lang, "order")}">${H.orderNow}</a>`}${c.contact.instagram ? `<a class="btn btn-line" href="${esc(c.contact.instagram)}" target="_blank" rel="noopener">Instagram</a>` : ""}</div>
     </div>
   </div>
-  <div class="wrap" id="gallery">
+  ${gallery ? `<div class="wrap" id="gallery">
     <div class="gal-head"><h3>${esc(t(c.gallery.title, lang))}</h3><p>${esc(t(c.gallery.lead, lang))} ${igLink}</p>
       <div class="gal-nav" data-avoid><button type="button" class="gbtn" data-dir="-1" aria-label="${H.prev}">‹</button><button type="button" class="gbtn" data-dir="1" aria-label="${H.next}">›</button></div></div>
     <div class="gal" id="gal" tabindex="0" aria-label="${esc(t(c.gallery.title, lang))}">
       ${gal.map((i) => `<img src="${esc(i.src)}" alt="${esc(t(i.alt, lang))}" loading="lazy" width="400" height="400">`).join("")}
     </div>
+  </div>` : ""}
+</section>`;
+}
+
+function faqList(c, lang, limit) {
+  const items = limit ? c.faq.items.slice(0, limit) : c.faq.items;
+  return `<div class="faq">
+      ${items.map((f) => `<details class="qa" data-avoid><summary>${esc(t(f.q, lang))}</summary><p>${inline(t(f.a, lang))}</p></details>`).join("\n      ")}
+    </div>`;
+}
+
+function ctaHtml(c, lang) {
+  const H = HL[lang];
+  return `<section class="section cta"><div class="wrap cta-box"><div><h2 class="h2">${H.ctaTitle}</h2><p class="lead">${H.ctaText}</p></div><div class="btns" data-avoid><a class="btn btn-gold" href="${siteUrl_(lang, "order")}">${H.orderNow}</a><a class="btn btn-line" href="${siteUrl_(lang, "contact")}">${esc(FT[lang].contact)}</a></div></div></section>`;
+}
+
+function contactBlock(c, lang) {
+  const H = HL[lang], ct = c.contact;
+  const tel = (p) => p.replace(/[^\d+]/g, "").replace(/^0/, "+374");
+  return `<div class="contact-grid">
+    <div class="ccard"><h3>${FT[lang].contact}</h3>
+      <ul class="clist">${ct.phones.map((p) => `<li><a href="tel:${esc(tel(p))}">${esc(p)}</a></li>`).join("")}</ul>
+      <div class="btns" data-avoid>${ct.phones[0] ? `<a class="btn btn-gold" href="tel:${esc(tel(ct.phones[0]))}">${H.call}</a>` : ""}${ct.whatsapp ? `<a class="btn btn-line" href="https://wa.me/${esc(ct.whatsapp)}" target="_blank" rel="noopener">${H.write}</a>` : ""}</div>
+    </div>
+    <div class="ccard"><h3>${esc(UI[lang].address)}</h3><p>${inline(t(ct.address, lang))}</p><p class="note">${H.hoursUnknown}</p>${ct.mapUrl ? `<p><a href="${esc(ct.mapUrl)}" target="_blank" rel="noopener">Google Maps</a></p>` : ""}</div>
+    <div class="ccard"><h3>Instagram</h3>${ct.instagram ? `<p><a href="${esc(ct.instagram)}" target="_blank" rel="noopener">${esc(ct.instagramHandle || "Instagram")}</a></p>` : ""}${ct.email ? `<p><a href="mailto:${esc(ct.email)}">${esc(ct.email)}</a></p>` : ""}</div>
+  </div>`;
+}
+
+function crumbs(lang, items) {
+  return `<nav class="crumbs wrap" aria-label="${FT[lang].crumbs}"><a href="${PREFIX[lang]}">${FT[lang].home}</a>${items.map(([h, l]) => h ? ` <span aria-hidden="true">›</span> <a href="${esc(h)}">${esc(l)}</a>` : ` <span aria-hidden="true">›</span> <span aria-current="page">${esc(l)}</span>`).join("")}</nav>`;
+}
+function crumbLd(base, lang, items) {
+  return { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [[PREFIX[lang], FT[lang].home], ...items].map(([h, n], i) => ({ "@type": "ListItem", position: i + 1, name: n, item: base + h })) };
+}
+
+export function renderHome(c, lang, pages, base) {
+  const H = HL[lang], SP = c.sitePages || {};
+  const paths = allPaths((l) => PREFIX[l]);
+  const body = `
+${nav(c, lang, pages, PREFIX[lang], paths)}
+${heroHtml(c, lang)}
+<section class="section" id="products">
+  <div class="wrap">
+    ${secHead(t(c.products.kicker, lang), t(c.products.title, lang), t(c.products.lead, lang))}
+    ${cardsHtml(c, lang, visibleCards(c))}
+    ${more(siteUrl_(lang, "menu"), H.allPrices)}
   </div>
 </section>
-
+<section class="section alt" id="delivery">
+  <div class="wrap">
+    ${secHead(t(c.deliveryInfo.kicker, lang), t(c.deliveryInfo.title, lang), t(c.deliveryInfo.lead, lang))}
+    ${deliveryCards(c, lang)}
+    ${more(siteUrl_(lang, "delivery"), H.deliveryMore)}
+  </div>
+</section>
+${storyHtml(c, lang)}
 <section class="section" id="faq">
   <div class="wrap">
-    <div class="sec-head">
-      <span class="kicker">${esc(t(c.faq.kicker, lang))}</span>
-      <h2 class="h2">${esc(t(c.faq.title, lang))}</h2>
-    </div>
-    <div class="faq">
-      ${c.faq.items.map((f) => `<details class="qa" data-avoid><summary>${esc(t(f.q, lang))}</summary><p>${inline(t(f.a, lang))}</p></details>`).join("\n      ")}
-    </div>
+    ${secHead(t(c.faq.kicker, lang), t(c.faq.title, lang))}
+    ${faqList(c, lang, 3)}
+    ${more(siteUrl_(lang, "faq"), H.faqMore)}
   </div>
 </section>
-
+${ctaHtml(c, lang)}
 ${chatHtml(c, lang)}
-${footer(c, lang, pages)}`;
-
+${footer(c, lang, pages, paths)}`;
   return head(c, lang, {
     title: t(c.seo.title, lang), description: t(c.seo.description, lang), path: PREFIX[lang], base,
     jsonld: jsonLd(c, lang, base), alt: LANGS.map((l) => [l, PREFIX[l]]),
   }) + body + tail(c, lang);
 }
 
+/* one of the main pages: /menu /delivery /order /about /faq /contact */
+export function renderSitePage(c, lang, key, pages, base) {
+  const H = HL[lang], sp = (c.sitePages || {})[key] || {};
+  const url = siteUrl_(lang, key), paths = allPaths((l) => siteUrl_(l, key));
+  const title = t(sp.title, lang), lead = t(sp.lead, lang);
+  let main = "", ld = [crumbLd(base, lang, [[url, title]])];
+  if (key === "menu") {
+    main = `<section class="section"><div class="wrap">${cardsHtml(c, lang, visibleCards(c))}${priceTableHtml(c, lang)}</div></section>
+<section class="section alt"><div class="wrap">${secHead(t(c.deliveryInfo.kicker, lang), t(c.deliveryInfo.title, lang), t(c.deliveryInfo.lead, lang))}${deliveryCards(c, lang)}</div></section>${ctaHtml(c, lang)}`;
+    ld.push(jsonLd(c, lang, base)[0]);
+  } else if (key === "delivery") {
+    main = `<section class="section"><div class="wrap">${deliveryCards(c, lang)}<div class="advice-box"><p class="advice"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>${inline(t(c.hero.advice, lang))}</span></p></div></div></section>
+<section class="section alt"><div class="wrap">${secHead("", t(c.faq.title, lang))}${faqList(c, lang)}</div></section>${ctaHtml(c, lang)}`;
+  } else if (key === "order") {
+    main = `<section class="section order" id="order"><div class="wrap"><form class="box" id="f" novalidate></form></div></section>`;
+  } else if (key === "about") {
+    main = `${storyHtml(c, lang, { button: false })}${ctaHtml(c, lang)}`;
+  } else if (key === "faq") {
+    main = `<section class="section"><div class="wrap">${faqList(c, lang)}</div></section>${ctaHtml(c, lang)}`;
+    ld.push({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: c.faq.items.map((f) => ({ "@type": "Question", name: t(f.q, lang), acceptedAnswer: { "@type": "Answer", text: t(f.a, lang) } })) });
+  } else if (key === "contact") {
+    main = `<section class="section"><div class="wrap">${contactBlock(c, lang)}</div></section>${ctaHtml(c, lang)}`;
+  }
+  const body = `
+${nav(c, lang, pages, url, paths)}
+${crumbs(lang, [[null, title]])}
+<header class="page-hero"><div class="wrap">${sp.kicker ? `<span class="kicker">${esc(t(sp.kicker, lang))}</span>` : ""}<h1>${esc(title)}</h1>${lead ? `<p class="lead">${inline(lead)}</p>` : ""}</div></header>
+${main}
+${chatHtml(c, lang)}
+${footer(c, lang, pages, paths)}`;
+  return head(c, lang, {
+    title: `${title} | ${t(c.brand.name, lang)}`, description: t(sp.seo, lang) || lead || t(c.seo.description, lang),
+    path: url, base, jsonld: ld, alt: LANGS.map((l) => [l, siteUrl_(l, key)]), noindex: key === "order" ? false : false,
+  }) + body + tail(c, lang);
+}
+
+/* one page per product card: /product/<slug> */
+export function renderProduct(c, lang, slug, pages, base) {
+  const list = visibleCards(c), k = list.find((x) => x._slug === slug);
+  if (!k) return null;
+  const H = HL[lang], { sizes, shown, minAt, minAll } = priceData(c);
+  const url = productUrl(lang, slug), paths = allPaths((l) => productUrl(l, slug));
+  const title = t(k.title, lang), menuT = t(((c.sitePages || {}).menu || {}).title, lang);
+  const others = list.filter((x) => x._slug !== slug);
+  const body = `
+${nav(c, lang, pages, siteUrl_(lang, "menu"), paths)}
+${crumbs(lang, [[siteUrl_(lang, "menu"), menuT], [null, title]])}
+<section class="section product-page"><div class="wrap pgrid">
+  <div class="pimg"><img src="${esc(k.image)}" alt="${esc(title)}" width="700" height="700"></div>
+  <div class="pinfo">
+    <span class="kicker">${esc(t(k.tag, lang))}</span>
+    <h1>${esc(title)}</h1>
+    <p class="lead">${inline(t(k.text, lang))}</p>
+    <div class="sp big"><b>${H.sizesPrices}</b><ul>${sizes.map((s, i) => isFinite(minAt(i)) ? `<li><span>${s.cm} ${H.cm}</span><span>${esc(H.from(num(minAt(i))))}</span></li>` : "").join("")}</ul></div>
+    <p class="packnote">${esc(packNoteOf(c, lang, k))}</p>
+    <div class="btns" data-avoid><a class="btn btn-gold" href="${siteUrl_(lang, "order")}?product=${esc(slug)}">${H.orderThis}</a><a class="btn btn-line" href="${siteUrl_(lang, "menu")}">${H.allPrices}</a></div>
+    <p class="advice"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>${inline(t(c.hero.advice, lang))}</span></p>
+  </div>
+</div>
+<div class="wrap">${priceTableHtml(c, lang)}</div></section>
+<section class="section alt"><div class="wrap">${secHead("", t(c.deliveryInfo.title, lang))}${deliveryCards(c, lang)}</div></section>
+${others.length ? `<section class="section"><div class="wrap">${secHead("", H.otherProducts)}${cardsHtml(c, lang, others)}</div></section>` : ""}
+${chatHtml(c, lang)}
+${footer(c, lang, pages, paths)}`;
+  const ld = [crumbLd(base, lang, [[siteUrl_(lang, "menu"), menuT], [url, title]]), {
+    "@context": "https://schema.org", "@type": "Product", name: title, description: t(k.text, lang), image: base + k.image, brand: { "@type": "Brand", name: t(c.brand.name, lang) },
+    offers: { "@type": "AggregateOffer", priceCurrency: "AMD", lowPrice: String(minAll), highPrice: String(Math.max(...shown.flatMap((f) => f.prices.map(Number)))), offerCount: shown.length * sizes.length },
+  }];
+  return head(c, lang, { title: `${title} | ${t(c.brand.name, lang)}`, description: `${t(k.text, lang)} ${H.fromFact(num(minAll))}.`, path: url, base, ogImage: k.image, jsonld: ld, alt: LANGS.map((l) => [l, productUrl(l, slug)]) }) + body + tail(c, lang);
+}
+
 export function renderPage(c, lang, p, pages, base) {
-  const paths = Object.fromEntries(LANGS.map((l) => [l, pageUrl(l, p.slug)]));
+  const paths = allPaths((l) => pageUrl(l, p.slug));
   const title = t(p.title, lang);
   const body = `
-${nav(c, lang, pages, false, paths)}
+${nav(c, lang, pages, pageUrl(lang, p.slug), paths)}
+${crumbs(lang, [[null, title]])}
 <header class="page-hero"><div class="wrap">${p.kicker ? `<span class="kicker">${esc(t(p.kicker, lang))}</span>` : ""}<h1>${esc(title)}</h1></div></header>
 ${p.image ? `<div class="wrap" style="max-width:960px"><img src="${esc(p.image)}" alt="${esc(title)}" style="border-radius:var(--r);box-shadow:var(--shadow);width:100%;max-height:520px;object-fit:cover"></div>` : ""}
 <article class="prose">${md(t(p.body, lang))}</article>
 ${chatHtml(c, lang)}
-${footer(c, lang, pages)}`;
+${footer(c, lang, pages, paths)}`;
   return head(c, lang, {
     title: `${title} | ${t(c.brand.name, lang)}`, description: t(p.seoDescription, lang) || t(c.seo.description, lang),
     path: pageUrl(lang, p.slug), base, ogImage: p.image || null, alt: LANGS.map((l) => [l, pageUrl(l, p.slug)]),
@@ -390,8 +521,8 @@ ${footer(c, lang, pages)}`;
 
 export function render404(c, lang, pages, base) {
   const u = UI[lang];
-  const paths = Object.fromEntries(LANGS.map((l) => [l, PREFIX[l]]));
+  const paths = allPaths((l) => PREFIX[l]);
   return head(c, lang, { title: `${u.notFound} | ${t(c.brand.name, lang)}`, description: u.notFoundTxt, path: PREFIX[lang], base, noindex: true }) +
-    `${nav(c, lang, pages, false, paths)}<header class="page-hero" style="min-height:50vh"><div class="wrap"><span class="kicker">404</span><h1>${u.notFound}</h1><p class="lead">${u.notFoundTxt}</p><div class="btns"><a class="btn btn-gold" href="${PREFIX[lang]}">${u.home}</a></div></div></header>${chatHtml(c, lang)}${footer(c, lang, pages)}` +
+    `${nav(c, lang, pages, "", paths)}<header class="page-hero" style="min-height:50vh"><div class="wrap"><span class="kicker">404</span><h1>${u.notFound}</h1><p class="lead">${u.notFoundTxt}</p><div class="btns"><a class="btn btn-gold" href="${PREFIX[lang]}">${u.home}</a><a class="btn btn-line" href="${siteUrl_(lang, "menu")}">${esc(t(((c.sitePages || {}).menu || {}).title, lang))}</a></div></div></header>${chatHtml(c, lang)}${footer(c, lang, pages, paths)}` +
     tail(c, lang);
 }

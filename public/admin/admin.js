@@ -487,7 +487,7 @@ VIEWS.home = async () => {
       Lst(C.products.cards, "Product cards", (k) => el("div", { class: "grid" }, If(k, "image", "Photo"),
         el("label", { class: "f" }, "Packaging (sets the order form when customers choose this card)", el("select", { onchange: (e) => { k.packaging = e.target.value; } }, [["", "Not set"], ...((C.menu.packs || []).map((p) => [p.id, tx(p.label)]))].map(([v, l]) => el("option", { value: v, selected: (k.packaging || "") === v }, l)))),
         el("label", { class: "f" }, "Price note on the card", el("select", { onchange: (e) => { k.packNote = e.target.value; } }, [["separate", "Packaging price is charged separately"], ["included", "Box included in the price"], ["variable", "Price depends on the chosen option"]].map(([v, l]) => el("option", { value: v, selected: (k.packNote || "separate") === v }, l)))),
-        Lf(k, "tag", "Small tag"), Lf(k, "title", "Title"), Lf(k, "text", "Text", { area: true }), Bf(k, "show", "Show")), () => ({ image: "/img/top.webp", packaging: "box", packNote: "separate", tag: L0(), title: L0(), text: L0(), show: true }), { name: "Card", label: (k) => tx(k.title) })));
+        Tf(k, "slug", "Page address (latin, e.g. wedding-box)", { hint: "The product page opens at /product/this-address" }), Lf(k, "tag", "Small tag"), Lf(k, "title", "Title"), Lf(k, "text", "Text", { area: true }), Bf(k, "show", "Show")), () => ({ image: "/img/top.webp", packaging: "box", packNote: "separate", tag: L0(), title: L0(), text: L0(), show: true }), { name: "Card", label: (k) => tx(k.title) })));
     b.append(sec("Our story", If(C.story, "image", "Photo"), Lf(C.story, "kicker", "Small line"), Lf(C.story, "title", "Title"), Lf(C.story, "p1", "Paragraph 1", { area: true }), Lf(C.story, "p2", "Paragraph 2", { area: true }), el("div", { class: "small muted" }, "The photo gallery under the story is edited in Photos.")));
     b.append(sec("Order section", Lf(C.order, "kicker", "Small line"), Lf(C.order, "title", "Title"), Lf(C.order, "lead", "Text above the form", { area: true }), Lf(C.order, "note", "Text under the send button", { area: true })));
     b.append(sec("Footer", Lf(C.footer, "copy", "Bottom line")));
@@ -519,6 +519,14 @@ VIEWS.pages = async (slug) => {
   PAGES = (await api("pages")).pages;
   if (slug) return pageEditor(slug === "new" ? null : PAGES.find((p) => p.slug === slug));
   top("Pages", el("a", { class: "btn gold", href: "#pages/new" }, "+ New page"));
+  const SPN = { menu: "/menu — Menu & prices", delivery: "/delivery — Delivery", order: "/order — Order form", about: "/about — About us", faq: "/faq — FAQ", contact: "/contact — Contact" };
+  C.sitePages = C.sitePages || JSON.parse(JSON.stringify(DEF.sitePages));
+  const spBox = card(el("h2", {}, "Main pages"), el("div", { class: "small muted" }, "Each main page has its own link in 3 languages (for example garnugata.am/menu, /ru/menu, /en/menu). Edit the title, the text under it and the Google description."),
+    ...Object.keys(SPN).map((k) => { C.sitePages[k] = C.sitePages[k] || {}; const sp = C.sitePages[k]; return el("details", { class: "item" }, el("summary", { style: "cursor:pointer;font-weight:600" }, SPN[k], " ", el("a", { href: "/" + k, target: "_blank", onclick: (e) => e.stopPropagation() }, "View ↗")),
+      el("div", { class: "grid", style: "margin-top:10px" }, Lf(sp, "title", "Title"), Lf(sp, "lead", "Text under the title", { area: true, rows: 2 }), Lf(sp, "seo", "Google description", { area: true, rows: 2 }))); }),
+    el("div", {}, el("button", { class: "btn gold", onclick: (e) => saveContent(e.currentTarget) }, "💾 Save main pages")));
+  main.append(spBox);
+  main.append(el("h2", { style: "margin:24px 0 10px" }, "Extra pages"));
   main.append(el("div", { class: "help", style: "margin-bottom:16px", html: "Make extra pages like <b>Wedding gata</b>, <b>Delivery info</b>, <b>About us</b> or <b>Price list</b>. Each page has Armenian, Russian and English versions and appears in Google." }));
   if (!PAGES.length) return main.append(el("div", { class: "card empty" }, "No pages yet. Press “New page”."));
   main.append(el("div", { class: "card", style: "padding:6px;overflow:auto" }, el("table", { class: "tbl" },
@@ -555,7 +563,7 @@ function pageEditor(p) {
 /* =============== links & contacts =============== */
 VIEWS.links = async () => {
   if (!C) await loadContent();
-  contentPage("Links & contacts", "Top menu links can point to a part of the homepage (<code>#products</code>, <code>#story</code>, <code>#gallery</code>, <code>#how</code>, <code>#order</code>, <code>#faq</code>), to a page (<code>/p/page-address</code>) or to any website (<code>https://…</code>).", (b) => {
+  contentPage("Links & contacts", "Top menu links can point to a main page (<code>/menu</code>, <code>/delivery</code>, <code>/order</code>, <code>/about</code>, <code>/faq</code>, <code>/contact</code>), a product (<code>/product/wedding-box</code>), an extra page (<code>/p/page-address</code>) or any website (<code>https://…</code>). The language is added automatically.", (b) => {
     const ct = C.contact;
     const phones = { v: ct.phones.join(", ") };
     b.append(card(el("h2", {}, "Contacts"),

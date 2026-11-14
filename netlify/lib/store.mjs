@@ -2,6 +2,7 @@ import { getStore } from "@netlify/blobs";
 import { DEFAULT_CONTENT, LANGS, CONTENT_VERSION } from "./defaults.mjs";
 import { V1_CONTENT } from "./defaults_v1.mjs";
 import { V2_CONTENT } from "./defaults_v2.mjs";
+import { V3_CONTENT } from "./defaults_v3.mjs";
 
 export const store = (name) => getStore({ name, consistency: "strong" });
 
@@ -37,7 +38,8 @@ export function migrate(saved) {
   if (!saved || (saved.version || 1) >= CONTENT_VERSION) return saved;
   let m = saved;
   if ((saved.version || 1) < 2) m = dropOldDefaults(m, V1_CONTENT);
-  m = dropOldDefaults(m, V2_CONTENT);
+  if ((saved.version || 1) < 3) m = dropOldDefaults(m, V2_CONTENT);
+  m = dropOldDefaults(m, V3_CONTENT);
   m.version = CONTENT_VERSION;
   return m;
 }

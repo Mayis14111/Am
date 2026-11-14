@@ -3,7 +3,7 @@
 const L = (hy, ru, en) => ({ hy, ru, en });
 
 export const LANGS = ["hy", "ru", "en"];
-export const CONTENT_VERSION = 3;
+export const CONTENT_VERSION = 4;
 
 export const DEFAULT_CONTENT = {
   version: CONTENT_VERSION,
@@ -28,10 +28,11 @@ export const DEFAULT_CONTENT = {
     domain: "garnugata.am",
   },
   nav: [
-    { label: L("Տեսականի և գներ", "Ассортимент и цены", "Menu & prices"), href: "#products", show: true },
-    { label: L("Առաքում", "Доставка", "Delivery"), href: "#delivery", show: true },
-    { label: L("Մեր մասին", "О нас", "About"), href: "#story", show: true },
-    { label: L("Հարցեր", "Вопросы", "FAQ"), href: "#faq", show: true },
+    { label: L("Տեսականի և գներ", "Ассортимент и цены", "Menu & prices"), href: "/menu", show: true },
+    { label: L("Առաքում", "Доставка", "Delivery"), href: "/delivery", show: true },
+    { label: L("Մեր մասին", "О нас", "About"), href: "/about", show: true },
+    { label: L("Հարցեր", "Вопросы", "FAQ"), href: "/faq", show: true },
+    { label: L("Կապ", "Контакты", "Contact"), href: "/contact", show: true },
   ],
   hero: {
     kicker: L("Գաթաներ՝ հարսանիքի և նվերի համար", "Гата для свадьбы и в подарок", "Gata for weddings and gifts"),
@@ -76,12 +77,45 @@ export const DEFAULT_CONTENT = {
       "Prices are per gata, without a box or other packaging."
     ),
     cards: [
-      { image: "/img/marble.webp", packaging: "box", packNote: "separate", tag: L("Հարսանիք", "Свадьба", "Wedding"), title: L("Հարսանեկան գաթա՝ տուփով", "Свадебная гата в коробке", "Wedding gata in a box"), text: L("Ավանդական գաթա՝ խորիզով, գեղեցիկ զարդարված հարսանեկան տուփում։", "Традиционная гата с хоризом в красиво украшенной свадебной коробке.", "Traditional gata with khoriz in a beautifully decorated wedding box.") },
-      { image: "/img/bag_pearl.webp", packaging: "bag", packNote: "separate", tag: L("Նվեր", "Подарок", "Gift"), title: L("Գաթա՝ նվեր-պայուսակում", "Гата в подарочном пакете", "Gata in a gift bag"), text: L("Գաթա՝ ուլունքներով զարդարված թափանցիկ նվեր-պայուսակում։", "Гата в прозрачном подарочном пакете, украшенном бусинами.", "Gata in a clear gift bag decorated with beads.") },
-      { image: "/img/bride.webp", packaging: "wrap", packNote: "separate", tag: L("Ավանդույթ", "Традиция", "Tradition"), title: L("Գաթա՝ հարսի ճամպրուկի համար", "Гата для чемодана невесты", "Gata for the bride's suitcase"), text: L("Ավանդական գաթա՝ շղարշով ու ժապավենով փաթեթավորված։", "Традиционная гата, упакованная в фатин с лентой.", "Traditional gata wrapped in tulle and ribbon.") },
-      { image: "/img/initials.webp", packaging: "box", packNote: "variable", tag: L("Անհատական", "Персонально", "Personal"), title: L("Գաթայի տուփեր՝ ձեր սկզբնատառերով", "Коробки для гаты с вашими инициалами", "Gata boxes with your initials"), text: L("Ձեր անունների սկզբնատառերով ձևավորված տուփեր՝ հարսանիքի հյուրերին նվիրելու համար։", "Коробки, оформленные инициалами ваших имён, — в подарок гостям свадьбы.", "Boxes decorated with your initials, as gifts for your wedding guests.") },
+      { slug: "wedding-box", image: "/img/marble.webp", packaging: "box", packNote: "separate", tag: L("Հարսանիք", "Свадьба", "Wedding"), title: L("Հարսանեկան գաթա՝ տուփով", "Свадебная гата в коробке", "Wedding gata in a box"), text: L("Ավանդական գաթա՝ խորիզով, գեղեցիկ զարդարված հարսանեկան տուփում։", "Традиционная гата с хоризом в красиво украшенной свадебной коробке.", "Traditional gata with khoriz in a beautifully decorated wedding box.") },
+      { slug: "gift-bag", image: "/img/bag_pearl.webp", packaging: "bag", packNote: "separate", tag: L("Նվեր", "Подарок", "Gift"), title: L("Գաթա՝ նվեր-պայուսակում", "Гата в подарочном пакете", "Gata in a gift bag"), text: L("Գաթա՝ ուլունքներով զարդարված թափանցիկ նվեր-պայուսակում։", "Гата в прозрачном подарочном пакете, украшенном бусинами.", "Gata in a clear gift bag decorated with beads.") },
+      { slug: "bride-suitcase", image: "/img/bride.webp", packaging: "wrap", packNote: "separate", tag: L("Ավանդույթ", "Традиция", "Tradition"), title: L("Գաթա՝ հարսի ճամպրուկի համար", "Гата для чемодана невесты", "Gata for the bride's suitcase"), text: L("Ավանդական գաթա՝ շղարշով ու ժապավենով փաթեթավորված։", "Традиционная гата, упакованная в фатин с лентой.", "Traditional gata wrapped in tulle and ribbon.") },
+      { slug: "initials-boxes", image: "/img/initials.webp", packaging: "box", packNote: "variable", tag: L("Անհատական", "Персонально", "Personal"), title: L("Գաթայի տուփեր՝ ձեր սկզբնատառերով", "Коробки для гаты с вашими инициалами", "Gata boxes with your initials"), text: L("Ձեր անունների սկզբնատառերով ձևավորված տուփեր՝ հարսանիքի հյուրերին նվիրելու համար։", "Коробки, оформленные инициалами ваших имён, — в подарок гостям свадьбы.", "Boxes decorated with your initials, as gifts for your wedding guests.") },
     ],
     btn: L("Ընտրել այս տարբերակը", "Выбрать этот вариант", "Choose this option"),
+  },
+  // the main pages, each with its own link: /menu /delivery /order /about /faq /contact
+  sitePages: {
+    menu: {
+      title: L("Տեսականի և գներ", "Ассортимент и цены", "Menu and prices"),
+      lead: L("Գաթաներ՝ տուփով, նվեր-պայուսակում կամ առանց փաթեթավորման։ Գները՝ ըստ չափսի և միջուկի։", "Гата в коробке, в подарочном пакете или без упаковки. Цены — по размеру и начинке.", "Gata in a box, a gift bag or without packaging. Prices by size and filling."),
+      seo: L("Գառնու գաթայի տեսականի և գներ՝ 25, 30 և 40 սմ, խորիզով, ընկույզով, չրերով և խուրմայով։ Հարսանեկան տուփեր և նվեր-պայուսակներ։", "Ассортимент и цены гаты из Гарни: 25, 30 и 40 см, с хоризом, орехами, сухофруктами и хурмой. Свадебные коробки и подарочные пакеты.", "Garnu Gata menu and prices: 25, 30 and 40 cm, khoriz, walnut, dried fruit and persimmon. Wedding boxes and gift bags."),
+    },
+    delivery: {
+      title: L("Առաքում և ստացում", "Доставка и получение", "Delivery and pickup"),
+      lead: L("Վերցրեք պատվերը Գառնիից կամ Մեգամոլից, կամ պատվիրեք առաքում Երևանում և Աբովյանում։", "Заберите заказ в Гарни или в «Мегамолле» либо закажите доставку по Еревану и в Абовян.", "Pick up in Garni or at Megamall, or order delivery in Yerevan and Abovyan."),
+      seo: L("Գառնու Գաթա․ վերցնել Գառնիից կամ Երևանի Մեգամոլից, առաքում Երևանում և Աբովյանում։", "Гарну Гата: самовывоз из Гарни или «Мегамолла», доставка по Еревану и в Абовян.", "Garnu Gata: pickup in Garni or at Megamall Yerevan, delivery in Yerevan and Abovyan."),
+    },
+    order: {
+      title: L("Պատվիրել գաթա", "Заказать гату", "Order gata"),
+      lead: L("Լրացրեք ձևը քայլ առ քայլ․ գինը կհաշվարկվի անմիջապես։ Պատվերն ուղարկելուց հետո կկապվենք ձեզ հետ։", "Заполните форму шаг за шагом — цена посчитается сразу. После отправки мы свяжемся с вами.", "Fill in the form step by step; the price is calculated right away. We'll contact you after you send it."),
+      seo: L("Պատվիրեք Գառնու գաթա առցանց՝ ընտրեք չափսը, միջուկը, փաթեթավորումը և ստացման եղանակը։", "Закажите гату из Гарни онлайн: выберите размер, начинку, упаковку и способ получения.", "Order Garnu Gata online: choose the size, filling, packaging and how you'll receive it."),
+    },
+    about: {
+      title: L("Մեր մասին", "О нас", "About us"),
+      lead: L("Գառնու Գաթան ավանդական գաթա է՝ թխված Գառնիում։", "Гарну Гата — традиционная гата, испечённая в Гарни.", "Garnu Gata is traditional gata baked in Garni."),
+      seo: L("Գառնու Գաթա․ ավանդական գաթա Գառնիից՝ հարսանիքի, նշանադրության, կնունքի և նվերի համար։", "Гарну Гата: традиционная гата из Гарни для свадьбы, помолвки, крестин и в подарок.", "Garnu Gata: traditional gata from Garni for weddings, engagements, christenings and gifts."),
+    },
+    faq: {
+      title: L("Հաճախ տրվող հարցեր", "Частые вопросы", "Frequently asked questions"),
+      lead: L("Պատասխաններ առաքման, պատվերի և գաթաների մասին։", "Ответы о доставке, заказе и гате.", "Answers about delivery, ordering and our gata."),
+      nav: L("Հարցեր", "Вопросы", "FAQ"),
+    },
+    contact: {
+      title: L("Կապ", "Контакты", "Contact"),
+      lead: L("Զանգահարեք, գրեք կամ պատվիրեք կայքում։", "Звоните, пишите или заказывайте на сайте.", "Call, message us or order on the website."),
+      seo: L("Գառնու Գաթայի հեռախոսահամարները, WhatsApp և Instagram։", "Телефоны, WhatsApp и Instagram Гарну Гата.", "Garnu Gata phone numbers, WhatsApp and Instagram."),
+    },
   },
   deliveryInfo: {
     kicker: L("Առաքում", "Доставка", "Delivery"),
