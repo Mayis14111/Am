@@ -93,8 +93,9 @@ ${/^G-[A-Z0-9]+$/.test(c.seo.googleTag || "") ? `<script async src="https://www.
 }
 export const ASSET_V = "1";
 
-function logo(c, lang, id, href) {
-  return `<a class="logo" href="${href}" id="${id}">${c.brand.logo ? `<img src="${esc(c.brand.logo)}" alt="${esc(t(c.brand.name, lang))}">` : `<b>${esc(t(c.brand.logoText, lang))}</b><small>${esc(t(c.brand.sub, lang))}</small>`}</a>`;
+function logo(c, lang, id, href, light) {
+  const src = light ? c.brand.logoLight || c.brand.logo : c.brand.logo;
+  return `<a class="logo" href="${href}" id="${id}">${src ? `<img src="${esc(src)}" alt="${esc(t(c.brand.name, lang))}" height="44">` : `<b>${esc(t(c.brand.logoText, lang))}</b><small>${esc(t(c.brand.sub, lang))}</small>`}</a>`;
 }
 
 function navLinks(c, lang, pages, onHome) {
@@ -136,7 +137,7 @@ function footer(c, lang, pages) {
   const fl = pages.filter((p) => p.published && p.showInFooter);
   const social = [["Instagram", ct.instagram], ["Facebook", ct.facebook], ["TikTok", ct.tiktok], ["Telegram", ct.telegram]].filter((x) => x[1]);
   return `<footer class="dark">
-  ${logo(c, lang, "logo2", PREFIX[lang])}
+  ${logo(c, lang, "logo2", PREFIX[lang], true)}
   <div class="rule"></div>
   <div class="fcols">
     <div><div class="fh">${u.address}</div>${inline(t(ct.address, lang))}${ct.mapUrl ? `<br><a href="${esc(ct.mapUrl)}" target="_blank" rel="noopener">Google Maps</a>` : ""}</div>

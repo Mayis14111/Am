@@ -10,7 +10,8 @@ export const DEFAULT_CONTENT = {
     name: L("Գառնու Գաթա", "Гарну Гата", "Garnu Gata"),
     logoText: L("ԳԱՌՆՈՒ ԳԱԹԱ", "ГАРНУ ГАТА", "GARNU GATA"),
     sub: L("Գառնի · Հայաստան", "Гарни · Армения", "Garni · Armenia"),
-    logo: "",
+    logo: "/img/logo.svg",
+    logoLight: "/img/logo-light.svg",
   },
   contact: {
     phones: ["041-55-10-56", "055-57-73-81"],

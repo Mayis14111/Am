@@ -315,3 +315,7 @@ body.chat-typing .chat-btn{opacity:0;pointer-events:none}
 .flinks a{color:#d2bfa8}
 .social{display:flex;gap:10px;justify-content:center;margin-top:8px;flex-wrap:wrap}
 .closed{background:#fff3e6;border:1px solid #f0d2a8;border-radius:16px;padding:16px;color:#7a4a1a}
+
+.nav .logo img{height:40px;width:auto}
+footer .logo img{height:64px;width:auto;margin:0 auto}
+@media (max-width:420px){.nav .logo img{height:30px}}
