@@ -1280,4 +1280,33 @@ if (chatBtn && chatPanel) {
   });
 })();
 
+
+/* ================= order page: live preview in header ================= */
+(() => {
+  const stage = document.querySelector("[data-order]");
+  if (!stage || !form) return;
+  const sc = $("ohScale"), capT = $("ohCapT"), ringT = $("ringText"), btns = [...stage.querySelectorAll(".szb")];
+  const selText = (id) => { const el = $(id); return el && el.selectedIndex >= 0 ? el.options[el.selectedIndex].text : ""; };
+  function sync() {
+    const fs = $("fsize"); if (!fs) return;
+    const i = +fs.value || 0, n = Math.max(1, btns.length - 1);
+    if (sc) sc.style.transform = `scale(${0.74 + 0.26 * (i / n)})`;
+    btns.forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.size === i)));
+    const q = Math.max(1, parseInt(($("qty") || {}).value, 10) || 1);
+    const parts = [selText("fsize"), selText("kind"), selText("fpack")].filter(Boolean);
+    if (capT) capT.textContent = parts.join(" · ") + (q > 1 ? ` · ×${q}` : "");
+    const cm = (selText("fsize").match(/\d+\s*\S+?(?=\))/) || [selText("fsize")])[0], fill = selText("kind").split("(")[0].trim();
+    const unit = `${cm} · ${fill} · `.toUpperCase();
+    if (ringT) ringT.textContent = unit.repeat(Math.max(2, Math.round(58 / unit.length)));
+  }
+  btns.forEach((b) => b.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const fs = $("fsize"); if (!fs) return;
+    fs.value = b.dataset.size; fs.dispatchEvent(new Event("change", { bubbles: true }));
+  }));
+  btns.forEach((b) => b.addEventListener("pointerdown", (e) => e.stopPropagation()));
+  form.addEventListener("change", sync); form.addEventListener("input", sync);
+  sync(); setTimeout(sync, 50);
+})();
+
 })();

@@ -92,7 +92,7 @@ ${/^G-[A-Z0-9]+$/.test(c.seo.googleTag || "") ? `<script async src="https://www.
 <body>
 <div class="root">`;
 }
-export const ASSET_V = "9";
+export const ASSET_V = "10";
 
 function logo(c, lang, id, href, light) {
   const src = light ? c.brand.logoLight || c.brand.logo : c.brand.logo;
@@ -311,6 +311,40 @@ ${c.expand && c.expand.show !== false && c.expand.image ? `<section class="expan
 </section>` : ""}`;
 }
 
+function orderHero(c, lang, title, lead) {
+  const sizes = ((c.menu || {}).sizes || []).map((z) => z.cm);
+  const OH = {
+    hy: { yours: "Ձեր գաթան", size: "Ընտրեք չափը", cm: "սմ", steps: ["Ընտրեք գաթան", "Նշեք օրը", "Ուղարկեք պատվերը"] },
+    ru: { yours: "Ваша гата", size: "Выберите размер", cm: "см", steps: ["Выберите гату", "Укажите день", "Отправьте заказ"] },
+    en: { yours: "Your gata", size: "Pick a size", cm: "cm", steps: ["Choose your gata", "Pick the day", "Send the order"] },
+  }[lang];
+  const angles = sizes.length === 1 ? [-35] : sizes.map((_, i) => -70 + (70 / (sizes.length - 1)) * i);
+  const sizeBtns = sizes.map((cm, i) => { const a = (angles[i] * Math.PI) / 180, x = 50 + 49 * Math.cos(a), y = 50 + 49 * Math.sin(a);
+    return `<button type="button" class="szb" data-size="${i}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%" aria-pressed="false">${cm}<small>${OH.cm}</small></button>`; }).join("");
+  const pearl = (x, y, sz, d) => `<span class="pearl" style="--x:${x}%;--y:${y}%;--s:${sz}px;--d:${d}"></span>`;
+  return `<header class="order-hero">
+  <div class="wrap oh-grid">
+    <div class="oh-text">
+      <h1 class="load">${esc(title)}</h1>
+      ${lead ? `<p class="lead load d1">${inline(lead)}</p>` : ""}
+      <ol class="oh-steps load d2">${OH.steps.map((s, i) => `<li><i>${i + 1}</i>${esc(s)}</li>`).join("")}</ol>
+    </div>
+    <div class="oh-visual load d1">
+      <div class="hero-stage oh-stage" id="heroStage" data-order>
+        <div class="hero-glow" aria-hidden="true"></div>
+        <svg class="hero-ring" id="heroRing" viewBox="0 0 400 400" aria-hidden="true"><defs><path id="ringPath" d="M200,200 m-170,0 a170,170 0 1,1 340,0 a170,170 0 1,1 -340,0"/></defs>
+          <circle cx="200" cy="200" r="192" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-dasharray="2 7"/>
+          <text><textPath href="#ringPath" id="ringText" textLength="1060" lengthAdjust="spacing">${esc((t(c.brand.logoText, lang) + " · ").repeat(3))}</textPath></text></svg>
+        <div class="hero-tilt" id="heroTilt"><div class="oh-scale" id="ohScale"><div class="hero-gata" id="heroGata" role="img" aria-label="${esc(OH.yours)}"><img src="${esc(c.hero.image)}" alt="" width="600" height="600" draggable="false"></div></div></div>
+        <div class="orbit" aria-hidden="true">${pearl(50, -2, 22, 1.6)}${pearl(-2, 50, 14, 2.6)}${pearl(50, 98, 26, 1.2)}</div>
+        <div class="oh-sizes" role="group" aria-label="${esc(OH.size)}">${sizeBtns}</div>
+      </div>
+      <p class="oh-cap" id="ohCap" aria-live="polite"><small>${esc(OH.yours)}</small><b id="ohCapT"></b></p>
+    </div>
+  </div>
+</header>`;
+}
+
 function cardsHtml(c, lang, list) {
   const H = HL[lang], { sizes, minAt } = priceData(c);
   return `<div class="products">
@@ -467,7 +501,7 @@ export function renderSitePage(c, lang, key, pages, base) {
   const body = `
 ${nav(c, lang, pages, url, paths)}
 ${crumbs(lang, [[null, title]])}
-<header class="page-hero"><div class="wrap">${sp.kicker ? `<span class="kicker">${esc(t(sp.kicker, lang))}</span>` : ""}<h1>${esc(title)}</h1>${lead ? `<p class="lead">${inline(lead)}</p>` : ""}</div></header>
+${key === "order" ? orderHero(c, lang, title, lead) : `<header class="page-hero"><div class="wrap">${sp.kicker ? `<span class="kicker">${esc(t(sp.kicker, lang))}</span>` : ""}<h1>${esc(title)}</h1>${lead ? `<p class="lead">${inline(lead)}</p>` : ""}</div></header>`}
 ${main}
 ${chatHtml(c, lang)}
 ${footer(c, lang, pages, paths)}`;
