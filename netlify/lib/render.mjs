@@ -67,8 +67,8 @@ function head(c, lang, { title, description, path, base, ogImage, jsonld, noinde
 ${alt ? alt.map(([l, p]) => `<link rel="alternate" hreflang="${l}" href="${esc(base + p)}">`).join("\n") + `\n<link rel="alternate" hreflang="x-default" href="${esc(base + alt[0][1])}">` : ""}
 <meta name="robots" content="${noindex ? "noindex, follow" : "index, follow, max-image-preview:large"}">
 <meta name="theme-color" content="#261b14">
-<link rel="icon" href="${esc(c.brand.favicon || "/img/favicon.png")}">
-<link rel="apple-touch-icon" href="${esc(c.brand.favicon || "/img/favicon.png")}">
+${c.brand.favicon ? `<link rel="icon" href="${esc(c.brand.favicon)}">` : `<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">\n<link rel="icon" href="/img/favicon.png" sizes="48x48">`}
+<link rel="apple-touch-icon" href="${esc(c.brand.favicon || "/img/apple-touch-icon.png")}">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="${OG_LOCALE[lang]}">
 <meta property="og:site_name" content="${esc(t(c.brand.name, lang))}">
@@ -95,7 +95,7 @@ export const ASSET_V = "1";
 
 function logo(c, lang, id, href, light) {
   const src = light ? c.brand.logoLight || c.brand.logo : c.brand.logo;
-  return `<a class="logo" href="${href}" id="${id}">${src ? `<img src="${esc(src)}" alt="${esc(t(c.brand.name, lang))}" height="44">` : `<b>${esc(t(c.brand.logoText, lang))}</b><small>${esc(t(c.brand.sub, lang))}</small>`}</a>`;
+  return `<a class="logo" href="${href}" id="${id}">${src ? `<img src="${esc(src)}" alt="${esc(t(c.brand.name, lang))}">` : `<b>${esc(t(c.brand.logoText, lang))}</b><small>${esc(t(c.brand.sub, lang))}</small>`}</a>`;
 }
 
 function navLinks(c, lang, pages, onHome) {
