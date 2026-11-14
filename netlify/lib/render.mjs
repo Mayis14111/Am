@@ -92,7 +92,7 @@ ${/^G-[A-Z0-9]+$/.test(c.seo.googleTag || "") ? `<script async src="https://www.
 <body>
 <div class="root">`;
 }
-export const ASSET_V = "4";
+export const ASSET_V = "5";
 
 function logo(c, lang, id, href, light) {
   const src = light ? c.brand.logoLight || c.brand.logo : c.brand.logo;
@@ -130,7 +130,7 @@ function nav(c, lang, pages, onHome, paths) {
     </div>
   </div>
 </nav>
-<div class="mmenu" id="mmenu" hidden>${links.map(a).join("")}<a href="${onHome ? "" : PREFIX[lang]}#order">${u.order} →</a></div>`;
+<div class="mmenu" id="mmenu" hidden>${langSwitch(lang, paths).replace('class="langs"', 'class="langs mlangs"')}${links.map(a).join("")}<a href="${onHome ? "" : PREFIX[lang]}#order">${u.order} →</a></div>`;
 }
 
 function footer(c, lang, pages) {
@@ -254,18 +254,15 @@ ${nav(c, lang, pages, true, paths)}
 <header class="hero" id="top">
   <div class="wrap hero-grid">
     <div class="hero-text">
-      <span class="kicker">${esc(t(c.hero.kicker, lang))}</span>
-      <h1>${esc(t(c.hero.title, lang))}</h1>
+      <span class="kicker">${esc(t(c.hero.title, lang))} · ${esc(t(c.brand.sub, lang).split("·")[0].trim())}</span>
+      <h1>${esc(t(c.hero.kicker, lang))}</h1>
       <p class="lead">${inline(t(c.hero.lead, lang))}</p>
-      <ul class="facts">
-        <li>${esc(H.sizesFact(sizes.map((s) => s.cm).join(", ")))}</li>
-        ${isFinite(minAll) ? `<li>${esc(H.fromFact(num(minAll)))}</li>` : ""}
-      </ul>
-      <div class="btns" data-avoid>
+      <div class="btns hero-btns" data-avoid>
         <a class="btn btn-gold" href="#order">${esc(t(c.hero.btnOrder, lang))}</a>
         <a class="btn btn-line" href="#products">${esc(t(c.hero.btnMenu, lang))}</a>
       </div>
-      ${t(c.hero.advice, lang) ? `<p class="advice">${inline(t(c.hero.advice, lang))}</p>` : ""}
+      <p class="facts"><b>${esc(H.sizesFact(sizes.map((s) => s.cm).join(", ")))}</b>${isFinite(minAll) ? `<span aria-hidden="true">·</span><b>${esc(H.fromFact(num(minAll)))}</b>` : ""}</p>
+      ${t(c.hero.advice, lang) ? `<p class="advice"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>${inline(t(c.hero.advice, lang))}</span></p>` : ""}
     </div>
     <div class="hero-stage" aria-hidden="true">
       <div class="hero-glow"></div>
@@ -294,8 +291,8 @@ ${nav(c, lang, pages, true, paths)}
           <p>${inline(t(k.text, lang))}</p>
           <div class="sp"><b>${H.sizesPrices}</b><ul>${sizes.map((s, i) => isFinite(minAt(i)) ? `<li><span>${s.cm} ${H.cm}</span><span>${esc(H.from(num(minAt(i))))}</span></li>` : "").join("")}</ul></div>
           <p class="packnote">${esc(packNote(k))}</p>
-          <a class="btn btn-gold btn-sm" data-avoid href="#order" data-pick="${esc(t(k.title, lang))}" data-pack="${esc(k.packaging || "")}" data-img="${esc(k.image)}">${esc(t(c.products.btn, lang))}</a>
         </div>
+        <div class="act"><a class="btn btn-gold" data-avoid href="#order" data-pick="${esc(t(k.title, lang))}" data-pack="${esc(k.packaging || "")}" data-img="${esc(k.image)}">${esc(t(c.products.btn, lang))}</a></div>
       </article>`).join("\n      ")}
     </div>
     <div class="price-table">
