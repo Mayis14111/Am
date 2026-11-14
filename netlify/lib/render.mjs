@@ -275,7 +275,6 @@ function packNoteOf(c, lang, k) {
 const secHead = (kicker, title, lead, tag = "h2") => `<div class="sec-head">${kicker ? `<span class="kicker">${esc(kicker)}</span>` : ""}<${tag} class="h2">${esc(title)}</${tag}>${lead ? `<p class="lead">${inline(lead)}</p>` : ""}</div>`;
 
 function heroHtml(c, lang) {
-  const H = HL[lang], { sizes, minAll } = priceData(c);
   const pearl = (x, y, sz, d) => `<span class="pearl" style="--x:${x}%;--y:${y}%;--s:${sz}px;--d:${d}"></span>`;
   return `<header class="hero" id="top">
   <div class="wrap hero-text">
@@ -286,14 +285,12 @@ function heroHtml(c, lang) {
       <a class="btn btn-gold" href="${siteUrl_(lang, "order")}">${esc(t(c.hero.btnOrder, lang))}</a>
       <a class="btn btn-line" href="${siteUrl_(lang, "menu")}">${esc(t(c.hero.btnMenu, lang))}</a>
     </div>
-    <p class="facts load d3"><b>${esc(H.sizesFact(sizes.map((s) => s.cm).join(", ")))}</b>${isFinite(minAll) ? `<span aria-hidden="true">·</span><b>${esc(H.fromFact(num(minAll)))}</b>` : ""}</p>
   </div>
   <div class="hero-stage load" id="heroStage" aria-hidden="true">
     <div class="hero-glow"></div>
     <div class="hero-gata" id="heroGata"><img src="${esc(c.hero.image)}" alt="" width="600" height="600" fetchpriority="high"></div>
     ${pearl(2, 18, 34, 1.6)}${pearl(88, 10, 22, 2.2)}${pearl(92, 66, 40, 1.2)}${pearl(0, 72, 20, 2.6)}${pearl(20, 94, 26, 1.9)}${pearl(74, 96, 16, 2.8)}
   </div>
-  ${t(c.hero.advice, lang) ? `<div class="wrap"><p class="advice hero-advice load d3"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>${inline(t(c.hero.advice, lang))}</span></p></div>` : ""}
 </header>
 ${c.expand && c.expand.show !== false && c.expand.image ? `<section class="expand" id="expand" aria-label="${esc(t(c.expand.title, lang))}">
   <div class="sticky">
