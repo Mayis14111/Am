@@ -1,6 +1,6 @@
 import { json } from "../lib/store.mjs";
 import { verifySignature, getPayment } from "../lib/paynet.mjs";
-import { orderByPaynetId, saveOrder } from "../lib/orders.mjs";
+import { orderByPaynetId, updateOrder } from "../lib/orders.mjs";
 import { sendAll, money } from "../lib/telegram.mjs";
 
 export default async (req) => {
@@ -17,15 +17,19 @@ export default async (req) => {
   let status = ev.transaction.status, amount = ev.transaction.amount;
   try { const p = await getPayment(pid); status = p.status || status; amount = p.amount ?? amount; } catch {}
 
-  const before = o.payment?.status;
-  o.payment = { ...(o.payment || {}), method: "online", status, uuid: ev.transaction.uuid || o.payment?.uuid };
-  if (status === "completed" && before !== "completed") {
-    o.payment.paidAt = ev.transaction.completed_at || new Date().toISOString();
-    o.payment.paidAmount = amount;
-  }
-  if (ev.event === "payment.refunded") o.payment.status = "refunded";
-  (o.paymentLog ||= []).push({ at: new Date().toISOString(), event: ev.event, status: o.payment.status, delivery: ev.delivery_id });
-  await saveOrder(o);
+  let before;
+  // applied to the freshest copy, so a parallel admin edit or status change is kept
+  const saved = await updateOrder(o.id, (cur) => {
+    before = cur.payment?.status;
+    cur.payment = { ...(cur.payment || {}), method: "online", status, uuid: ev.transaction.uuid || cur.payment?.uuid };
+    if (status === "completed" && before !== "completed") {
+      cur.payment.paidAt = ev.transaction.completed_at || new Date().toISOString();
+      cur.payment.paidAmount = amount;
+    }
+    if (ev.event === "payment.refunded") cur.payment.status = "refunded";
+    (cur.paymentLog ||= []).push({ at: new Date().toISOString(), event: ev.event, status: cur.payment.status, delivery: ev.delivery_id });
+  });
+  if (saved) Object.assign(o, saved);
 
   if (o.payment.status !== before) {
     const msg = {

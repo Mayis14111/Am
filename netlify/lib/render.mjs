@@ -101,7 +101,7 @@ function logo(c, lang, id, href, light) {
 }
 
 /* ---------- site pages (each has its own link, like SellTo.us) ---------- */
-export const SITE_PAGES = ["menu", "delivery", "order", "about", "faq", "contact"];
+export const SITE_PAGES = ["menu", "delivery", "order", "about", "faq", "contact", "privacy"];
 export const siteUrl_ = (lang, key) => PREFIX[lang] + key;
 const CARD_SLUGS = ["wedding-box", "gift-bag", "bride-suitcase", "initials-boxes"];
 export const cardSlug = (k, i) => (k.slug && /^[a-z0-9-]+$/.test(k.slug) ? k.slug : CARD_SLUGS[i] || "product-" + (i + 1));
@@ -217,7 +217,9 @@ function clientData(c, lang) {
     packs: packsOf(c),
     orderNote: t(c.order.note, lang),
     menuUrl: PREFIX[lang] + "menu",
-    products: c.products.cards.map((k, i) => ({ slug: cardSlug(k, i), title: t(k.title, lang), pack: k.packaging || "", img: k.image })),
+    products: c.products.cards.map((k, i) => ({ slug: cardSlug(k, i), title: t(k.title, lang), pack: k.packaging || "", img: k.image, personalize: !!k.personalize || cardSlug(k, i) === "initials-boxes" })),
+    heroImg: c.hero.image,
+    privacyUrl: PREFIX[lang] + "privacy",
   };
 }
 
@@ -254,9 +256,9 @@ function jsonLd(c, lang, base) {
 }
 
 const HL = {
-  hy: { decor: (p) => `Գաթայի ձևավորում՝ ${p} դրամ։ Ձևավորման արժեքը հաշվարկվում է առանձին։`, sizesPrices: "Չափսեր և գներ", from: (p) => `${p} դրամից`, cur: "դրամ", cm: "սմ", packIncluded: "Տուփը ներառված է գնի մեջ", packSeparateBox: "Տուփի արժեքը հաշվարկվում է առանձին", packSeparate: "Փաթեթավորման արժեքը հաշվարկվում է առանձին", packVariable: "Գինը՝ ըստ ընտրված տարբերակի", fixed: (p) => ` (${p} դրամ՝ մեկ հատի համար)`, sizesFact: (s) => `Չափսեր՝ ${s} սմ`, fromFact: (p) => `Գինը՝ ${p} դրամից`, prev: "Նախորդ լուսանկարը", next: "Հաջորդ լուսանկարը", filling: "Միջուկ", deliveryFree: "Առանց առաքման վճարի", deliveryLater: "Առաքման արժեքը՝ ենթակա է ճշտման", orderNow: "Պատվիրել", orderThis: "Պատվիրել այս տարբերակը", allPrices: "Բոլոր գները", deliveryMore: "Առաքման մանրամասներ", aboutMore: "Ավելին մեր մասին", faqMore: "Բոլոր հարցերը", otherProducts: "Այլ տարբերակներ", ctaTitle: "Պատրա՞ստ եք պատվիրելու", ctaText: "Լրացրեք պատվերի ձևը կամ գրեք մեր չատում։", call: "Զանգահարել", write: "Գրել WhatsApp-ով", hoursUnknown: "Աշխատանքային ժամերը և վերցնելու հասցեն ճշտեք զանգահարելով։" },
-  ru: { decor: (p) => `Оформление гаты — ${p} драм. Стоимость оформления считается отдельно.`, sizesPrices: "Размеры и цены", from: (p) => `от ${p} драм`, cur: "драм", cm: "см", packIncluded: "Коробка входит в цену", packSeparateBox: "Стоимость коробки считается отдельно", packSeparate: "Стоимость упаковки считается отдельно", packVariable: "Цена — в зависимости от выбранного варианта", fixed: (p) => ` (${p} драм за штуку)`, sizesFact: (s) => `Размеры: ${s} см`, fromFact: (p) => `Цена: от ${p} драм`, prev: "Предыдущее фото", next: "Следующее фото", filling: "Начинка", deliveryFree: "Без оплаты доставки", deliveryLater: "Стоимость доставки уточняется", orderNow: "Заказать", orderThis: "Заказать этот вариант", allPrices: "Все цены", deliveryMore: "Подробнее о доставке", aboutMore: "Подробнее о нас", faqMore: "Все вопросы", otherProducts: "Другие варианты", ctaTitle: "Готовы заказать?", ctaText: "Заполните форму заказа или напишите в чат.", call: "Позвонить", write: "Написать в WhatsApp", hoursUnknown: "Часы работы и адрес самовывоза уточните по телефону." },
-  en: { decor: (p) => `Gata decoration — ${p} AMD. The decoration is charged separately.`, sizesPrices: "Sizes and prices", from: (p) => `from ${p} AMD`, cur: "AMD", cm: "cm", packIncluded: "Box included in the price", packSeparateBox: "Box price is charged separately", packSeparate: "Packaging price is charged separately", packVariable: "Price depends on the chosen option", fixed: (p) => ` (${p} AMD each)`, sizesFact: (s) => `Sizes: ${s} cm`, fromFact: (p) => `From ${p} AMD`, prev: "Previous photo", next: "Next photo", filling: "Filling", deliveryFree: "No delivery fee", deliveryLater: "Delivery price to be confirmed", orderNow: "Order", orderThis: "Order this option", allPrices: "All prices", deliveryMore: "Delivery details", aboutMore: "More about us", faqMore: "All questions", otherProducts: "Other options", ctaTitle: "Ready to order?", ctaText: "Fill in the order form or message us in the chat.", call: "Call", write: "Message on WhatsApp", hoursUnknown: "Please call to check opening hours and the pickup address." },
+  hy: { baseLabel: "Գաթայի գինը՝ առանց փաթեթավորման", baseNote: "Փաթեթավորման արժեքը կճշտենք պատվերը հաստատելիս։", inclDecor: (p) => `Գինը ներառում է ձևավորումը՝ ${p} դրամ մեկ գաթայի համար։`, decor: (p) => `Գաթայի ձևավորում՝ ${p} դրամ։ Ձևավորման արժեքը հաշվարկվում է առանձին։`, sizesPrices: "Չափսեր և գներ", from: (p) => `${p} դրամից`, cur: "դրամ", cm: "սմ", packIncluded: "Տուփը ներառված է գնի մեջ", packSeparateBox: "Տուփի արժեքը հաշվարկվում է առանձին", packSeparate: "Փաթեթավորման արժեքը հաշվարկվում է առանձին", packVariable: "Գինը՝ ըստ ընտրված տարբերակի", fixed: (p) => ` (${p} դրամ՝ մեկ հատի համար)`, sizesFact: (s) => `Չափսեր՝ ${s} սմ`, fromFact: (p) => `Գինը՝ ${p} դրամից`, prev: "Նախորդ լուսանկարը", next: "Հաջորդ լուսանկարը", filling: "Միջուկ", deliveryFree: "Առանց առաքման վճարի", deliveryLater: "Առաքման արժեքը՝ ենթակա է ճշտման", orderNow: "Պատվիրել", orderThis: "Պատվիրել այս տարբերակը", allPrices: "Բոլոր գները", deliveryMore: "Առաքման մանրամասներ", aboutMore: "Ավելին մեր մասին", faqMore: "Բոլոր հարցերը", otherProducts: "Այլ տարբերակներ", ctaTitle: "Պատրա՞ստ եք պատվիրելու", ctaText: "Լրացրեք պատվերի ձևը կամ գրեք մեր չատում։", call: "Զանգահարել", write: "Գրել WhatsApp-ով", hoursUnknown: "Աշխատանքային ժամերը և վերցնելու հասցեն ճշտեք զանգահարելով։" },
+  ru: { baseLabel: "Цена гаты без упаковки", baseNote: "Стоимость упаковки уточним при подтверждении заказа.", inclDecor: (p) => `Цена включает оформление — ${p} драм за одну гату.`, decor: (p) => `Оформление гаты — ${p} драм. Стоимость оформления считается отдельно.`, sizesPrices: "Размеры и цены", from: (p) => `от ${p} драм`, cur: "драм", cm: "см", packIncluded: "Коробка входит в цену", packSeparateBox: "Стоимость коробки считается отдельно", packSeparate: "Стоимость упаковки считается отдельно", packVariable: "Цена — в зависимости от выбранного варианта", fixed: (p) => ` (${p} драм за штуку)`, sizesFact: (s) => `Размеры: ${s} см`, fromFact: (p) => `Цена: от ${p} драм`, prev: "Предыдущее фото", next: "Следующее фото", filling: "Начинка", deliveryFree: "Без оплаты доставки", deliveryLater: "Стоимость доставки уточняется", orderNow: "Заказать", orderThis: "Заказать этот вариант", allPrices: "Все цены", deliveryMore: "Подробнее о доставке", aboutMore: "Подробнее о нас", faqMore: "Все вопросы", otherProducts: "Другие варианты", ctaTitle: "Готовы заказать?", ctaText: "Заполните форму заказа или напишите в чат.", call: "Позвонить", write: "Написать в WhatsApp", hoursUnknown: "Часы работы и адрес самовывоза уточните по телефону." },
+  en: { baseLabel: "Gata price without packaging", baseNote: "We'll confirm the packaging price when we confirm your order.", inclDecor: (p) => `The price includes the decoration: ${p} AMD per gata.`, decor: (p) => `Gata decoration — ${p} AMD. The decoration is charged separately.`, sizesPrices: "Sizes and prices", from: (p) => `from ${p} AMD`, cur: "AMD", cm: "cm", packIncluded: "Box included in the price", packSeparateBox: "Box price is charged separately", packSeparate: "Packaging price is charged separately", packVariable: "Price depends on the chosen option", fixed: (p) => ` (${p} AMD each)`, sizesFact: (s) => `Sizes: ${s} cm`, fromFact: (p) => `From ${p} AMD`, prev: "Previous photo", next: "Next photo", filling: "Filling", deliveryFree: "No delivery fee", deliveryLater: "Delivery price to be confirmed", orderNow: "Order", orderThis: "Order this option", allPrices: "All prices", deliveryMore: "Delivery details", aboutMore: "More about us", faqMore: "All questions", otherProducts: "Other options", ctaTitle: "Ready to order?", ctaText: "Fill in the order form or message us in the chat.", call: "Call", write: "Message on WhatsApp", hoursUnknown: "Please call to check opening hours and the pickup address." },
 };
 const num = (n) => (+n || 0).toLocaleString("en-US").replace(/,/g, " ");
 const allPaths = (fn) => Object.fromEntries(LANGS.map((l) => [l, fn(l)]));
@@ -265,6 +267,16 @@ function priceData(c) {
   const m = c.menu, sizes = m.sizes, shown = m.fillings.filter((f) => f.show !== false);
   const minAt = (i) => Math.min(...shown.map((f) => +f.prices[i] || Infinity));
   return { sizes, shown, minAt, minAll: Math.min(...sizes.map((s, i) => minAt(i))) };
+}
+/* the advertised price of a finished product: mandatory known extras are included, unknown ones are named */
+function cardPrice(c, lang, k) {
+  const H = HL[lang], { sizes, minAt } = priceData(c);
+  const pk = packsOf(c).find((p) => p.id === k.packaging && p.show !== false);
+  const extra = pk && pk.price > 0 ? +pk.price : 0, unknown = !!(pk && pk.price < 0);
+  const head = unknown ? H.baseLabel : H.sizesPrices;
+  const note = unknown ? H.baseNote : extra ? H.inclDecor(num(extra)) : k.packNote === "included" ? H.packIncluded : "";
+  const rows = sizes.map((s, i) => (isFinite(minAt(i)) ? [s.cm, minAt(i) + extra] : null)).filter(Boolean);
+  return { head, note, rows, extra, unknown, html: (cls = "") => `<div class="sp${cls}"><b>${esc(head)}</b><ul>${rows.map(([cm, p]) => `<li><span>${cm} ${H.cm}</span><span>${esc(H.from(num(p)))}</span></li>`).join("")}</ul></div>${note ? `<p class="packnote">${esc(note)}</p>` : ""}` };
 }
 function packNoteOf(c, lang, k) {
   const H = HL[lang], packs = packsOf(c);
@@ -314,16 +326,13 @@ ${c.expand && c.expand.show !== false && c.expand.image ? `<section class="expan
 }
 
 function orderHero(c, lang, title, lead) {
-  const sizes = ((c.menu || {}).sizes || []).map((z) => z.cm);
   const OH = {
-    hy: { yours: "Ձեր գաթան", size: "Ընտրեք չափը", cm: "սմ", steps: ["Ընտրեք գաթան", "Նշեք օրը", "Ուղարկեք պատվերը"] },
-    ru: { yours: "Ваша гата", size: "Выберите размер", cm: "см", steps: ["Выберите гату", "Укажите день", "Отправьте заказ"] },
-    en: { yours: "Your gata", size: "Pick a size", cm: "cm", steps: ["Choose your gata", "Pick the day", "Send the order"] },
+    hy: { yours: "Ձեր գաթան", steps: ["Ընտրեք գաթան", "Նշեք օրը", "Ուղարկեք պատվերը"] },
+    ru: { yours: "Ваша гата", steps: ["Выберите гату", "Укажите день", "Отправьте заказ"] },
+    en: { yours: "Your gata", steps: ["Choose your gata", "Pick the day", "Send the order"] },
   }[lang];
-  const angles = sizes.length === 1 ? [-35] : sizes.map((_, i) => -70 + (70 / (sizes.length - 1)) * i);
-  const sizeBtns = sizes.map((cm, i) => { const a = (angles[i] * Math.PI) / 180, x = 50 + 49 * Math.cos(a), y = 50 + 49 * Math.sin(a);
-    return `<button type="button" class="szb" data-size="${i}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%" aria-pressed="false">${cm}<small>${OH.cm}</small></button>`; }).join("");
   const pearl = (x, y, sz, d) => `<span class="pearl" style="--x:${x}%;--y:${y}%;--s:${sz}px;--d:${d}"></span>`;
+  // decorative preview for wide screens only; the size is chosen in the form (one control)
   return `<header class="order-hero">
   <div class="wrap oh-grid">
     <div class="oh-text">
@@ -331,17 +340,16 @@ function orderHero(c, lang, title, lead) {
       ${lead ? `<p class="lead load d1">${inline(lead)}</p>` : ""}
       <ol class="oh-steps load d2">${OH.steps.map((s, i) => `<li><i>${i + 1}</i>${esc(s)}</li>`).join("")}</ol>
     </div>
-    <div class="oh-visual load d1">
+    <div class="oh-visual load d1" aria-hidden="true">
       <div class="hero-stage oh-stage" id="heroStage" data-order>
-        <div class="hero-glow" aria-hidden="true"></div>
-        <svg class="hero-ring" id="heroRing" viewBox="0 0 400 400" aria-hidden="true"><defs><path id="ringPath" d="M200,200 m-170,0 a170,170 0 1,1 340,0 a170,170 0 1,1 -340,0"/></defs>
+        <div class="hero-glow"></div>
+        <svg class="hero-ring" id="heroRing" viewBox="0 0 400 400"><defs><path id="ringPath" d="M200,200 m-170,0 a170,170 0 1,1 340,0 a170,170 0 1,1 -340,0"/></defs>
           <circle cx="200" cy="200" r="192" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-dasharray="2 7"/>
           <text><textPath href="#ringPath" id="ringText" textLength="1060" lengthAdjust="spacing">${esc((t(c.brand.logoText, lang) + " · ").repeat(3))}</textPath></text></svg>
-        <div class="hero-tilt" id="heroTilt"><div class="oh-scale" id="ohScale"><div class="hero-gata" id="heroGata" role="img" aria-label="${esc(OH.yours)}"><img src="${esc(c.hero.image)}" alt="" width="600" height="600" draggable="false"></div></div></div>
-        <div class="orbit" aria-hidden="true">${pearl(50, -2, 22, 1.6)}${pearl(-2, 50, 14, 2.6)}${pearl(50, 98, 26, 1.2)}</div>
-        <div class="oh-sizes" role="group" aria-label="${esc(OH.size)}">${sizeBtns}</div>
+        <div class="hero-tilt" id="heroTilt"><div class="oh-scale" id="ohScale"><div class="hero-gata" id="heroGata"><img src="${esc(c.hero.image)}" alt="" width="600" height="600" draggable="false"></div></div></div>
+        <div class="orbit">${pearl(50, -2, 22, 1.6)}${pearl(-2, 50, 14, 2.6)}${pearl(50, 98, 26, 1.2)}</div>
       </div>
-      <p class="oh-cap" id="ohCap" aria-live="polite"><small>${esc(OH.yours)}</small><b id="ohCapT"></b></p>
+      <p class="oh-cap"><small>${esc(OH.yours)}</small><b id="ohCapT"></b></p>
     </div>
   </div>
 </header>`;
@@ -356,8 +364,7 @@ function cardsHtml(c, lang, list) {
           <span class="tag">${esc(t(k.tag, lang))}</span>
           <h3><a href="${productUrl(lang, k._slug)}">${esc(t(k.title, lang))}</a></h3>
           <p>${inline(t(k.text, lang))}</p>
-          <div class="sp"><b>${H.sizesPrices}</b><ul>${sizes.map((s, i) => isFinite(minAt(i)) ? `<li><span>${s.cm} ${H.cm}</span><span>${esc(H.from(num(minAt(i))))}</span></li>` : "").join("")}</ul></div>
-          <p class="packnote">${esc(packNoteOf(c, lang, k))}</p>
+          ${cardPrice(c, lang, k).html()}
         </div>
         <div class="act"><a class="btn btn-gold" data-avoid href="${siteUrl_(lang, "order")}?product=${esc(k._slug)}">${esc(t(c.products.btn, lang))}</a></div>
       </article>`).join("\n      ")}
@@ -497,6 +504,8 @@ export function renderSitePage(c, lang, key, pages, base) {
   } else if (key === "faq") {
     main = `<section class="section"><div class="wrap">${faqList(c, lang)}</div></section>${ctaHtml(c, lang)}`;
     ld.push({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: c.faq.items.map((f) => ({ "@type": "Question", name: t(f.q, lang), acceptedAnswer: { "@type": "Answer", text: t(f.a, lang) } })) });
+  } else if (key === "privacy") {
+    main = `<section class="section"><div class="wrap prose">${privacyHtml(c, lang)}</div></section>`;
   } else if (key === "contact") {
     main = `<section class="section"><div class="wrap">${contactBlock(c, lang)}</div></section>${ctaHtml(c, lang)}`;
   }
@@ -513,6 +522,50 @@ ${footer(c, lang, pages, paths)}`;
   }) + body + tail(c, lang);
 }
 
+/* privacy text built from what the site really does (storage, Telegram, optional payment, AI chat, analytics) */
+function privacyHtml(c, lang) {
+  const ph = (c.contact.phones || []).join(", ");
+  const T_ = {
+    hy: {
+      what: ["Ինչ տվյալներ ենք ստանում", "Պատվերի ձևում կամ չատում պատվեր ձևակերպելիս նշում եք ձեր անունը, հեռախոսահամարը, ստացման եղանակը, առաքման դեպքում՝ հասցեն, ինչպես նաև պատվերի մանրամասներն ու ձեր ցանկությունները։"],
+      why: ["Ինչի համար ենք օգտագործում", "Այս տվյալներն օգտագործում ենք պատվերը մշակելու, ձեզ հետ կապվելու, պատվերի մանրամասները հաստատելու և այն հանձնելու համար։"],
+      where: ["Որտեղ են պահվում և ում են փոխանցվում", "Ուղարկված պատվերները պահվում են կայքի հոսթինգի ծառայությունում (Netlify)։ Պատվերի մանրամասները, այդ թվում՝ անունը, հեռախոսահամարը և հասցեն, ուղարկվում են մեզ Telegram հավելվածի միջոցով, որպեսզի արագ տեսնենք նոր պատվերը։"],
+      pay: "Առցանց վճարումն իրականացվում է Paynet վճարային համակարգի էջում։ Քարտի տվյալները մուտքագրում եք Paynet-ի էջում, և դրանք մեզ չեն փոխանցվում։",
+      ai: "Եթե չատի օգնականը պատրաստի պատասխան չունի, ձեր հարցի տեքստը կարող է ուղարկվել արհեստական բանականության ծառայությանը (Anthropic)՝ պատասխան ստանալու համար։ Խնդրում ենք հարցերում անձնական տվյալներ չգրել։",
+      ga: "Կայքն օգտագործում է Google Analytics՝ այցելությունների ընդհանուր վիճակագրության համար։",
+      fonts: "Կայքի տառատեսակները բեռնվում են Google Fonts ծառայությունից, ուստի ձեր դիտարկիչը կապվում է Google-ի սերվերների հետ։",
+      draft: ["Չուղարկված պատվեր", "Մինչև պատվերն ուղարկելը լրացված տվյալները պահվում են միայն ձեր սարքի դիտարկիչում, որպեսզի լեզուն կամ էջը փոխելիս չկորչեն։ Դրանք ջնջվում են պատվերը հաջողությամբ ուղարկելուց կամ «Մաքրել ձևը» սեղմելուց հետո։"],
+      ask: ["Հարցեր", (p) => `Ձեր տվյալների վերաբերյալ հարցերի համար կապվեք մեզ հետ՝ ${p}։`],
+    },
+    ru: {
+      what: ["Какие данные мы получаем", "При оформлении заказа в форме или в чате вы указываете имя, номер телефона, способ получения, при доставке — адрес, а также детали заказа и пожелания."],
+      why: ["Для чего мы их используем", "Мы используем эти данные, чтобы обработать заказ, связаться с вами, подтвердить детали заказа и передать его вам."],
+      where: ["Где хранятся и кому передаются", "Отправленные заказы хранятся в сервисе хостинга сайта (Netlify). Детали заказа, включая имя, телефон и адрес, отправляются нам через приложение Telegram, чтобы мы быстро увидели новый заказ."],
+      pay: "Онлайн-оплата проходит на странице платёжной системы Paynet. Данные карты вы вводите на странице Paynet, и нам они не передаются.",
+      ai: "Если у чат-помощника нет готового ответа, текст вашего вопроса может быть отправлен сервису искусственного интеллекта (Anthropic), чтобы получить ответ. Пожалуйста, не пишите в вопросах личные данные.",
+      ga: "Сайт использует Google Analytics для общей статистики посещений.",
+      fonts: "Шрифты сайта загружаются из сервиса Google Fonts, поэтому ваш браузер соединяется с серверами Google.",
+      draft: ["Неотправленный заказ", "До отправки заказа заполненные данные хранятся только в браузере на вашем устройстве, чтобы они не пропали при смене языка или страницы. Они удаляются после успешной отправки заказа или нажатия «Очистить форму»."],
+      ask: ["Вопросы", (p) => `По вопросам о ваших данных свяжитесь с нами: ${p}.`],
+    },
+    en: {
+      what: ["What data we receive", "When you order in the form or the chat, you give us your name, phone number, how you'll receive the order, your address if you choose delivery, and your order details and requests."],
+      why: ["What we use it for", "We use this data to process your order, contact you, confirm the order details and hand the order over to you."],
+      where: ["Where it is stored and who receives it", "Sent orders are stored with the website's hosting service (Netlify). Order details, including your name, phone number and address, are sent to us through the Telegram app so we see new orders quickly."],
+      pay: "Online payment takes place on the Paynet payment page. You enter your card details on Paynet's page and they are not passed to us.",
+      ai: "If the chat assistant has no ready answer, the text of your question may be sent to an AI service (Anthropic) to get an answer. Please don't write personal data in your questions.",
+      ga: "The website uses Google Analytics for general visit statistics.",
+      fonts: "The website's fonts load from Google Fonts, so your browser connects to Google's servers.",
+      draft: ["Unsent orders", "Until you send your order, what you've filled in is kept only in the browser on your device, so it isn't lost when you change the language or page. It's deleted after the order is sent successfully or when you tap “Clear form”."],
+      ask: ["Questions", (p) => `For questions about your data, contact us: ${p}.`],
+    },
+  }[lang];
+  const sec = (h, ...ps) => `<h2>${esc(h)}</h2>${ps.filter(Boolean).map((p) => `<p>${esc(p)}</p>`).join("")}`;
+  return sec(...T_.what) + sec(...T_.why) +
+    sec(T_.where[0], T_.where[1], c.payments.enabled && paynetReady() ? T_.pay : "", c.chat.ai ? T_.ai : "", /^G-[A-Z0-9]+$/.test(c.seo.googleTag || "") ? T_.ga : "", T_.fonts) +
+    sec(...T_.draft) + (ph ? sec(T_.ask[0], T_.ask[1](ph)) : "");
+}
+
 /* one page per product card: /product/<slug> */
 export function renderProduct(c, lang, slug, pages, base) {
   const list = visibleCards(c), k = list.find((x) => x._slug === slug);
@@ -520,7 +573,7 @@ export function renderProduct(c, lang, slug, pages, base) {
   const H = HL[lang], { sizes, shown, minAt, minAll } = priceData(c);
   const url = productUrl(lang, slug), paths = allPaths((l) => productUrl(l, slug));
   const title = t(k.title, lang), menuT = t(((c.sitePages || {}).menu || {}).title, lang);
-  const others = list.filter((x) => x._slug !== slug);
+  const others = list.filter((x) => x._slug !== slug), cp = cardPrice(c, lang, k);
   const body = `
 ${nav(c, lang, pages, siteUrl_(lang, "menu"), paths)}
 ${crumbs(lang, [[siteUrl_(lang, "menu"), menuT], [null, title]])}
@@ -530,8 +583,7 @@ ${crumbs(lang, [[siteUrl_(lang, "menu"), menuT], [null, title]])}
     <span class="kicker">${esc(t(k.tag, lang))}</span>
     <h1>${esc(title)}</h1>
     <p class="lead">${inline(t(k.text, lang))}</p>
-    <div class="sp big"><b>${H.sizesPrices}</b><ul>${sizes.map((s, i) => isFinite(minAt(i)) ? `<li><span>${s.cm} ${H.cm}</span><span>${esc(H.from(num(minAt(i))))}</span></li>` : "").join("")}</ul></div>
-    <p class="packnote">${esc(packNoteOf(c, lang, k))}</p>
+    ${cp.html(" big")}
     <div class="btns" data-avoid><a class="btn btn-gold" href="${siteUrl_(lang, "order")}?product=${esc(slug)}">${H.orderThis}</a><a class="btn btn-line" href="${siteUrl_(lang, "menu")}">${H.allPrices}</a></div>
     <p class="advice"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>${inline(t(c.hero.advice, lang))}</span></p>
   </div>
@@ -543,9 +595,9 @@ ${chatHtml(c, lang)}
 ${footer(c, lang, pages, paths)}`;
   const ld = [crumbLd(base, lang, [[siteUrl_(lang, "menu"), menuT], [url, title]]), {
     "@context": "https://schema.org", "@type": "Product", name: title, description: t(k.text, lang), image: base + k.image, brand: { "@type": "Brand", name: t(c.brand.name, lang) },
-    offers: { "@type": "AggregateOffer", priceCurrency: "AMD", lowPrice: String(minAll), highPrice: String(Math.max(...shown.flatMap((f) => f.prices.map(Number)))), offerCount: shown.length * sizes.length },
+    offers: { "@type": "AggregateOffer", priceCurrency: "AMD", lowPrice: String(minAll + cp.extra), highPrice: String(Math.max(...shown.flatMap((f) => f.prices.map(Number))) + cp.extra), offerCount: shown.length * sizes.length },
   }];
-  return head(c, lang, { title: `${title} | ${t(c.brand.name, lang)}`, description: `${t(k.text, lang)} ${H.fromFact(num(minAll))}.`, path: url, base, ogImage: k.image, jsonld: ld, alt: LANGS.map((l) => [l, productUrl(l, slug)]) }) + body + tail(c, lang);
+  return head(c, lang, { title: `${title} | ${t(c.brand.name, lang)}`, description: `${t(k.text, lang)} ${H.fromFact(num(minAll + cp.extra))}.`, path: url, base, ogImage: k.image, jsonld: ld, alt: LANGS.map((l) => [l, productUrl(l, slug)]) }) + body + tail(c, lang);
 }
 
 export function renderPage(c, lang, p, pages, base) {

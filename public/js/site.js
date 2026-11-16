@@ -81,7 +81,7 @@ const T = {
     changeWhat: "Ի՞նչն եք ուզում փոխել։",
     changeChoose: "Ընտրեք, թե ինչն եք ուզում փոխել։",
     changeAck: "Լավ, փոխենք։",
-    fields: { kind: "Միջուկը", pack: "Փաթեթավորումը", size: "Չափսը", qty: "Քանակը", date: "Ստանալու օրը", delivery: "Ստանալու եղանակը", name: "Անունը", phone: "Հեռախոսահամարը", notes: "Ցանկությունները", pay: "Վճարումը" },
+    fields: { perso: "Սկզբնատառերը", kind: "Միջուկը", pack: "Փաթեթավորումը", size: "Չափսը", qty: "Քանակը", date: "Ստանալու օրը", delivery: "Ստանալու եղանակը", name: "Անունը", phone: "Հեռախոսահամարը", notes: "Ցանկությունները", pay: "Վճարումը" },
     acks: ["Լավ։", "Նշեցի։", "Շատ լավ։", "Պարզ է։", "Հիանալի է։"],
     dateBad: "Չհասկացա ամսաթիվը։ Գրեք, օրինակ՝ 20.10 կամ «25 հոկտեմբերի»։",
     phoneBad: "Խնդրում ենք ստուգել հեռախոսահամարը և գրել այն ամբողջությամբ։",
@@ -93,7 +93,7 @@ const T = {
     soon: (p) => `Եթե գաթան պետք է այսօր կամ վաղը, խնդրում ենք նաև զանգահարել՝ ${p}։\n\n`,
     intro: "Այո, կարող եք պատվիրել հենց այստեղ։",
     introGot: (g) => ` Նշեցի՝ ${g}։`,
-    introNone: " Մի քանի հարց կտամ, և պատվերը պատրաստ կլինի։",
+    introNone: " Մի քանի հարց կտամ, հետո կկարողանաք ստուգել և ուղարկել պատվերը։",
     pcs: (n) => `${n} հատ`,
     gataWord: " գաթա",
     sending: "Պատվերն ուղարկվում է…",
@@ -166,7 +166,7 @@ const T = {
     changeWhat: "Что хотите изменить?",
     changeChoose: "Выберите, что изменить.",
     changeAck: "Хорошо, меняем.",
-    fields: { kind: "Начинку", pack: "Упаковку", size: "Размер", qty: "Количество", date: "Дату", delivery: "Получение", name: "Имя", phone: "Телефон", notes: "Пожелания", pay: "Оплату" },
+    fields: { perso: "Инициалы", kind: "Начинку", pack: "Упаковку", size: "Размер", qty: "Количество", date: "Дату", delivery: "Получение", name: "Имя", phone: "Телефон", notes: "Пожелания", pay: "Оплату" },
     acks: ["Хорошо.", "Записала.", "Отлично.", "Понятно.", "Прекрасно."],
     dateBad: "Не поняла дату. Напишите, например: 20.10 или «25 октября».",
     phoneBad: "Пожалуйста, проверьте номер телефона и напишите его полностью.",
@@ -178,7 +178,7 @@ const T = {
     soon: (p) => `Если гата нужна сегодня или завтра, пожалуйста, также позвоните: ${p}.\n\n`,
     intro: "Да, можно заказать прямо здесь.",
     introGot: (g) => ` Записала: ${g}.`,
-    introNone: " Задам несколько вопросов — и заказ готов.",
+    introNone: " Задам несколько вопросов, затем вы сможете проверить и отправить заказ.",
     pcs: (n) => `${n} шт.`,
     gataWord: "",
     sending: "Заказ отправляется…",
@@ -251,7 +251,7 @@ const T = {
     changeWhat: "What would you like to change?",
     changeChoose: "Choose what you want to change.",
     changeAck: "Okay, let's change it.",
-    fields: { kind: "Filling", pack: "Packaging", size: "Size", qty: "Quantity", date: "Date", delivery: "Delivery", name: "Name", phone: "Phone", notes: "Requests", pay: "Payment" },
+    fields: { perso: "Initials", kind: "Filling", pack: "Packaging", size: "Size", qty: "Quantity", date: "Date", delivery: "Delivery", name: "Name", phone: "Phone", notes: "Requests", pay: "Payment" },
     acks: ["Great.", "Noted.", "Lovely.", "Got it.", "Perfect."],
     dateBad: "I didn't get the date. Type for example: 20.10 or “25 October”.",
     phoneBad: "Please check the phone number and write it in full.",
@@ -263,7 +263,7 @@ const T = {
     soon: (p) => `If you need it today or tomorrow, please also call us: ${p}.\n\n`,
     intro: "Yes, you can order right here.",
     introGot: (g) => ` Noted: ${g}.`,
-    introNone: " I'll ask a few questions and your order will be ready.",
+    introNone: " I'll ask a few questions, then you can check and send your order.",
     pcs: (n) => `${n} pcs`,
     gataWord: " gata",
     sending: "Sending your order…",
@@ -363,6 +363,51 @@ Object.assign(T.en, {
   payLater: "Online payment becomes available once the final price is confirmed.",
   orderClosed: "The order has been sent. For a new order, tap “Order in chat”.",
 });
+Object.assign(T.hy, {
+  custom: "Ձեր ընտրած տարբերակը",
+  askDateF: (ex) => `Ո՞ր օրն եք ուզում ստանալ պատվերը։ Նշեք օրը, ամիսը և տարին, օրինակ՝ ${ex}, կամ գրեք «վաղը»։`,
+  dateBadF: (ex) => `Չհասկացա ամսաթիվը։ Նշեք օրը, ամիսը և տարին, օրինակ՝ ${ex}։`,
+  dateAmb: (d, nx) => `${d}-ն այս տարի արդեն անցել է։ Նկատի ունե՞ք ${nx}-ը։ Խնդրում ենք գրել ամսաթիվը տարեթվով։`,
+  dateSet: (d) => `Ստացման օրը՝ ${d}։`,
+  askPerso: "Գրեք այն սկզբնատառերը, որոնք ցանկանում եք տեսնել տուփի վրա։ Կարող եք նշել նաև նախընտրելի գույնը։",
+  persoDeferChip: "Մանրամասները կհամաձայնեցնեմ ձեզ հետ",
+});
+Object.assign(T.ru, {
+  custom: "Ваш вариант",
+  askDateF: (ex) => `В какой день вы хотите получить заказ? Укажите день, месяц и год, например: ${ex}, или напишите «завтра».`,
+  dateBadF: (ex) => `Не поняла дату. Укажите день, месяц и год, например: ${ex}.`,
+  dateAmb: (d, nx) => `${d} в этом году уже прошло. Вы имеете в виду ${nx}? Пожалуйста, напишите дату с годом.`,
+  dateSet: (d) => `Дата получения: ${d}.`,
+  askPerso: "Напишите инициалы, которые хотите видеть на коробке. Можно указать и предпочтительный цвет.",
+  persoDeferChip: "Детали согласую с вами",
+});
+Object.assign(T.en, {
+  custom: "Your chosen option",
+  askDateF: (ex) => `Which day would you like to receive your order? Give the day, month and year, for example ${ex}, or type “tomorrow”.`,
+  dateBadF: (ex) => `I didn't get the date. Please give the day, month and year, for example ${ex}.`,
+  dateAmb: (d, nx) => `${d} has already passed this year. Do you mean ${nx}? Please write the date with the year.`,
+  dateSet: (d) => `Date: ${d}.`,
+  askPerso: "Write the initials you'd like on the box. You can also mention a preferred colour.",
+  persoDeferChip: "I'll agree the details with you",
+});
+Object.assign(F.hy, {
+  qtyNeed: "Նշեք ճիշտ քանակը՝ արժեքը հաշվարկելու համար։", qtyBad: "Խնդրում ենք նշել ամբողջ թիվ՝ առնվազն 1 հատ։", qtyMax: (m) => `Առավելագույն քանակը՝ ${m} հատ։ Ավելի մեծ պատվերի համար զանգահարեք մեզ։`,
+  persoTitle: "Տուփի անհատական ձևավորում", pIni: "Սկզբնատառեր", pIniH: "Գրեք այն սկզբնատառերը, որոնք ցանկանում եք տեսնել տուփի վրա։", pCol: "Նախընտրելի գույն", pWish: "Ձևավորման ցանկություններ",
+  pDefer: "Մանրամասները կհամաձայնեցնեմ ձեզ հետ", pDeferred: "Ձևավորման մանրամասները՝ կհամաձայնեցնենք հաճախորդի հետ", persoNeed: "Գրեք սկզբնատառերը կամ նշեք, որ մանրամասները կհամաձայնեցնեք մեզ հետ։",
+  reset: "Մաքրել ձևը", resetSure: "Սեղմեք ևս մեկ անգամ՝ ձևը մաքրելու համար", privacy: "Ինչպես ենք օգտագործում ձեր տվյալները",
+});
+Object.assign(F.ru, {
+  qtyNeed: "Укажите правильное количество, чтобы рассчитать стоимость.", qtyBad: "Пожалуйста, укажите целое число — не меньше 1 шт.", qtyMax: (m) => `Максимальное количество — ${m} шт. Для большего заказа позвоните нам.`,
+  persoTitle: "Персональное оформление коробки", pIni: "Инициалы", pIniH: "Напишите инициалы, которые хотите видеть на коробке.", pCol: "Предпочтительный цвет", pWish: "Пожелания к оформлению",
+  pDefer: "Детали согласую с вами", pDeferred: "Детали оформления согласуем с клиентом", persoNeed: "Напишите инициалы или отметьте, что согласуете детали с нами.",
+  reset: "Очистить форму", resetSure: "Нажмите ещё раз, чтобы очистить форму", privacy: "Как мы используем ваши данные",
+});
+Object.assign(F.en, {
+  qtyNeed: "Enter a valid quantity to calculate the price.", qtyBad: "Please enter a whole number, at least 1.", qtyMax: (m) => `The maximum is ${m}. For a bigger order, please call us.`,
+  persoTitle: "Personalised box design", pIni: "Initials", pIniH: "Write the initials you'd like to see on the box.", pCol: "Preferred colour", pWish: "Design wishes",
+  pDefer: "I'll agree the details with you", pDeferred: "Design details: to be agreed with the customer", persoNeed: "Write the initials or tick that you'll agree the details with us.",
+  reset: "Clear form", resetSure: "Tap again to clear the form", privacy: "How we use your data",
+});
 Object.assign(F.hy, {
   s1: "Գաթան", s2: "Արժեքը", s3: "Ստացումը", s4: "Ձեր տվյալները", s5: "Լրացուցիչ ցանկություններ", s6: "Ստուգեք և ուղարկեք",
   picked: "Ձեր ընտրությունը", change: "Փոխել",
@@ -438,17 +483,29 @@ if (gal) document.querySelectorAll(".gbtn").forEach((b) => b.addEventListener("c
 /* ================= order form ================= */
 const FL = F[PL];
 const form = $("f");
-let formKey = newKey(), sending = false, picked = { title: "" };
+let formKey = newKey(), sending = false, prod = null, ready = false;
 const touched = new Set();
 const opt = (v, l, s) => `<option value="${v}"${s ? " selected" : ""}>${l}</option>`;
 const fieldHtml = (id, label, input, extra = "") => `<label for="${id}" id="${id}L"${extra}>${label}${input}<span class="err" id="${id}E" hidden></span></label>`;
+/* products (cards) — stable slugs, same rule everywhere: the name is shown only while the packaging matches the product */
+const prodBy = (slug) => (G.products || []).find((x) => x.slug === slug) || null;
+const isCustom = (p, packId) => !!p && !!p.pack && packId !== p.pack;
+const prodLabel = (p, packId, l) => (!p ? "" : isCustom(p, packId) ? T[l].custom : p.title);
+const persoOn = (p, packId) => !!p && !!p.personalize && !isCustom(p, packId);
+const QMAX = 9999;
+function qtyParse(raw) {
+  const v = String(raw ?? "").trim();
+  if (!/^\d+$/.test(v)) return { ok: false, empty: !v };
+  const q = Number(v);
+  return q >= 1 && q <= QMAX ? { ok: true, q } : { ok: false, over: q > QMAX };
+}
 function buildForm() {
   if (!form) return;
   if (!G.accept) { form.innerHTML = `<div class="closed">${G.closedText || ""}<br>📞 ${PHONES}</div>`; return; }
   const mid = Math.min(1, SIZES.length - 1);
   form.innerHTML = `
     <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px" aria-hidden="true">
-    <div class="picked" id="fpicked" hidden><img alt="" id="fpickedImg"><div><small>${FL.picked}</small><b id="fpickedT"></b></div><button type="button" id="fpickedX">${FL.change}</button></div>
+    <div class="picked" id="fpicked"><img alt="" id="fpickedImg"><div><small id="fpickedS">${FL.picked}</small><b id="fpickedT"></b></div><button type="button" id="fpickedX">${FL.change}</button></div>
     <fieldset class="fs"><legend><i>1</i>${FL.s1}</legend>
       <div class="row">
         ${fieldHtml("fsize", FL.size, `<select id="fsize">${SIZES.map((s, i) => opt(i, sizeL(i, PL), i === mid)).join("")}</select>`)}
@@ -457,7 +514,16 @@ function buildForm() {
       ${fieldHtml("fchoco", FL.choco, `<select id="fchoco">${Object.keys(CHOCO).map((k) => opt(k, tx(CHOCO[k], PL))).join("")}</select>`, " hidden")}
       <div class="row">
         ${fieldHtml("fpack", FL.box, `<select id="fpack">${PACKS.map((p) => opt(p.id, tx(p.label, PL))).join("")}</select>`)}
-        ${fieldHtml("qty", FL.qty, `<input id="qty" type="number" min="1" max="9999" step="1" value="1" inputmode="numeric" aria-describedby="qtyE">`)}
+        ${fieldHtml("qty", FL.qty, `<input id="qty" type="number" min="1" max="${QMAX}" step="1" value="1" inputmode="numeric" aria-describedby="qtyE">`)}
+      </div>
+      <div class="perso" id="fperso" hidden>
+        <p class="perso-h">${FL.persoTitle}</p>
+        ${fieldHtml("pini", FL.pIni, `<input id="pini" maxlength="30" autocomplete="off" aria-describedby="piniH piniE"><span class="note" id="piniH">${FL.pIniH}</span>`)}
+        <div class="row">
+          ${fieldHtml("pcol", `${FL.pCol} <span class="note">(${FL.optional})</span>`, `<input id="pcol" maxlength="40" autocomplete="off">`)}
+          ${fieldHtml("pwish", `${FL.pWish} <span class="note">(${FL.optional})</span>`, `<input id="pwish" maxlength="300" autocomplete="off">`)}
+        </div>
+        <label class="check"><input type="checkbox" id="pdefer"><span>${FL.pDefer}</span></label>
       </div>
     </fieldset>
     <fieldset class="fs"><legend><i>2</i>${FL.s2}</legend><div class="breakdown" id="fprice" aria-live="polite"></div><p class="note" id="fpaynote" hidden></p></fieldset>
@@ -487,26 +553,71 @@ function buildForm() {
       </div>` : ""}
       <button class="btn btn-gold btn-submit" type="submit" id="fsubmit">${FL.submit}</button>
       <p class="note">${G.orderNote || ""}</p>
+      <p class="note form-meta"><button type="button" class="linkbtn" id="freset">${FL.reset}</button>${G.privacyUrl ? ` · <a href="${G.privacyUrl}">${FL.privacy}</a>` : ""}</p>
       <div class="done" id="done" hidden tabindex="-1"></div>
     </fieldset>`;
   $("date").min = isoDate(today());
   $("date").max = isoDate(new Date(today().getTime() + 366 * 864e5));
   $("date").value = isoDate(new Date(today().getTime() + Math.max(1, G.minDays || 0) * 864e5 + 36e5));
-  $("fpickedX").addEventListener("click", () => { const p = document.getElementById("products"); if (p) p.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); else location.href = G.menuUrl || "/menu"; });
-  form.addEventListener("input", (e) => { if (e.target.id) { touched.add(e.target.id); clearErr(e.target.id); } fUpdate(); });
+  $("fpickedX").addEventListener("click", () => { saveDraft(); location.href = G.menuUrl || "/menu"; });
+  form.addEventListener("input", (e) => {
+    if (e.target.id) { touched.add(e.target.id); clearErr(e.target.id); }
+    if (e.target.id === "qty" && e.target.value.trim()) validateField("qty"); // show the problem right away
+    if (e.target.id === "pdefer" || e.target.id === "pini") clearErr("pini");
+    fUpdate();
+  });
   form.addEventListener("change", (e) => { if (e.target.id) touched.add(e.target.id); fUpdate(); });
-  form.addEventListener("focusout", (e) => { if (["name", "phone", "qty", "date", "faddr"].includes(e.target.id) && e.target.value) validateField(e.target.id); });
+  form.addEventListener("focusout", (e) => { if (["name", "phone", "qty", "date", "faddr"].includes(e.target.id) && (e.target.value || e.target.id === "qty")) validateField(e.target.id); });
   form.addEventListener("submit", fSubmit);
-  fUpdate();
+  let armed = 0;
+  $("freset").addEventListener("click", (e) => {
+    // two taps, so a stray tap can't wipe the form
+    if (Date.now() - armed > 4000) { armed = Date.now(); e.currentTarget.textContent = FL.resetSure; return; }
+    clearDraft(); location.replace(location.pathname);
+  });
 }
+
+/* ---------- draft: kept in this browser (never in the link) until sent or cleared ---------- */
+const DRAFT = "gg_order_draft_v1";
+const DRAFT_FIELDS = ["qty", "date", "faddr", "name", "phone", "notes", "pini", "pcol", "pwish"];
+function readDraft() { try { const d = JSON.parse(localStorage.getItem(DRAFT) || "null"); return d && d.v === 1 && Date.now() - (d.at || 0) < 60 * 864e5 ? d : null; } catch { return null; } }
+function clearDraft() { try { localStorage.removeItem(DRAFT); } catch {} }
+function saveDraft() {
+  if (!form || !ready || !$("fsize")) return;
+  const d = { v: 1, at: Date.now(), key: formKey, product: prod ? prod.slug : "", touched: [...touched],
+    size: SIZES[+$("fsize").value] && SIZES[+$("fsize").value].cm, kind: $("kind").value, choco: $("fchoco").value, pack: $("fpack").value, delivery: $("how2").value,
+    defer: $("pdefer").checked, pay: (form.querySelector("input[name=pay]:checked") || {}).value || "" };
+  for (const id of DRAFT_FIELDS) d[id] = $(id).value;
+  try { localStorage.setItem(DRAFT, JSON.stringify(d)); } catch {}
+}
+const setSel = (id, v) => { const el = $(id); if (el && v != null && [...el.options].some((o) => o.value === String(v))) { el.value = String(v); return true; } return false; };
+function restoreDraft(d) {
+  if (!d) return;
+  if (d.key) formKey = d.key; // a retry after reload must reuse the same key (no duplicate orders)
+  const si = SIZES.findIndex((s) => +s.cm === +d.size); if (si >= 0) $("fsize").value = si;
+  setSel("kind", d.kind); setSel("fchoco", d.choco); setSel("fpack", d.pack); setSel("how2", d.delivery);
+  for (const id of DRAFT_FIELDS) if (typeof d[id] === "string" && (d[id] || id !== "date")) $(id).value = d[id];
+  $("pdefer").checked = !!d.defer;
+  if (d.pay) { const r = form.querySelector(`input[name=pay][value=${d.pay}]`); if (r) r.checked = true; }
+  (d.touched || []).forEach((x) => touched.add(x));
+  prod = prodBy(d.product);
+  if (d.date && dateCheck(d.date) === "past") setTimeout(() => validateField("date"), 0);
+}
+/* a product chosen on the menu: apply its packaging, keep everything else the customer entered */
+function applyProduct(slug) {
+  const p = prodBy(slug); if (!p) return;
+  prod = p; touched.add("picked");
+  if (p.pack && pOpt(p.pack)) { $("fpack").value = p.pack; touched.add("fpack"); }
+}
+
 function fState() {
-  const si = +$("fsize").value, f = SHOWN.find((x) => x.id === $("kind").value), qRaw = $("qty").value.trim(), q = Number(qRaw);
-  const qOk = /^\d+$/.test(qRaw) && q >= 1 && q <= 9999;
+  const si = +$("fsize").value, f = SHOWN.find((x) => x.id === $("kind").value), qp = qtyParse($("qty").value);
   const d = dOpt($("how2").value) || {};
   const packId = $("fpack").value;
   const pay = (form.querySelector("input[name=pay]:checked") || {}).value || "cash";
-  const p = calc({ fillingId: f && f.id, sizeIdx: si, qty: qOk ? q : 1, packId, deliveryId: d.id });
-  return { si, f, q: qOk ? q : 1, qOk, packId, d, p, pay };
+  // no price at all while the quantity is not valid: never fall back to one gata
+  const p = qp.ok ? calc({ fillingId: f && f.id, sizeIdx: si, qty: qp.q, packId, deliveryId: d.id }) : null;
+  return { si, f, q: qp.ok ? qp.q : null, qOk: qp.ok, qp, packId, d, p, pay, perso: persoOn(prod, packId) };
 }
 const dateCheck = (v) => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return "bad";
@@ -516,40 +627,63 @@ const dateCheck = (v) => {
   if ((d - today()) / 864e5 > 366) return "bad";
   return (d - today()) / 864e5 < Math.max(1, G.minDays || 0) ? "soon" : "ok";
 };
+const selShort = (s, l) => [SIZES[s.si] ? `${SIZES[s.si].cm} ${CM[l]}` : "", tx(s.f && s.f.short, l), tx((pOpt(s.packId) || {}).label, l)].filter(Boolean);
 function fUpdate() {
+  if (!$("fsize")) return;
   const s = fState(), t = T[PL];
   $("faddrL").hidden = !s.d.address;
   $("fchocoL").hidden = !(s.f && s.f.id === "choco");
+  $("fperso").hidden = !s.perso;
   $("fdnote").textContent = tx(s.d.note, PL);
+  // selection summary (banner): product name only while it matches the packaging
+  $("fpickedS").textContent = prod ? prodLabel(prod, s.packId, PL) : FL.picked;
+  $("fpickedT").textContent = selShort(s, PL).join(" · ") + (s.qOk && s.q > 1 ? ` · ${t.pcs(s.q)}` : "");
+  $("fpickedImg").src = (prod && !isCustom(prod, s.packId) && prod.img) || (prod && prod.img) || G.heroImg || "";
   // price breakdown
   const box = $("fprice"); box.innerHTML = "";
-  for (const [a, b, unk] of priceLines(s.p, PL)) { const r = document.createElement("div"); r.innerHTML = "<span></span><span></span>"; r.firstChild.textContent = a; r.lastChild.textContent = b; if (unk) r.lastChild.className = "tbd"; box.append(r); }
-  const tot = document.createElement("div"); tot.className = "tot"; tot.innerHTML = "<span></span><span></span>";
-  tot.firstChild.textContent = s.p.estimate ? t.estLabel : t.totLabel; tot.lastChild.textContent = fmtL(s.p.total, PL); box.append(tot);
-  if (s.p.estimate) { const sm = document.createElement("small"); sm.textContent = t.estNote; box.append(sm); }
+  if (!s.p) {
+    const m = document.createElement("p"); m.className = "qneed"; m.textContent = FL.qtyNeed; box.append(m);
+  } else {
+    for (const [a, b, unk] of priceLines(s.p, PL)) { const r = document.createElement("div"); r.innerHTML = "<span></span><span></span>"; r.firstChild.textContent = a; r.lastChild.textContent = b; if (unk) r.lastChild.className = "tbd"; box.append(r); }
+    const tot = document.createElement("div"); tot.className = "tot"; tot.innerHTML = "<span></span><span></span>";
+    tot.firstChild.textContent = s.p.estimate ? t.estLabel : t.totLabel; tot.lastChild.textContent = fmtL(s.p.total, PL); box.append(tot);
+    if (s.p.estimate) { const sm = document.createElement("small"); sm.textContent = t.estNote; box.append(sm); }
+  }
   // online payment only for final prices
   const pp = $("fpaypick");
   if (pp) {
-    pp.querySelector("input[value=online]").disabled = s.p.estimate;
-    if (s.p.estimate) pp.querySelector("input[value=cash]").checked = true;
-    $("fpaynote").hidden = !s.p.estimate; $("fpaynote").textContent = t.payLater;
+    const est = !s.p || s.p.estimate;
+    pp.querySelector("input[value=online]").disabled = est;
+    if (est) pp.querySelector("input[value=cash]").checked = true;
+    $("fpaynote").hidden = !(s.p && s.p.estimate); $("fpaynote").textContent = t.payLater;
   }
   $("fsoon").hidden = dateCheck($("date").value) !== "soon";
-  $("fsubmit").textContent = G.pay && fState().pay === "online" ? FL.submitPay : FL.submit;
-  // review
+  $("fsubmit").textContent = G.pay && s.pay === "online" && s.p && !s.p.estimate ? FL.submitPay : FL.submit;
   $("freview").textContent = reviewText(s);
+  saveDraft();
+  if (window.__ggSync) window.__ggSync(s);
 }
+function persoLines(o, l) {
+  const t = F[l], out = [];
+  if (o.initials) out.push(`${t.pIni}${l === "hy" ? "՝" : ":"} ${o.initials}`);
+  if (o.color) out.push(`${t.pCol}${l === "hy" ? "՝" : ":"} ${o.color}`);
+  if (o.wishes) out.push(`${t.pWish}${l === "hy" ? "՝" : ":"} ${o.wishes}`);
+  if (o.deferred) out.push(t.pDeferred);
+  return out;
+}
+const formPerso = () => ({ initials: $("pini").value.trim(), color: $("pcol").value.trim(), wishes: $("pwish").value.trim(), deferred: $("pdefer").checked });
 function reviewText(s) {
-  const t = T[PL], l = PL, lines = [];
-  if (picked.title) lines.push(t.product(picked.title));
-  lines.push(`${tx(s.f && s.f.short, l)}${t.gataWord}, ${sizeL(s.si, l).toLowerCase()} — ${t.qty(s.q)}`);
-  lines.push(`${FL.box}${l === "hy" ? "՝" : ":"} ${tx((pOpt(s.packId) || {}).label, l)}`);
+  const t = T[PL], l = PL, lines = [], sep = l === "hy" ? "՝" : ":";
+  if (prod) lines.push(t.product(prodLabel(prod, s.packId, l)));
+  lines.push(`${tx(s.f && s.f.short, l)}${t.gataWord}, ${sizeL(s.si, l).toLowerCase()}${s.qOk ? " — " + t.qty(s.q) : ""}`);
+  lines.push(`${FL.box}${sep} ${tx((pOpt(s.packId) || {}).label, l)}`);
+  if (s.perso) lines.push(...persoLines(formPerso(), l));
   const dc = dateCheck($("date").value);
-  lines.push(`${FL.date}${l === "hy" ? "՝" : ":"} ${dc === "bad" ? "—" : longDate(parseISO($("date").value), l)}`);
-  lines.push(`${FL.how}${l === "hy" ? "՝" : ":"} ${tx(s.d.label, l)}${s.d.address && $("faddr").value.trim() ? ", " + $("faddr").value.trim() : ""}`);
+  lines.push(`${FL.date}${sep} ${dc === "bad" ? "—" : longDate(parseISO($("date").value), l)}`);
+  lines.push(`${FL.how}${sep} ${tx(s.d.label, l)}${s.d.address && $("faddr").value.trim() ? ", " + $("faddr").value.trim() : ""}`);
   if ($("name").value.trim() || $("phone").value.trim()) lines.push(`${$("name").value.trim()} ${$("phone").value.trim()}`.trim());
   if ($("notes").value.trim()) lines.push(t.note($("notes").value.trim()));
-  lines.push("", totalLine(s.p, l));
+  lines.push("", s.p ? totalLine(s.p, l) : FL.qtyNeed);
   return lines.join("\n");
 }
 function setErr(id, msg) {
@@ -562,9 +696,10 @@ function validateField(id) {
   clearErr(id);
   if (id === "name" && !v) return setErr(id, FL.need), false;
   if (id === "phone") { const dg = v.replace(/\D/g, ""); if (!v) return setErr(id, FL.need), false; if (dg.length < 8 || dg.length > 15) return setErr(id, t.phoneBad), false; }
-  if (id === "qty" && !s.qOk) return setErr(id, t.qtyBad), false;
+  if (id === "qty" && !s.qOk) return setErr(id, s.qp.over ? FL.qtyMax(QMAX) : FL.qtyBad), false;
   if (id === "date") { const dc = dateCheck(v); if (!v) return setErr(id, FL.need), false; if (dc === "bad") return setErr(id, FL.dateBad), false; if (dc === "past") return setErr(id, t.past.trim()), false; }
   if (id === "faddr" && s.d.address && v.replace(/\s/g, "").length < 5) return setErr(id, v ? t.addrBad : FL.need), false;
+  if (id === "pini" && s.perso && !v && !$("pdefer").checked) return setErr(id, FL.persoNeed), false;
   return true;
 }
 async function postOrder(body) {
@@ -572,7 +707,7 @@ async function postOrder(body) {
   try {
     const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: ctl.signal });
     const j = await r.json().catch(() => ({}));
-    if (!r.ok) return { ok: false, error: j.error, status: r.status };
+    if (!r.ok) return { ok: false, error: j.error, status: r.status, conflict: !!j.conflict, pending: !!j.pending, retry: !!j.retry };
     if (!j.ok || !j.id) return { ok: false, network: true };
     return j;
   } catch (e) { return { ok: false, network: true }; } finally { clearTimeout(tm); }
@@ -595,27 +730,35 @@ async function fSubmit(e) {
   e.preventDefault();
   if (sending) return; // no double orders from repeated clicks
   const t = T[PL], s = fState();
-  const ids = ["qty", "date", "faddr", "name", "phone"].filter((id) => id !== "faddr" || s.d.address);
+  const ids = ["qty", "pini", "date", "faddr", "name", "phone"].filter((id) => (id !== "faddr" || s.d.address) && (id !== "pini" || s.perso));
   const bad = ids.filter((id) => !validateField(id));
   if (bad.length) { $(bad[0]).focus(); return; }
   const d = $("done"), btn = $("fsubmit");
   const body = {
     key: formKey, lang: PL, source: "form", filling: s.f && s.f.id, choco: s.f && s.f.id === "choco" ? tx(CHOCO[$("fchoco").value], "hy") : "",
     size: SIZES[s.si] && SIZES[s.si].cm, qty: s.q, pack: s.packId, box: s.packId !== "none", date: $("date").value, delivery: s.d.id, address: s.d.address ? $("faddr").value : "",
-    name: $("name").value, phone: $("phone").value, notes: $("notes").value, product: picked.title, pay: s.p.estimate ? "cash" : s.pay,
-    website: form.querySelector("input[name=website]").value,
+    name: $("name").value, phone: $("phone").value, notes: $("notes").value, productSlug: prod ? prod.slug : "", perso: s.perso ? formPerso() : null,
+    pay: s.p.estimate ? "cash" : s.pay, website: form.querySelector("input[name=website]").value,
   };
   sending = true; btn.disabled = true; btn.textContent = FL.sending; d.hidden = true; d.className = "done";
   const r = await postOrder(body);
   sending = false; btn.disabled = false; fUpdate();
   d.hidden = false;
   if (r.ok) {
-    // success is shown only after the server confirms the order was saved
+    // success is shown only after the server confirms the order was saved; only then the draft is cleared
+    clearDraft();
     if (r.checkoutUrl) { d.textContent = FL.redirect; location.href = r.checkoutUrl; return; }
+    ready = false;
     d.className = "done ok"; d.textContent = t.received(r.id) + (r.payError ? "\n\n" + t.payFail : "");
     formKey = newKey();
-    $("notes").value = ""; setPicked(null); touched.clear(); fUpdate();
+    for (const id of ["notes", "pini", "pcol", "pwish"]) $(id).value = ""; $("pdefer").checked = false;
+    prod = null; touched.clear(); fUpdate();
+  } else if (r.conflict) {
+    // this key already belongs to an order with other details: never reuse it; the next tap is a new, separate order
+    formKey = newKey(); saveDraft();
+    d.className = "done bad"; d.textContent = "⚠️ " + r.error;
   } else if (r.error) {
+    // validation error, "still processing" or a storage problem: same key, so a retry can't double the order
     d.className = "done bad"; d.textContent = "⚠️ " + r.error + "\n" + FL.failSaved;
   } else {
     // we don't know if it arrived: keep the same key so a retry can't create a second order
@@ -626,27 +769,16 @@ async function fSubmit(e) {
   d.focus({ preventScroll: true });
   d.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
 }
-/* product cards: remember the choice, show a thumbnail, set the packaging */
-function setPicked(card) {
-  picked = card ? { title: card.dataset.pick, pack: card.dataset.pack || "", img: card.dataset.img || "" } : { title: "" };
-  const box = $("fpicked"); if (!box) return;
-  box.hidden = !picked.title;
-  if (picked.title) {
-    $("fpickedT").textContent = picked.title;
-    $("fpickedImg").hidden = !picked.img; if (picked.img) $("fpickedImg").src = picked.img;
-    if (picked.pack && pOpt(picked.pack)) { $("fpack").value = picked.pack; touched.add("fpack"); }
-    touched.add("picked");
+if (form) {
+  buildForm();
+  if ($("fsize")) {
+    restoreDraft(readDraft());
+    // /order?product=wedding-box — chosen on the menu or a product page; the slug is removed from the link afterwards
+    const u = new URL(location.href), slug = u.searchParams.get("product");
+    if (slug) { applyProduct(slug); u.searchParams.delete("product"); history.replaceState(null, "", u.pathname + u.search + u.hash); }
+    ready = true; fUpdate();
   }
-  fUpdate();
 }
-buildForm();
-document.querySelectorAll("[data-pick]").forEach((a) => a.addEventListener("click", () => setPicked(a)));
-/* /order?product=wedding-box — the product chosen on the menu or a product page */
-(() => {
-  const slug = new URL(location.href).searchParams.get("product");
-  const pr = slug && (G.products || []).find((x) => x.slug === slug);
-  if (pr && form && $("fpack")) setPicked({ dataset: { pick: pr.title, pack: pr.pack, img: pr.img } });
-})();
 
 /* ================= chat assistant ================= */
 /* keyword stems; a word matches if it starts with the stem (stems of 5+ letters also allow one typo) */
@@ -787,7 +919,7 @@ function reply(text) {
 
 /* ---------- ordering inside the chat ---------- */
 const MONTHS = [["հունվ", "hunv", "янв", "jan"], ["փետր", "petr", "фев", "feb"], ["մարտ", "mart", "мар", "mar"], ["ապր", "apr", "апр"], ["մայ", "may", "мая", "май"], ["հունիս", "hunis", "июн", "jun"], ["հուլիս", "hulis", "июл", "jul"], ["օգոստ", "ogost", "авг", "aug"], ["սեպտ", "sept", "сен", "sep"], ["հոկտ", "hokt", "окт", "oct"], ["նոյ", "noy", "ноя", "nov"], ["դեկտ", "dekt", "дек", "dec"]];
-const fmtDate = (d) => (CL === "en" ? `${d.getDate()} ${MON.en[d.getMonth()]}` : `${d.getDate()} ${MON[CL][d.getMonth()]}`);
+const fmtDate = (d) => (CL === "en" ? `${d.getDate()} ${MON.en[d.getMonth()]} ${d.getFullYear()}` : `${d.getDate()} ${MON[CL][d.getMonth()]} ${d.getFullYear()}`);
 function chocoFrom(h) {
   if (/սև|sev\b|черн|тёмн|темн|dark|black|bitter/.test(h)) return "dark";
   if (/կաթնային|katnayin|katn|молоч|milk/.test(h)) return "milk";
@@ -819,6 +951,9 @@ function delivFrom(h) {
   for (const d of DELIV) for (const l of ["hy", "ru", "en"]) { const n = norm(tx(d.label, l)); if (n && n.length > 4 && h.includes(n)) return { id: d.id }; }
   return null;
 }
+/* an example date that is always in the future (Armenia time) */
+const exDate = () => { const d = new Date(today()); d.setDate(d.getDate() + 7 + Math.max(0, G.minDays || 0)); return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`; };
+const dmy = (d) => `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
 function dateFrom(t) {
   const h = norm(t), d0 = today(), add = (n) => { const d = new Date(d0); d.setDate(d.getDate() + n); return d; };
   if (/մյուս օր|myus or|mius or|послезавтра|day after/.test(h)) return add(2);
@@ -828,14 +963,21 @@ function dateFrom(t) {
   if (m && +m[2] >= 1 && +m[2] <= 12 && +m[1] >= 1 && +m[1] <= 31) {
     const y = m[3] ? (+m[3] < 100 ? 2000 + +m[3] : +m[3]) : d0.getFullYear();
     const d = new Date(y, +m[2] - 1, +m[1]); if (d.getMonth() !== +m[2] - 1) return "bad";
-    if (!m[3] && d < d0) d.setFullYear(y + 1); return d;
+    // no year and this year's date has passed: ask, don't guess the year
+    if (!m[3] && d < d0) { const nx = new Date(d); nx.setFullYear(y + 1); return { amb: `${pad(+m[1])}.${pad(+m[2])}`, next: nx }; }
+    return d;
   }
   const words = h.split(" ");
   for (let i = 0; i < 12; i++) {
     const wi = words.findIndex((w) => MONTHS[i].some((st) => w.startsWith(st)));
     if (wi < 0) continue;
     const num = [words[wi - 1], words[wi + 1]].map((x) => (x && /^\d{1,2}(ին|in|ի|y|th|st|nd|rd|го)?$/.test(x) ? parseInt(x) : NaN)).find((n) => n >= 1 && n <= 31);
-    if (num) { const d = new Date(d0.getFullYear(), i, num); if (d < d0) d.setFullYear(d.getFullYear() + 1); return d; }
+    if (num) {
+      const yw = words.slice(wi + 1, wi + 3).map((x) => (/^20\d\d/.test(x || "") ? parseInt(x) : NaN)).find((n) => n > 2000);
+      const d = new Date(yw || d0.getFullYear(), i, num); if (d.getMonth() !== i) return "bad";
+      if (!yw && d < d0) { const nx = new Date(d); nx.setFullYear(d.getFullYear() + 1); return { amb: `${pad(num)}.${pad(i + 1)}`, next: nx }; }
+      return d;
+    }
   }
   return null;
 }
@@ -855,10 +997,13 @@ function qtyFrom(t, asked) {
 
 /* ================= ordering inside the chat (same rules as the form) ================= */
 let O = null, waiting = null, HIST = [];
-const newOrder = () => ({ kind: null, choco: null, pack: PACKS.length === 1 ? PACKS[0].id : null, size: null, qty: null, date: null, delivery: null, dGroup: null, address: null, name: null, phone: null, notes: null, pay: G.pay ? null : "cash", product: "", key: newKey() });
-const STEPS = ["size", "kind", "choco", "pack", "qty", "date", "delivery", "ymode", "address", "name", "phone", "notes", "pay"];
+const newOrder = () => ({ perso: null, kind: null, choco: null, pack: PACKS.length === 1 ? PACKS[0].id : null, size: null, qty: null, date: null, delivery: null, dGroup: null, address: null, name: null, phone: null, notes: null, pay: G.pay ? null : "cash", product: "", key: newKey() });
+const STEPS = ["size", "kind", "choco", "pack", "perso", "qty", "date", "delivery", "ymode", "address", "name", "phone", "notes", "pay"];
 const chatCalc = () => calc({ fillingId: O.kind, sizeIdx: O.size, qty: O.qty || 1, packId: O.pack || "none", deliveryId: O.delivery });
+const chatProd = () => prodBy(O.product);
+const chatPerso = () => persoOn(chatProd(), O.pack || "none");
 function need(k) {
+  if (k === "perso") return !!O.pack && chatPerso() && !O.perso;
   if (k === "choco") return O.kind === "choco" && !O.choco;
   if (k === "delivery") return !O.delivery && !O.dGroup;
   if (k === "ymode") return !O.delivery && !!O.dGroup;
@@ -877,7 +1022,8 @@ function prompt(st) {
     case "choco": return { text: l.askChoco, chips: l.chocoChips };
     case "pack": return { text: l.packHead + "\n" + PACKS.map((p) => `${tx(p.label, CL)} — ${p.price < 0 ? l.tbd.toLowerCase() : p.price > 0 ? fmt(p.price) : l.free.toLowerCase()}`).join("\n"), chips: PACKS.map((p) => tx(p.label, CL)) };
     case "qty": return { text: l.askQty, chips: ["1", "2", "5", "10", "20"] };
-    case "date": return { text: l.askDate, chips: l.dateChips };
+    case "date": return { text: l.askDateF(exDate()), chips: l.dateChips };
+    case "perso": return { text: l.askPerso, chips: [l.persoDeferChip] };
     case "delivery": return { text: l.askDelivery + "\n" + DELIV.map((d) => `• ${tx(d.label, CL)}${tx(d.note, CL) ? " — " + tx(d.note, CL) : ""}`).join("\n"), chips: DELIV.map((d) => tx(d.label, CL)) };
     case "ymode": return { text: l.askYmode, chips: DELIV.filter((d) => d.id === "megamall" || d.id === "yerevan").map((d) => tx(d.label, CL)) };
     case "address": return { text: l.askAddress, chips: [] };
@@ -891,9 +1037,10 @@ function prompt(st) {
 function summary() {
   const l = L(), f = fill(O.kind), d = dOpt(O.delivery) || {}, p = chatCalc();
   const lines = [l.yourOrder];
-  if (O.product) lines.push(`• ${l.product(O.product)}`);
+  if (O.product && chatProd()) lines.push(`• ${l.product(prodLabel(chatProd(), O.pack || "none", CL))}`);
   lines.push(`• ${tx(f.short, CL)}${l.gataWord}${O.kind === "choco" && O.choco ? ` (${tx(CHOCO[O.choco], CL)})` : ""}, ${sizeL(O.size, CL).toLowerCase()}`, `• ${l.qty(O.qty)}`);
   lines.push(`• ${tx((pOpt(O.pack) || {}).label, CL)}`);
+  if (chatPerso() && O.perso) persoLines(O.perso, CL).forEach((x) => lines.push(`• ${x}`));
   lines.push(`• ${l.day(longDate(O.date, CL))}`, `• ${tx(d.label, CL)}${O.address ? `, ${O.address}` : ""}`, `• ${O.name}, ${O.phone}`);
   if (O.notes) lines.push(`• ${l.note(O.notes)}`);
   if (G.pay && !p.estimate) lines.push(`• ${O.pay === "online" ? l.payOnline : l.payCash}`);
@@ -901,6 +1048,7 @@ function summary() {
   return lines.join("\n");
 }
 const CHANGE = [
+  ["perso", /սկզբնատառ|skzbnatar|initial|инициал/, () => { O.perso = null; }],
   ["size", /չափ|chap|size|размер/, () => { O.size = null; }],
   ["kind", /միջուկ|mijuk|տեսակ|tesak|начин|вид|kind|filling/, () => { O.kind = null; O.choco = null; }],
   ["pack", /փաթեթ|տուփ|tup|box|pack|упак|короб/, () => { O.pack = null; }],
@@ -912,12 +1060,15 @@ const CHANGE = [
   ["notes", /նշում|ցանկ|nshum|note|request|пожел|примеч/, () => { O.notes = null; }],
   ["pay", /վճար|vchar|pay|оплат/, () => { O.pay = null; }],
 ].filter((c) => (c[0] !== "pack" || PACKS.length > 1) && (c[0] !== "pay" || G.pay));
-const changeChips = () => CHANGE.map((c) => L().fields[c[0]]);
+const changeChips = () => CHANGE.filter((c) => c[0] !== "perso" || chatPerso()).map((c) => L().fields[c[0]]);
 let ackI = 0;
 function nextAsk(pre) {
   let note = "", extra = "";
+  const amb = O._amb && !O.date; if (amb) note = O._amb + "\n\n";
+  delete O._amb;
   if (O.date && O.date < today()) { O.date = null; note = L().past; }
-  const st = STEPS.find(need) || "confirm";
+  // an unclear or past date is asked again right away
+  const st = amb || note === L().past ? "date" : STEPS.find(need) || "confirm";
   waiting = st; const p = prompt(st);
   if ((st === "delivery" || st === "confirm") && O.date && (O.date - today()) / 864e5 < Math.max(1, G.minDays || 0) && !O._warned) { extra = L().soon(PHONES); O._warned = true; }
   return { text: (pre ? pre + "\n\n" : "") + note + extra + p.text, chips: p.chips, ctl: !p.noCtl };
@@ -929,13 +1080,14 @@ function fromForm() {
   if (touched.has("fsize") || touched.has("picked")) { O.size = +$("fsize").value; got.push(`${SIZES[O.size].cm} ${CM[CL]}`); }
   if (touched.has("kind")) { O.kind = $("kind").value; got.push(tx(fill(O.kind).short, CL).toLowerCase()); }
   if (touched.has("fpack") && pOpt($("fpack").value)) { O.pack = $("fpack").value; got.push(tx(pOpt(O.pack).label, CL).toLowerCase()); }
-  if (touched.has("qty") && /^\d+$/.test($("qty").value) && +$("qty").value >= 1) { O.qty = +$("qty").value; got.push(l.pcs(O.qty)); }
+  if (touched.has("qty") && qtyParse($("qty").value).ok) { O.qty = +$("qty").value; got.push(l.pcs(O.qty)); }
   if (touched.has("date") && ["ok", "soon"].includes(dateCheck($("date").value))) { O.date = parseISO($("date").value); got.push(fmtDate(O.date)); }
   if (touched.has("how2")) { O.delivery = $("how2").value; got.push(tx(dOpt(O.delivery).label, CL)); }
   if (touched.has("faddr") && $("faddr").value.replace(/\s/g, "").length >= 5 && (dOpt(O.delivery) || {}).address) O.address = $("faddr").value.trim();
   if (touched.has("name") && $("name").value.trim().length >= 2) { O.name = $("name").value.trim(); got.push(O.name); }
   if (touched.has("phone")) { const dg = $("phone").value.replace(/\D/g, ""); if (dg.length >= 8 && dg.length <= 15) O.phone = $("phone").value.trim(); }
-  if (picked.title) O.product = picked.title;
+  if (prod) O.product = prod.slug;
+  if (O.product && persoOn(prod, O.pack || $("fpack").value) && ($("pini").value.trim() || $("pdefer").checked)) O.perso = formPerso();
   return got;
 }
 function startOrder(t) {
@@ -953,6 +1105,7 @@ function startOrder(t) {
   return nextAsk(pre);
 }
 function packFrom(h, asked) {
+  if (/առանց տուփ|aranc tup|arants tup|без короб|без упак|no box|without (a )?box/.test(h) && pOpt("none")) return "none";
   for (const p of PACKS) for (const l of ["hy", "ru", "en"]) if (norm(tx(p.label, l)) === h) return p.id;
   if (/պայուսակ|payusak|(^|\s)bag|пакет/.test(h) && pOpt("bag")) return "bag";
   if (/շղարշ|tul|фатин|tulle|wrap|լենտ|ժապավեն/.test(h) && pOpt("wrap")) return "wrap";
@@ -967,7 +1120,11 @@ function extract(t, step) {
   if (O.kind === "choco" && !O.choco) { const c = chocoFrom(h); if (c) O.choco = c; }
   if (!O.pack) { const p = packFrom(h, step === "pack"); if (p) O.pack = p; }
   if (O.size == null) { const s = sizeFrom(t.replace(/մեծ պատվեր|mec patver|mets patver|большой заказ|big order/gi, "")); if (s >= 0 && (step === "size" || /սմ|sm|см|cm|փոքր|միջին|մեծ|poqr|pokr|mijin|mec|mets|small|medium|large|big|маленьк|средн|больш/.test(h))) O.size = s; }
-  if (!O.date) { const d = dateFrom(t); if (d && d !== "bad" && (d - today()) / 864e5 <= 366) O.date = d; }
+  if (!O.date) {
+    const d = dateFrom(t);
+    if (d && d.amb) O._amb = L().dateAmb(d.amb, dmy(d.next));
+    else if (d && d !== "bad" && (d - today()) / 864e5 <= 366) O.date = d;
+  }
   if (O.qty == null) { const q = qtyFrom(t, step === "qty"); if (q && q >= 1 && q <= 9999) O.qty = q; }
   if (!O.delivery) { const dv = delivFrom(h); if (dv) { if (dv.id) { O.delivery = dv.id; O.dGroup = null; } else if (!O.dGroup) O.dGroup = dv.group; } }
 }
@@ -977,7 +1134,7 @@ function finish() {
   const body = {
     key: O.key, lang: CL, source: "chat", filling: O.kind, choco: O.choco ? tx(CHOCO[O.choco], "hy") : "", size: SIZES[O.size].cm, qty: O.qty,
     pack: O.pack || "none", box: (O.pack || "none") !== "none", date: isoDate(O.date), delivery: O.delivery, address: O.address || "", name: O.name, phone: O.phone,
-    notes: O.notes || "", product: O.product || "", pay: p.estimate ? "cash" : O.pay,
+    notes: O.notes || "", productSlug: O.product || "", perso: chatPerso() ? O.perso : null, pay: p.estimate ? "cash" : O.pay,
   };
   const saved = O;
   waiting = "sending";
@@ -1012,6 +1169,10 @@ function orderTurn(t) {
     return { text: r.text + "\n\n" + l.cont + p.text, chips: p.chips, ctl: true };
   }
   if (waiting === "pack") { const p = packFrom(h, true); if (p) O.pack = p; else extract(t, waiting); }
+  else if (waiting === "perso") {
+    if (isCtl(h, "persoDeferChip") || /կհամաձայն|համաձայնեց|hamadzayn|согласу|agree|later|հետո|потом/.test(h)) O.perso = { initials: "", color: "", wishes: "", deferred: true };
+    else if (t.trim().length >= 1 && t.trim().length <= 120) O.perso = { initials: t.trim().slice(0, 30), color: "", wishes: t.trim().length > 30 ? t.trim().slice(0, 300) : "", deferred: false };
+  }
   else if (waiting === "size" && SIZES.findIndex((s) => norm(`${s.cm} ${CM[CL]}`) === h) >= 0) O.size = SIZES.findIndex((s) => norm(`${s.cm} ${CM[CL]}`) === h);
   else if (waiting === "ymode") {
     for (const d of DELIV) if (norm(tx(d.label, CL)) === h) { O.delivery = d.id; O.dGroup = null; }
@@ -1037,13 +1198,16 @@ function orderTurn(t) {
   else extract(t, waiting);
   if (JSON.stringify(O) === snap) {
     if (waiting === "qty" && /\d/.test(t)) return { text: l.qtyBad, chips: prompt("qty").chips, ctl: true };
-    if (waiting === "date" && /\d/.test(t)) return { text: l.dateBad, chips: prompt("date").chips, ctl: true };
+    if (waiting === "date" && /\d/.test(t)) return { text: l.dateBadF(exDate()), chips: prompt("date").chips, ctl: true };
     if (waiting === "phone") return { text: l.phoneBad, chips: [], ctl: true };
     const r = reply(t), p = prompt(waiting);
     if (r.topic && !["yes", "no", "greet", "order"].includes(r.topic)) return { text: r.text + "\n\n" + l.cont + p.text, chips: p.chips, ctl: true };
     return { text: l.sorry + p.text, chips: p.chips, ctl: true };
   }
+  if (O._amb && !O.date) return nextAsk("");
   HIST.push(JSON.parse(snap, (k, v) => (k === "date" && v ? new Date(v) : v)));
+  const prevDate = JSON.parse(snap).date;
+  if (O.date && (!prevDate || new Date(prevDate).getTime() !== O.date.getTime()) && O.date >= today()) return nextAsk(l.dateSet(longDate(O.date, CL)));
   return nextAsk(l.acks[ackI++ % l.acks.length]);
 }
 /* quick-reply buttons: the same action whatever the button text says */
@@ -1096,6 +1260,12 @@ async function submitChat(s) {
     if (r.checkoutUrl) { add(L().payInfo, "bot"); addExtras({ pay: r.checkoutUrl }); }
     else if (r.payError) add(L().payFail, "bot");
     addExtras({});
+  } else if (r.conflict) {
+    O = s.saved; O.key = newKey(); waiting = "confirm";
+    add("⚠️ " + r.error, "bot"); addExtras({ chips: L().confirmChips });
+  } else if (r.pending || r.retry) {
+    O = s.saved; waiting = "confirm";
+    add("⚠️ " + r.error, "bot"); addExtras({ chips: L().confirmChips });
   } else if (r.error) {
     O = s.saved; waiting = "change";
     add("⚠️ " + r.error + "\n\n" + L().changeWhat, "bot"); addExtras({ chips: changeChips(), ctl: true });
@@ -1281,34 +1451,21 @@ if (chatBtn && chatPanel) {
 })();
 
 
-/* ================= order page: live preview in header ================= */
+/* ================= order page: decorative preview in the header (follows the form) ================= */
 (() => {
   const stage = document.querySelector("[data-order]");
   if (!stage || !form) return;
-  const sc = $("ohScale"), capT = $("ohCapT"), ringT = $("ringText"), btns = [...stage.querySelectorAll(".szb")];
-  const selText = (id) => { const el = $(id); return el && el.selectedIndex >= 0 ? el.options[el.selectedIndex].text : ""; };
-  function sync() {
-    const fs = $("fsize"); if (!fs) return;
-    const i = +fs.value || 0, n = Math.max(1, btns.length - 1);
-    if (sc) sc.style.transform = `scale(${0.74 + 0.26 * (i / n)})`;
-    btns.forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.size === i)));
-    const q = Math.max(1, parseInt(($("qty") || {}).value, 10) || 1);
-    const parts = [selText("fsize"), selText("kind"), selText("fpack")].filter(Boolean);
-    if (capT) capT.textContent = parts.join(" · ") + (q > 1 ? ` · ×${q}` : "");
-    const cm = (selText("fsize").match(/\d+\s*\S+?(?=\))/) || [selText("fsize")])[0], fill = selText("kind").split("(")[0].trim();
-    const unit = `${cm} · ${fill} · `.toUpperCase();
-    if (ringT) ringT.textContent = unit.replace(/ԵՒ/g, "ԵՎ").repeat(Math.max(2, Math.round(58 / unit.length)));
-  }
-  btns.forEach((b) => b.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const fs = $("fsize"); if (!fs) return;
-    fs.value = b.dataset.size; fs.dispatchEvent(new Event("change", { bubbles: true }));
-  }));
-  btns.forEach((b) => b.addEventListener("pointerdown", (e) => e.stopPropagation()));
-  form.addEventListener("change", sync); form.addEventListener("input", sync);
-  sync(); setTimeout(sync, 50);
+  const sc = $("ohScale"), capT = $("ohCapT"), ringT = $("ringText");
+  window.__ggSync = (s) => {
+    const n = Math.max(1, SIZES.length - 1);
+    if (sc) sc.style.transform = `scale(${0.74 + 0.26 * (s.si / n)})`;
+    const parts = selShort(s, PL);
+    if (capT) capT.textContent = [prod ? prodLabel(prod, s.packId, PL) : "", parts.join(" · ")].filter(Boolean).join(" — ") + (s.qOk && s.q > 1 ? ` · ×${s.q}` : "");
+    const unit = `${parts.slice(0, 2).join(" · ")} · `.toUpperCase().replace(/ԵՒ/g, "ԵՎ");
+    if (ringT) ringT.textContent = unit.repeat(Math.max(2, Math.round(58 / unit.length)));
+  };
+  if ($("fsize")) fUpdate();
 })();
-
 
 /* ================= wedding petals (header) ================= */
 (() => {

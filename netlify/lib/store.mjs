@@ -4,8 +4,10 @@ import { V1_CONTENT } from "./defaults_v1.mjs";
 import { V2_CONTENT } from "./defaults_v2.mjs";
 import { V3_CONTENT } from "./defaults_v3.mjs";
 import { V4_CONTENT } from "./defaults_v4.mjs";
+import { V5_CONTENT } from "./defaults_v5.mjs";
 
-export const store = (name) => getStore({ name, consistency: "strong" });
+// tests can plug in an in-memory store (globalThis.__ggStore); production always uses Netlify Blobs
+export const store = (name) => (globalThis.__ggStore ? globalThis.__ggStore(name) : getStore({ name, consistency: "strong" }));
 
 export const env = (k, d = "") => {
   try { return (globalThis.Netlify?.env?.get(k) ?? process.env[k] ?? d) || d; } catch { return process.env[k] || d; }
@@ -41,7 +43,8 @@ export function migrate(saved) {
   if ((saved.version || 1) < 2) m = dropOldDefaults(m, V1_CONTENT);
   if ((saved.version || 1) < 3) m = dropOldDefaults(m, V2_CONTENT);
   if ((saved.version || 1) < 4) m = dropOldDefaults(m, V3_CONTENT);
-  m = dropOldDefaults(m, V4_CONTENT);
+  if ((saved.version || 1) < 5) m = dropOldDefaults(m, V4_CONTENT);
+  m = dropOldDefaults(m, V5_CONTENT);
   m.version = CONTENT_VERSION;
   return m;
 }

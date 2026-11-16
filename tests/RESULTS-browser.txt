@@ -1,0 +1,121 @@
+===== tests/browser/form_ui.py
+PASS product param removed from link http://localhost:8888/order
+PASS draft kept after switching to /en/order Wedding gata in a box
+PASS no contact data in link /en/order 
+PASS draft kept after switching to /ru/order Свадебная гата в коробке
+PASS no contact data in link /ru/order 
+PASS draft kept after switching to /order Հարսանեկան գաթա՝ տուփով
+PASS no contact data in link /order 
+PASS Change goes to menu http://localhost:8888/menu
+PASS new product applied (pack=bag) Գաթա՝ նվեր-պայուսակում
+PASS other fields kept after product change {"size": "2", "kind": "walnut", "pack": "bag", "qty": "3", "date": "2026-12-20", "how": "yerevan", "addr": "Երևան, Աբովյան 10, բն. 5", "name": "Անի", "phone": "077123456", "notes": "Զանգել առավոտյան", "banner": "Գաթա՝ նվեր-պայուսակում"}
+PASS boxed product name while box Հարսանեկան գաթա՝ տուփով
+PASS custom label after 'no box' (banner) Ձեր ընտրած տարբերակը
+PASS review has no boxed name Ընտրված տեսակը՝ Ձեր ընտրած տարբերակը
+PASS header caption consistent Ձեր ընտրած տարբերակը — 40 սմ · Ընկույզով · Առանց տուփի · ×3
+PASS initials fields shown 
+PASS initials in review 
+PASS initials hidden for other packaging 
+PASS no stale initials in review 
+PASS initials required or deferral Գրեք սկզբնատառերը կամ նշեք, որ մանրամասները կհամաձայնեցնեք մեզ հետ։
+PASS qty empty: no total Խնդրում ենք նշել ամբողջ թիվ՝ առնվազն 1 հատ։
+PASS qty zero: no total Խնդրում ենք նշել ամբողջ թիվ՝ առնվազն 1 հատ։
+PASS qty negative: no total Խնդրում ենք նշել ամբողջ թիվ՝ առնվազն 1 հատ։
+PASS qty fraction: no total Խնդրում ենք նշել ամբողջ թիվ՝ առնվազն 1 հատ։
+PASS qty above max: no total Առավելագույն քանակը՝ 9999 հատ։ Ավելի մեծ պատվերի համար զանգահարեք մեզ։
+PASS qty valid again restores price Գաթայի արժեքը | 2 × 5 000 դրամ = 10 000 դրամ | Տուփի արժեքը | Ենթակա է ճշտման | Առաքման արժեքը | Անվճար | Նախնական գումար | 10 000 դրամ | Վերջնական գումարը կհաստատենք պատվերը հաստատելիս։
+PASS 2x30 walnut = 8 000, final total Գաթայի արժեքը | 2 × 4 000 դրամ = 8 000 դրամ | Առաքման արժեքը | Անվճար | Ընդհանուր գումար | 8 000 դրամ
+PASS 2x30 classic + decoration = 9 000 Գաթայի արժեքը | 2 × 3 500 դրամ = 7 000 դրամ | Ձևավորման արժեքը | 2 000 դրամ | Առաքման արժեքը | Անվճար | Ընդհանուր գումար | 9 000 դրամ
+PASS unknown box + delivery stay unconfirmed Գաթայի արժեքը | 2 × 3 500 դրամ = 7 000 դրամ | Տուփի արժեքը | Ենթակա է ճշտման | Առաքման արժեքը | Ենթակա է ճշտման | Նախնական գումար | 7 000 դրամ | Վերջնական գումարը կհաստատենք պատվերը հաստատելիս։
+   card: Հարսանեկան գաթա՝ տուփով || Գաթայի գինը՝ առանց փաթեթավորման 25 սմ 3 000 դրամից 30 սմ 3 500 դրամից 40 սմ 4 500 դրամից || Փաթեթավորման արժեքը կճշտենք պատվերը հաստատելիս։
+   card: Գաթա՝ նվեր-պայուսակում || Գաթայի գինը՝ առանց փաթեթավորման 25 սմ 3 000 դրամից 30 սմ 3 500 դրամից 40 սմ 4 500 դրամից || Փաթեթավորման արժեքը կճշտենք պատվերը հաստատելիս։
+   card: Հարսի ճամպրուկի գաթա || Չափսեր և գներ 25 սմ 4 000 դրամից 30 սմ 4 500 դրամից 40 սմ 5 500 դրամից || Գինը ներառում է ձևավորումը՝ 1 000 դրամ մեկ գաթայի համար։
+   card: Գաթայի տուփեր՝ ձեր սկզբնատառերով || Գաթայի գինը՝ առանց փաթեթավորման 25 սմ 3 000 դրամից 30 սմ 3 500 դրամից 40 սմ 4 500 դրամից || Փաթեթավորման արժեքը կճշտենք պատվերը հաստատելիս։
+PASS bride suitcase from 4 000 
+PASS boxed card says price without packaging 
+PASS product page bride from 4 000 
+ERRS []
+===== tests/browser/order_sending.py
+PASS network failure message + draft kept Չհաջողվեց ստանալ պատվերի ուղարկման հաստատումը։ Նախ կապվեք մեզ հետ՝ ճշտելու համար, թե արդյոք պատվերը ստացվել է։
+PASS server error keeps draft ⚠️ Սերվերի սխալ (թեստ)
+PASS same order key after reload 
+PASS success message (sent, not confirmed) Ձեր պատվերն ուղարկված է։ Պատվերի համարը՝ GG-261116-EFAC4։ Մենք կկապվենք ձեզ հետ՝ մանրամասները հաստատելու համար։
+PASS only one request from repeated clicks 1
+PASS draft cleared after success 
+PASS retry with same key returns same order GG-261116-EFAC4
+PASS exactly one new order saved 18->19
+   saved: {"id": "GG-261116-EFAC4", "product": "Ձեր ընտրած տարբերակը", "productBase": "Հարսանեկան գաթա՝ տուփով", "packLabel": "Առանց տուփի", "qty": 2, "unit": 4000, "total": 8000, "estimate": false, "personalization": null}
+PASS saved order: custom product + no box + 8000 
+   saved: {"product": "Գաթայի տուփեր՝ ձեր սկզբնատառերով", "packLabel": "Տուփով", "estimate": true, "total": 8000, "personalization": {"initials": "", "color": "ոսկեգույն", "wishes": "", "deferred": true}}
+PASS initials order saved with design details 
+PASS telegram text has product, initials info, preliminary total 
+ERRS []
+PASS server rejects qty 0 Խնդրում ենք թարմացնել էջը և նորից փորձել։
+PASS server rejects qty -1 Խնդրում ենք թարմացնել էջը և նորից փորձել։
+PASS server rejects qty 1.5 Խնդրում ենք թարմացնել էջը և նորից փորձել։
+PASS server rejects qty '' Խնդրում ենք թարմացնել էջը և նորից փորձել։
+PASS server rejects qty None Խնդրում ենք թարմացնել էջը և նորից փորձել։
+PASS server rejects qty True Խնդրում ենք թարմացնել էջը և նորից փորձել։
+PASS server rejects qty '2abc' Խնդրում ենք թարմացնել էջը և նորից փորձել։
+PASS server rejects qty 10000 Խնդրում ենք թարմացնել էջը և նորից փորձել։
+PASS server requires initials or deferral Խնդրում ենք թարմացնել էջը և նորից փորձել։
+PASS server rejects past date Խնդրում ենք թարմացնել էջը և նորից փորձել։
+===== tests/browser/layout.py
+PASS form date 2026-11-11 -> past ['Ստացման ամսաթիվ՝ 11 նոյեմբերի, 2026 (չորեքշաբթի)']
+PASS form date 2026-11-16 -> soon ['Ստացման ամսաթիվ՝ 16 նոյեմբերի, 2026 (երկուշաբթի)']
+PASS form date 2026-11-17 -> soon ['Ստացման ամսաթիվ՝ 17 նոյեմբերի, 2026 (երեքշաբթի)']
+PASS form date 2026-12-06 -> ok ['Ստացման ամսաթիվ՝ 6 դեկտեմբերի, 2026 (կիրակի)']
+PASS 320px: no sideways scroll 
+PASS 320px: amounts not wrapped 
+PASS 320px: launcher clear of submit/errors/fields 
+PASS 320px: launcher hidden while typing 
+PASS 320px: size control and price high up {'banner': 267, 'size': 528, 'price': 915}
+PASS 375px: no sideways scroll 
+PASS 375px: amounts not wrapped 
+PASS 375px: launcher clear of submit/errors/fields 
+PASS 375px: launcher hidden while typing 
+PASS 375px: size control and price high up {'banner': 246, 'size': 452, 'price': 838}
+PASS 390px: no sideways scroll 
+PASS 390px: amounts not wrapped 
+PASS 390px: launcher clear of submit/errors/fields 
+PASS 390px: launcher hidden while typing 
+PASS 390px: size control and price high up {'banner': 248, 'size': 453, 'price': 840}
+PASS 430px: no sideways scroll 
+PASS 430px: amounts not wrapped 
+PASS 430px: launcher clear of submit/errors/fields 
+PASS 430px: launcher hidden while typing 
+PASS 430px: size control and price high up {'banner': 266, 'size': 475, 'price': 862}
+PASS 1280px: no sideways scroll 
+PASS 1280px: amounts not wrapped 
+PASS 1280px: launcher clear of submit/errors/fields 
+PASS 1280px: launcher hidden while typing 
+ERRS []
+===== tests/browser/lost_answer.py
+PASS lost answer: customer told result unknown 
+PASS server did save it once 
+PASS changed details + same attempt -> no fake success, explains ⚠️ Այս փորձով արդեն ստացել ենք պատվեր այլ տվյալներով (համար՝ GG-261116-VTSBE)։ Եթե ցանկանում եք փոխել այդ պատվերը, զանգահարեք մեզ։ Եթե սա նոր, առանձին պատվեր է, սեղմեք «Ուղարկել պատվերը» ևս մեկ անգամ։
+PASS no new order yet 
+PASS new key prepared for a separate order 
+PASS second tap = new separate order Ձեր պատվերն ուղարկված է։ Պատվերի համարը՝ GG-261116-GGT23։ Մենք կկապվենք ձեզ հետ՝ մանրամասները հաստատելու համար։
+PASS unchanged retry after lost answer -> success, no duplicate Ձեր պատվերն ուղարկված է։ Պատվերի համարը՝ GG-261116-YAQC2։ Մենք կկապվենք ձեզ հետ՝ մանրամասները հաստատելու համար։
+ERRS []
+===== tests/browser/parallel_real_blobs.py
+PASS real Blobs: 10 parallel same-key requests -> 1 order statuses=[200, 200, 200, 200, 200, 200, 200, 200, 200, 200] ids={'GG-261116-A2THA'}
+PASS real Blobs: same key + changed name -> 409 conflict Այս փորձով արդեն ստացել ենք պատվեր այլ տվյալներով (համար՝ GG-261116-A2THA)։ Եթե ցանկանում 
+PASS real Blobs: identical retry -> same order 
+PASS real Blobs: still exactly one order 
+PASS order number has 5-letter suffix GG-261116-A2THA
+===== tests/browser/chat.py
+PASS price answer works Ընկույզով գաթա, միջին (30 սմ)՝ 4 000 դրամ։
+PASS several details in one message Այո, կարող եք պատվիրել հենց այստեղ։ Նշեցի՝ ընկույզով գաթա, 2 հատ, միջին (30 սմ), 17 նոյեմբերի 2026։ ⏎  ⏎ Ինչպե՞ս փաթեթավորենք գաթան։ ⏎ Առանց տուփի — անվճար ⏎ Տուփով — ենթակա է ճշտման ⏎ Նվեր-պայուսակով — ենթակա է ճշտման ⏎ Հարսի ճամպրուկի ձևա
+PASS date question uses a future example, not 20.10 Այո, կարող եք պատվիրել հենց այստեղ։ Նշեցի՝ ընկույզով գաթա, 2 հատ, միջին (30 սմ)։ ⏎  ⏎ Ո՞ր օրն եք ուզում ստանալ պատվերը։ Նշեք օրը, ամիսը և տարին, օրինակ՝ 25.11.2026, կամ գրեք «վաղը»։
+PASS day.month already passed this year -> asks which year 17.10-ն այս տարի արդեն անցել է։ Նկատի ունե՞ք 17.10.2027-ը։ Խնդրում ենք գրել ամսաթիվը տարեթվով։ ⏎  ⏎ Ո՞ր օրն եք ուզում ստանալ պատվերը։ Նշեք օրը, ամիսը և տարին, օրինակ՝ 25.11.2026, կամ գրեք «վաղը»։
+PASS past explicit date rejected and asked again Լավ։ ⏎  ⏎ Նշված օրն արդեն անցել է։ Ընտրեք մեկ այլ օր։ ⏎  ⏎ Ո՞ր օրն եք ուզում ստանալ պատվերը։ Նշեք օրը, ամիսը և տարին, օրինակ՝ 25.11.2026, կամ գրեք «վաղը»։
+PASS explicit future date repeated with year Ստացման օրը՝ 28 նոյեմբերի, 2026 (շաբաթ)։ ⏎  ⏎ Ինչպե՞ս եք ուզում ստանալ պատվերը։ ⏎ • Վերցնել Գառնիից — Վերցնելու հասցեն և ժամը կճշտենք պատվերը հաստատելիս։ ⏎ • Վերցնել Մեգամոլից — Երևանի «Մեգամոլ» առևտրի կենտրոն։ Ժամը կճշտենք պատվերը հաստատել
+PASS 'վաղը' = tomorrow in Armenia Ստացման օրը՝ 17 նոյեմբերի, 2026 (երեքշաբթի)։ ⏎  ⏎ Եթե գաթան պետք է այսօր կամ վաղը, խնդրում ենք նաև զանգահարել՝ 041-55-10-56, 055-57-73-81։ ⏎  ⏎ Ինչպե՞ս եք ուզում ստանալ պատվերը։ ⏎ • Վերցնել Գառնիից — Վերցնելու հասցեն և ժամը կճշտենք պատվերը 
+PASS 'այսօր' = today in Armenia + short-notice warning Ստացման օրը՝ 16 նոյեմբերի, 2026 (երկուշաբթի)։ ⏎  ⏎ Եթե գաթան պետք է այսօր կամ վաղը, խնդրում ենք նաև զանգահարել՝ 041-55-10-56, 055-57-73-81։ ⏎  ⏎ Ինչպե՞ս եք ուզում ստանալ պատվերը։ ⏎ • Վերցնել Գառնիից — Վերցնելու հասցեն և ժամը կճշտենք պատվերը
+PASS chat summary uses the same product rule Պարզ է։ ⏎  ⏎ 📋 Ձեր պատվերը՝ ⏎ • Ընտրված տեսակը՝ Ձեր ընտրած տարբերակը ⏎ • Ընկույզով գաթա, միջին (30 սմ) ⏎ • Քանակը՝ 2 հատ ⏎ • Առանց տուփի ⏎ • Ստացման ամսաթիվ՝ 28 նոյեմբերի, 2026 (շաբաթ) ⏎ • Վերցնել Գառնիից ⏎ • Անի, 077123456 ⏎  ⏎ Գաթայի արժե
+PASS chat asks for initials for personalised boxes Այո, կարող եք պատվիրել հենց այստեղ։ Մի քանի հարց կտամ, հետո կկարողանաք ստուգել և ուղարկել պատվերը։ ⏎ Պատվերի ձևից վերցրեցի՝ 30 սմ, ընկույզով, տուփով, 2 հատ։ ⏎  ⏎ Գրեք այն սկզբնատառերը, որոնք ցանկանում եք տեսնել տուփի վրա։ Կարող եք նշել նաև 
+PASS deferral accepted, moves on to the date Լավ։ ⏎  ⏎ Ո՞ր օրն եք ուզում ստանալ պատվերը։ Նշեք օրը, ամիսը և տարին, օրինակ՝ 25.11.2026, կամ գրեք «վաղը»։
+PASS no page errors []
+RESULT 12/12 passed

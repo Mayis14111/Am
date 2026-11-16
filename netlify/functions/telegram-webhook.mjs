@@ -1,7 +1,7 @@
 import { json } from "../lib/store.mjs";
 import { safeEqual } from "../lib/auth.mjs";
 import { tg, tgSecret, tgChats, STATUS, orderText, orderButtons } from "../lib/telegram.mjs";
-import { getOrder, saveOrder, setStatus, listOrders } from "../lib/orders.mjs";
+import { getOrder, saveOrder, updateOrder, setStatus, listOrders } from "../lib/orders.mjs";
 
 export default async (req) => {
   if (!safeEqual(req.headers.get("x-telegram-bot-api-secret-token") || "", tgSecret())) return json({ error: "no" }, 401);
@@ -14,8 +14,7 @@ export default async (req) => {
     const [, id, st] = String(cq.data || "").split(":");
     const o = await getOrder(id);
     if (!o) { await tg("answerCallbackQuery", { callback_query_id: cq.id, text: "Order not found" }); return json({ ok: true }); }
-    setStatus(o, st, "telegram");
-    await saveOrder(o);
+    Object.assign(o, await updateOrder(o.id, (cur) => { setStatus(cur, st, "telegram"); }));
     await tg("editMessageText", {
       chat_id: cq.message.chat.id, message_id: cq.message.message_id, parse_mode: "HTML",
       text: orderText(o).replace("Նոր պատվեր", "Պատվեր") + `\n\n<b>Կարգավիճակ՝ ${STATUS[o.status]}</b>`,

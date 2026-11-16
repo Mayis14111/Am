@@ -6,7 +6,7 @@ export const STATUSES = ["new", "confirmed", "baking", "ready", "delivered", "ca
 export function newId() {
   const d = yerevanNow().toISOString();
   const abc = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const r = Array.from(crypto.randomBytes(3), (b) => abc[b % abc.length]).join("");
+  const r = Array.from(crypto.randomBytes(5), (b) => abc[b % abc.length]).join(""); // 32^5 ≈ 33 million per day
   return `GG-${d.slice(2, 4)}${d.slice(5, 7)}${d.slice(8, 10)}-${r}`;
 }
 export const keyOf = (id) => {
@@ -21,6 +21,30 @@ export async function saveOrder(o) {
   o.updatedAt = new Date().toISOString();
   await store("orders").setJSON(keyOf(o.id), o);
   return o;
+}
+// change an order without losing a change someone else saved meanwhile:
+// read with its etag, apply fn to the fresh copy, write only if nobody wrote in between, else repeat
+export async function updateOrder(id, fn, tries = 8) {
+  const k = keyOf(id); if (!k) return null;
+  for (let i = 0; i < tries; i++) {
+    const cur = await store("orders").getWithMetadata(k, { type: "json" });
+    if (!cur) return null;
+    const o = cur.data;
+    if ((await fn(o)) === false) return o;
+    o.updatedAt = new Date().toISOString();
+    const w = await store("orders").setJSON(k, o, { onlyIfMatch: cur.etag });
+    if (w.modified) return o;
+  }
+  throw new Error("order changed too often, try again");
+}
+// a brand-new order (admin "new order"): never overwrites an existing number
+export async function insertOrder(o) {
+  for (let i = 0; i < 10; i++) {
+    const w = await store("orders").setJSON(keyOf(o.id), o, { onlyIfNew: true });
+    if (w.modified) return o;
+    o.id = newId();
+  }
+  throw new Error("could not reserve an order number");
 }
 export async function deleteOrder(id) {
   const k = keyOf(id);

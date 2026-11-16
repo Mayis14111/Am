@@ -3,7 +3,7 @@
 const L = (hy, ru, en) => ({ hy, ru, en });
 
 export const LANGS = ["hy", "ru", "en"];
-export const CONTENT_VERSION = 5;
+export const CONTENT_VERSION = 6;
 
 export const DEFAULT_CONTENT = {
   version: CONTENT_VERSION,
@@ -38,7 +38,7 @@ export const DEFAULT_CONTENT = {
     kicker: L("Գաթաներ՝ հարսանիքի և նվերի համար", "Гата для свадьбы и в подарок", "Gata for weddings and gifts"),
     title: L("Գառնու Գաթա", "Гарну Гата", "Garnu Gata"),
     lead: L(
-      "Գառնիում թխում ենք ավանդական գաթա և գեղեցիկ փաթեթավորում՝ հարսանիքի, նշանադրության, կնունքի կամ նվերի համար։",
+      "Գառնիում թխում ենք ավանդական գաթա և գեղեցիկ փաթեթավորում այն՝ հարսանիքի, նշանադրության, կնունքի կամ նվերի համար։",
       "Мы печём традиционную гату в Гарни и красиво упаковываем её для свадьбы, помолвки, крестин или в подарок.",
       "We bake traditional gata in Garni and wrap it beautifully for weddings, engagements, christenings or as a gift."
     ),
@@ -80,7 +80,7 @@ export const DEFAULT_CONTENT = {
       { slug: "wedding-box", image: "/img/marble.webp", packaging: "box", packNote: "separate", tag: L("Հարսանիք", "Свадьба", "Wedding"), title: L("Հարսանեկան գաթա՝ տուփով", "Свадебная гата в коробке", "Wedding gata in a box"), text: L("Ավանդական գաթա՝ խորիզով, գեղեցիկ զարդարված հարսանեկան տուփում։", "Традиционная гата с хоризом в красиво украшенной свадебной коробке.", "Traditional gata with khoriz in a beautifully decorated wedding box.") },
       { slug: "gift-bag", image: "/img/bag_pearl.webp", packaging: "bag", packNote: "separate", tag: L("Նվեր", "Подарок", "Gift"), title: L("Գաթա՝ նվեր-պայուսակում", "Гата в подарочном пакете", "Gata in a gift bag"), text: L("Գաթա՝ ուլունքներով զարդարված թափանցիկ նվեր-պայուսակում։", "Гата в прозрачном подарочном пакете, украшенном бусинами.", "Gata in a clear gift bag decorated with beads.") },
       { slug: "bride-suitcase", image: "/img/bride.webp", packaging: "wrap", packNote: "separate", tag: L("Ավանդույթ", "Традиция", "Tradition"), title: L("Հարսի ճամպրուկի գաթա", "Гата для чемодана невесты", "Bride's suitcase gata"), text: L("Հարսի ճամպրուկի գաթա՝ դասական խորիզով, ընկույզով կամ չրերով և խուրմայով, տարբեր չափսերով։", "Гата для чемодана невесты — с классическим хоризом, с орехами или с сухофруктами и хурмой, разных размеров.", "Gata for the bride's suitcase — with classic khoriz, walnut, or dried fruit and persimmon, in different sizes.") },
-      { slug: "initials-boxes", image: "/img/initials.webp", packaging: "box", packNote: "variable", tag: L("Անհատական", "Персонально", "Personal"), title: L("Գաթայի տուփեր՝ ձեր սկզբնատառերով", "Коробки для гаты с вашими инициалами", "Gata boxes with your initials"), text: L("Ձեր անունների սկզբնատառերով ձևավորված տուփեր՝ հարսանիքի հյուրերին նվիրելու համար։", "Коробки, оформленные инициалами ваших имён, — в подарок гостям свадьбы.", "Boxes decorated with your initials, as gifts for your wedding guests.") },
+      { slug: "initials-boxes", image: "/img/initials.webp", packaging: "box", packNote: "variable", personalize: true, tag: L("Անհատական", "Персонально", "Personal"), title: L("Գաթայի տուփեր՝ ձեր սկզբնատառերով", "Коробки для гаты с вашими инициалами", "Gata boxes with your initials"), text: L("Ձեր անունների սկզբնատառերով ձևավորված տուփեր՝ հարսանիքի հյուրերին նվիրելու համար։", "Коробки, оформленные инициалами ваших имён, — в подарок гостям свадьбы.", "Boxes decorated with your initials, as gifts for your wedding guests.") },
     ],
     btn: L("Ընտրել այս տարբերակը", "Выбрать этот вариант", "Choose this option"),
   },
@@ -98,7 +98,7 @@ export const DEFAULT_CONTENT = {
     },
     order: {
       title: L("Պատվիրել գաթա", "Заказать гату", "Order gata"),
-      lead: L("Լրացրեք ձևը քայլ առ քայլ․ գինը կհաշվարկվի անմիջապես։ Պատվերն ուղարկելուց հետո կկապվենք ձեզ հետ։", "Заполните форму шаг за шагом — цена посчитается сразу. После отправки мы свяжемся с вами.", "Fill in the form step by step; the price is calculated right away. We'll contact you after you send it."),
+      lead: L("Ընտրեք գաթայի տարբերակը և լրացրեք տվյալները։ Նախնական արժեքը կհաշվարկվի անմիջապես, իսկ պատվերի մանրամասները կհաստատենք ձեզ հետ։", "Выберите вариант гаты и заполните данные. Предварительная стоимость посчитается сразу, а детали заказа мы подтвердим вместе с вами.", "Choose your gata and fill in your details. The estimated price is calculated right away, and we'll confirm the order details with you."),
       seo: L("Պատվիրեք Գառնու գաթա առցանց՝ ընտրեք չափսը, միջուկը, փաթեթավորումը և ստացման եղանակը։", "Закажите гату из Гарни онлайн: выберите размер, начинку, упаковку и способ получения.", "Order Garnu Gata online: choose the size, filling, packaging and how you'll receive it."),
     },
     about: {
@@ -110,6 +110,11 @@ export const DEFAULT_CONTENT = {
       title: L("Հաճախ տրվող հարցեր", "Частые вопросы", "Frequently asked questions"),
       lead: L("Պատասխաններ առաքման, պատվերի և գաթաների մասին։", "Ответы о доставке, заказе и гате.", "Answers about delivery, ordering and our gata."),
       nav: L("Հարցեր", "Вопросы", "FAQ"),
+    },
+    privacy: {
+      title: L("Անձնական տվյալների օգտագործում", "Использование личных данных", "How we use your personal data"),
+      lead: L("Ինչ տվյալներ ենք ստանում պատվերի ժամանակ և ինչպես ենք դրանք օգտագործում։", "Какие данные мы получаем при заказе и как их используем.", "What data we receive when you order and how we use it."),
+      seo: L("Գառնու Գաթա․ ինչպես ենք օգտագործում պատվերի տվյալները։", "Гарну Гата: как мы используем данные заказа.", "Garnu Gata: how we use your order data."),
     },
     contact: {
       title: L("Կապ", "Контакты", "Contact"),
@@ -183,9 +188,9 @@ export const DEFAULT_CONTENT = {
     kicker: L("Պատվեր", "Заказ", "Order"),
     title: L("Պատվիրեք ձեր գաթան", "Закажите свою гату", "Order your gata"),
     lead: L(
-      "Լրացրեք ձևը քայլ առ քայլ․ գինը կհաշվարկվի անմիջապես։",
-      "Заполните форму шаг за шагом — цена посчитается сразу.",
-      "Fill in the form step by step; the price is calculated right away."
+      "Ընտրեք գաթայի տարբերակը և լրացրեք տվյալները։ Նախնական արժեքը կհաշվարկվի անմիջապես, իսկ պատվերի մանրամասները կհաստատենք ձեզ հետ։",
+      "Выберите вариант гаты и заполните данные. Предварительная стоимость посчитается сразу, а детали заказа мы подтвердим вместе с вами.",
+      "Choose your gata and fill in your details. The estimated price is calculated right away, and we'll confirm the order details with you."
     ),
     note: L(
       "Պատվերն ուղարկելուց հետո կկապվենք ձեզ հետ՝ վերջնական գինը և ստացման ժամկետը հաստատելու համար։",

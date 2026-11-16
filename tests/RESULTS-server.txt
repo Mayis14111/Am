@@ -1,0 +1,113 @@
+
+> test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: 1. simultaneous submissions with the same key create exactly one order
+ok 1 - 1. simultaneous submissions with the same key create exactly one order
+  ---
+  duration_ms: 68.361107
+  type: 'test'
+  ...
+# Subtest: 2. a retry with the same key but changed details is refused, not answered with the earlier order
+ok 2 - 2. a retry with the same key but changed details is refused, not answered with the earlier order
+  ---
+  duration_ms: 5.025231
+  type: 'test'
+  ...
+# Subtest: 3. the function dies right after saving the order: the retry returns that order, no second one
+ok 3 - 3. the function dies right after saving the order: the retry returns that order, no second one
+  ---
+  duration_ms: 1503.67412
+  type: 'test'
+  ...
+# Subtest: 3b. the function dies after claiming the key but before saving: a later retry takes over, one order
+ok 4 - 3b. the function dies after claiming the key but before saving: a later retry takes over, one order
+  ---
+  duration_ms: 802.661646
+  type: 'test'
+  ...
+# Subtest: 4. Telegram times out: order confirmed once; the failed notification is retried and succeeds
+ok 5 - 4. Telegram times out: order confirmed once; the failed notification is retried and succeeds
+  ---
+  duration_ms: 4006.275685
+  type: 'test'
+  ...
+# idem finish failed Error: injected set failure on idem/k-record-fails
+# Subtest: 5a. the final retry-record write fails: the customer still gets success, and a retry returns the same order
+ok 6 - 5a. the final retry-record write fails: the customer still gets success, and a retry returns the same order
+  ---
+  duration_ms: 2.2929
+  type: 'test'
+  ...
+# order store failed Error: injected set failure on idem/k-claim-fails
+# Subtest: 5b. the first retry-record write (the claim) fails: nothing is saved, the error says so, a retry creates one order
+ok 7 - 5b. the first retry-record write (the claim) fails: nothing is saved, the error says so, a retry creates one order
+  ---
+  duration_ms: 5.019026
+  type: 'test'
+  ...
+# Subtest: 6. order-number collision: an existing order is never overwritten
+ok 8 - 6. order-number collision: an existing order is never overwritten
+  ---
+  duration_ms: 1.954054
+  type: 'test'
+  ...
+# Subtest: 7. a submission without a key is refused (so it can never be duplicated)
+ok 9 - 7. a submission without a key is refused (so it can never be duplicated)
+  ---
+  duration_ms: 0.622288
+  type: 'test'
+  ...
+# Subtest: N1. 12 concurrent same-key requests with a 600 ms Telegram delay: one order, one notification
+ok 10 - N1. 12 concurrent same-key requests with a 600 ms Telegram delay: one order, one notification
+  ---
+  duration_ms: 607.228542
+  type: 'test'
+  ...
+# notify-retry {"GG-261116-3VG2E":"sent"}
+# Subtest: N2. a failed notification is retried by the scheduled job without any customer action
+ok 11 - N2. a failed notification is retried by the scheduled job without any customer action
+  ---
+  duration_ms: 4004.188182
+  type: 'test'
+  ...
+# Subtest: N3. notification retries never create another order
+ok 12 - N3. notification retries never create another order
+  ---
+  duration_ms: 8010.585823
+  type: 'test'
+  ...
+# Subtest: N4. notification work never overwrites status, payment or admin changes made meanwhile
+ok 13 - N4. notification work never overwrites status, payment or admin changes made meanwhile
+  ---
+  duration_ms: 5207.58067
+  type: 'test'
+  ...
+# Subtest: N5. documented limit: crash after Telegram accepted but before 'done' was saved → the message is sent again (order still single)
+ok 14 - N5. documented limit: crash after Telegram accepted but before 'done' was saved → the message is sent again (order still single)
+  ---
+  duration_ms: 1001.719526
+  type: 'test'
+  ...
+# Subtest: N6. two retry jobs at the same time send the notification once
+ok 15 - N6. two retry jobs at the same time send the notification once
+  ---
+  duration_ms: 4605.762359
+  type: 'test'
+  ...
+# Subtest: N7. the orphan notification left by an order-number clash never notifies about someone else's order
+ok 16 - N7. the orphan notification left by an order-number clash never notifies about someone else's order
+  ---
+  duration_ms: 3.147392
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 29914.742645

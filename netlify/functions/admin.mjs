@@ -3,7 +3,7 @@ import { store, env, json, getContent, saveContent, listPages, getPage, siteUrl,
 import { DEFAULT_CONTENT } from "../lib/defaults.mjs";
 import { isAdmin, makeCookie, clearCookie, bumpVersion, safeEqual, hmac } from "../lib/auth.mjs";
 import { tg, sendAll, tgToken, tgSecret, orderText, orderButtons, STATUS } from "../lib/telegram.mjs";
-import { listOrders, listAllOrders, getOrder, saveOrder, deleteOrder, setStatus, newId, STATUSES } from "../lib/orders.mjs";
+import { listOrders, listAllOrders, getOrder, saveOrder, updateOrder, insertOrder, deleteOrder, setStatus, newId, STATUSES } from "../lib/orders.mjs";
 import { paynetReady, refundPayment, getPayment } from "../lib/paynet.mjs";
 import { startPayment } from "../lib/checkout.mjs";
 import { ask } from "../lib/ai.mjs";
@@ -45,9 +45,9 @@ async function verify(req) {
 }
 
 function csv(orders) {
-  const cols = ["id", "createdAt", "status", "date", "fillingName", "choco", "size", "qty", "unit", "total", "box", "delivery", "address", "name", "phone", "notes", "payment", "paid", "source", "lang", "adminNote"];
+  const cols = ["id", "createdAt", "status", "date", "product", "fillingName", "choco", "size", "qty", "unit", "total", "packaging", "personalization", "delivery", "address", "name", "phone", "notes", "payment", "paid", "source", "lang", "adminNote"];
   const q = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  const rows = orders.map((o) => [o.id, o.createdAt, o.status, o.date, o.fillingName, o.choco, o.size, o.qty, o.unit, o.total, o.box ? "yes" : "no", o.delivery?.label, o.delivery?.address, o.customer?.name, o.customer?.phone, o.notes, o.payment?.method, o.payment?.status, o.source, o.lang, o.adminNote].map(q).join(","));
+  const rows = orders.map((o) => [o.id, o.createdAt, o.status, o.date, o.product ? o.product + (o.productBase ? ` (${o.productBase})` : "") : "", o.fillingName, o.choco, o.size, o.qty, o.unit, o.total, o.packLabel || (o.box ? "yes" : "no"), o.personalization ? [o.personalization.initials, o.personalization.color, o.personalization.wishes, o.personalization.deferred ? "to agree" : ""].filter(Boolean).join(" / ") : "", o.delivery?.label, o.delivery?.address, o.customer?.name, o.customer?.phone, o.notes, o.payment?.method, o.payment?.status, o.source, o.lang, o.adminNote].map(q).join(","));
   return "﻿" + cols.join(",") + "\n" + rows.join("\n");
 }
 
@@ -157,7 +157,7 @@ export default async (req) => {
         customer: { name: b.name || "", phone: b.phone || "" }, notes: b.notes || "", status: "confirmed",
         statusHistory: [{ status: "confirmed", at: new Date().toISOString(), by: "admin" }], payment: { method: "cash", status: "none" }, adminNote: b.adminNote || "",
       };
-      await saveOrder(o);
+      await insertOrder(o);
       return json({ ok: true, order: o });
     }
     if (seg[0] === "orders" && seg[1]) {
@@ -166,6 +166,8 @@ export default async (req) => {
       if (M === "DELETE") { await deleteOrder(o.id); return json({ ok: true }); }
       if (M === "PATCH") {
         const b = await req.json();
+        // only the fields the admin changed are applied, on the freshest copy (keeps parallel payment updates)
+        const saved = await updateOrder(o.id, (o) => {
         if (b.status) setStatus(o, b.status, "admin");
         if (b.final === true) { o.estimate = false; o.finalAt = new Date().toISOString(); }
         if (b.final === false) o.estimate = true;
@@ -173,8 +175,8 @@ export default async (req) => {
         if (b.customer) o.customer = { ...o.customer, ...b.customer };
         if (b.address !== undefined) o.delivery = { ...o.delivery, address: b.address };
         if (b.paymentStatus) o.payment = { ...(o.payment || {}), status: b.paymentStatus, method: b.paymentStatus === "completed" && o.payment?.method !== "online" ? "cash" : o.payment?.method, paidAt: b.paymentStatus === "completed" ? new Date().toISOString() : o.payment?.paidAt };
-        await saveOrder(o);
-        return json({ ok: true, order: o });
+        });
+        return json({ ok: true, order: saved });
       }
       if (seg[2] === "paylink" && M === "POST") {
         if (!paynetReady()) return json({ error: "Paynet is not connected yet (PAYNET_API_KEY)." }, 400);

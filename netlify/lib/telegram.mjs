@@ -5,15 +5,19 @@ export const tgToken = () => env("TELEGRAM_BOT_TOKEN");
 export const tgChats = () => env("TELEGRAM_CHAT_IDS", "713576021").split(/[,\s]+/).filter(Boolean);
 export const tgSecret = () => hmac("telegram-webhook").slice(0, 40);
 
+export const TG_TIMEOUT_MS = 4000;
 export async function tg(method, body) {
   const token = tgToken();
   if (!token) return { ok: false, description: "TELEGRAM_BOT_TOKEN is not set" };
+  // never let a slow Telegram hold up (or time out) the order request
+  const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), TG_TIMEOUT_MS);
   try {
     const r = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
-      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), signal: ctl.signal,
     });
     return await r.json();
-  } catch (e) { return { ok: false, description: String(e) }; }
+  } catch (e) { return { ok: false, description: ctl.signal.aborted ? "timeout" : String(e) }; }
+  finally { clearTimeout(tm); }
 }
 
 export async function sendAll(text, extra = {}) {
@@ -38,13 +42,19 @@ export function orderText(o) {
   const lines = [
     `🧁 <b>Նոր պատվեր ${h(o.id)}</b>${o.source === "chat" ? " · չատից" : o.source === "form" ? " · ձևից" : ""}`,
     "",
-    o.product ? `🎀 ${h(o.product)}` : "",
+    o.product ? `🎀 ${h(o.product)}${o.productBase ? ` (սկզբում ընտրվել էր՝ ${h(o.productBase)})` : ""}` : "",
     `🥐 ${h(o.fillingName)}${o.choco ? " (" + h(o.choco) + ")" : ""}`,
     `📏 ${h(o.size)} սմ × ${h(o.qty)} հատ`,
     `🎁 ${h(o.packLabel || (o.box ? "Տուփով" : "Առանց տուփի"))}`,
     `📅 ${h(o.date || "—")}`,
     `🚗 ${h(o.delivery?.label || "—")}`,
     o.delivery?.address ? `📍 ${h(o.delivery.address)}` : "",
+    ...(o.personalization ? [
+      o.personalization.initials ? `🔤 Սկզբնատառեր՝ ${h(o.personalization.initials)}` : "",
+      o.personalization.color ? `🎨 Նախընտրելի գույն՝ ${h(o.personalization.color)}` : "",
+      o.personalization.wishes ? `✨ Ձևավորման ցանկություններ՝ ${h(o.personalization.wishes)}` : "",
+      o.personalization.deferred ? "🤝 Ձևավորման մանրամասները պետք է համաձայնեցնել հաճախորդի հետ" : "",
+    ] : []),
     "",
     `Գաթայի արժեքը՝ ${money(o.unit * o.qty)} (${money(o.unit)} × ${o.qty})`,
     `${o.pack === "wrap" ? "Ձևավորման" : o.pack === "box" ? "Տուփի" : "Փաթեթավորման"} արժեքը՝ ${packFee}`,

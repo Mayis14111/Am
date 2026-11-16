@@ -282,7 +282,7 @@ function orderList(list) {
     el("div", { class: "btns" }, pill(o.status), el("span", { class: "small muted" }, o.id)),
     el("div", { class: "amt" }, el("small", { class: "muted", style: "display:block;font-weight:400;font-size:12px" }, PRICE_LBL(o)), money(o.total)),
     el("div", { class: "who" }, `${o.customer?.name || "—"} · ${o.customer?.phone || ""}`),
-    el("div", { class: "what" }, `${o.fillingName}${o.choco ? " (" + o.choco + ")" : ""} · ${o.size} cm × ${o.qty} · ${o.packLabel || (o.box ? "Տուփով" : "Առանց տուփի")} · ${o.delivery?.label || ""}`),
+    el("div", { class: "what" }, `${o.product ? o.product + " · " : ""}${o.fillingName}${o.choco ? " (" + o.choco + ")" : ""} · ${o.size} cm × ${o.qty} · ${o.packLabel || (o.box ? "Տուփով" : "Առանց տուփի")} · ${o.delivery?.label || ""}`),
     el("div", { class: "when" }, "📅 ", el("b", {}, fdate(o.date)), " ", ppill(o)),
   )));
 }
@@ -337,7 +337,9 @@ async function openOrder(id) {
       card(el("div", { class: "fieldhead" }, "Status"), el("div", { class: "stbtns" }, Object.entries(STATUS).map(([k, l]) => el("button", { class: o.status === k ? "on" : "", onclick: () => patch({ status: k }, "Status: " + l) }, l))),
         el("div", { class: "small muted" }, (o.statusHistory || []).map((h) => `${STATUS[h.status]} · ${new Date(h.at).toLocaleString()} (${h.by})`).join("  ←  "))),
       card(el("dl", { class: "kv" },
-        o.product ? el("dt", {}, "Product") : null, o.product ? el("dd", {}, o.product) : null,
+        o.product ? el("dt", {}, "Product") : null, o.product ? el("dd", {}, o.product, o.productBase ? ` (started from: ${o.productBase})` : "") : null,
+        o.personalization ? el("dt", {}, "Initials / design") : null,
+        o.personalization ? el("dd", {}, [o.personalization.initials && `Սկզբնատառեր՝ ${o.personalization.initials}`, o.personalization.color && `Գույն՝ ${o.personalization.color}`, o.personalization.wishes && `Ցանկություններ՝ ${o.personalization.wishes}`, o.personalization.deferred && "Մանրամասները պետք է համաձայնեցնել հաճախորդի հետ"].filter(Boolean).join(" · ")) : null,
         el("dt", {}, "Gata"), el("dd", {}, `${o.fillingName}${o.choco ? " (" + o.choco + ")" : ""}, ${o.size} cm`),
         el("dt", {}, "Quantity"), el("dd", {}, `${o.qty} × ${money(o.unit)}`),
         el("dt", {}, "Packaging"), el("dd", {}, o.packLabel || (o.box ? "Տուփով" : "Առանց տուփի"), o.packLater ? " · price to confirm" : ""),
@@ -487,7 +489,7 @@ VIEWS.home = async () => {
       Lst(C.products.cards, "Product cards", (k) => el("div", { class: "grid" }, If(k, "image", "Photo"),
         el("label", { class: "f" }, "Packaging (sets the order form when customers choose this card)", el("select", { onchange: (e) => { k.packaging = e.target.value; } }, [["", "Not set"], ...((C.menu.packs || []).map((p) => [p.id, tx(p.label)]))].map(([v, l]) => el("option", { value: v, selected: (k.packaging || "") === v }, l)))),
         el("label", { class: "f" }, "Price note on the card", el("select", { onchange: (e) => { k.packNote = e.target.value; } }, [["separate", "Packaging price is charged separately"], ["included", "Box included in the price"], ["variable", "Price depends on the chosen option"]].map(([v, l]) => el("option", { value: v, selected: (k.packNote || "separate") === v }, l)))),
-        Tf(k, "slug", "Page address (latin, e.g. wedding-box)", { hint: "The product page opens at /product/this-address" }), Lf(k, "tag", "Small tag"), Lf(k, "title", "Title"), Lf(k, "text", "Text", { area: true }), Bf(k, "show", "Show")), () => ({ image: "/img/top.webp", packaging: "box", packNote: "separate", tag: L0(), title: L0(), text: L0(), show: true }), { name: "Card", label: (k) => tx(k.title) })));
+        Tf(k, "slug", "Page address (latin, e.g. wedding-box)", { hint: "The product page opens at /product/this-address" }), Lf(k, "tag", "Small tag"), Lf(k, "title", "Title"), Lf(k, "text", "Text", { area: true }), Bf(k, "personalize", "Ask for initials (personalised boxes)"), Bf(k, "show", "Show")), () => ({ image: "/img/top.webp", packaging: "box", packNote: "separate", tag: L0(), title: L0(), text: L0(), show: true }), { name: "Card", label: (k) => tx(k.title) })));
     b.append(sec("Our story", If(C.story, "image", "Photo"), Lf(C.story, "kicker", "Small line"), Lf(C.story, "title", "Title"), Lf(C.story, "p1", "Paragraph 1", { area: true }), Lf(C.story, "p2", "Paragraph 2", { area: true }), el("div", { class: "small muted" }, "The photo gallery under the story is edited in Photos.")));
     b.append(sec("Order section", Lf(C.order, "kicker", "Small line"), Lf(C.order, "title", "Title"), Lf(C.order, "lead", "Text above the form", { area: true }), Lf(C.order, "note", "Text under the send button", { area: true })));
     b.append(sec("Footer", Lf(C.footer, "copy", "Bottom line")));
@@ -519,7 +521,7 @@ VIEWS.pages = async (slug) => {
   PAGES = (await api("pages")).pages;
   if (slug) return pageEditor(slug === "new" ? null : PAGES.find((p) => p.slug === slug));
   top("Pages", el("a", { class: "btn gold", href: "#pages/new" }, "+ New page"));
-  const SPN = { menu: "/menu — Menu & prices", delivery: "/delivery — Delivery", order: "/order — Order form", about: "/about — About us", faq: "/faq — FAQ", contact: "/contact — Contact" };
+  const SPN = { menu: "/menu — Menu & prices", delivery: "/delivery — Delivery", order: "/order — Order form", about: "/about — About us", faq: "/faq — FAQ", contact: "/contact — Contact", privacy: "/privacy — Personal data" };
   C.sitePages = C.sitePages || JSON.parse(JSON.stringify(DEF.sitePages));
   const spBox = card(el("h2", {}, "Main pages"), el("div", { class: "small muted" }, "Each main page has its own link in 3 languages (for example garnugata.am/menu, /ru/menu, /en/menu). Edit the title, the text under it and the Google description."),
     ...Object.keys(SPN).map((k) => { C.sitePages[k] = C.sitePages[k] || {}; const sp = C.sitePages[k]; return el("details", { class: "item" }, el("summary", { style: "cursor:pointer;font-weight:600" }, SPN[k], " ", el("a", { href: "/" + k, target: "_blank", onclick: (e) => e.stopPropagation() }, "View ↗")),

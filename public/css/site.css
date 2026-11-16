@@ -444,3 +444,43 @@ footer .copy{text-align:center;border-top:1px solid rgba(255,255,255,.12);margin
   .oh-stage{width:min(250px,70vw)}
   .szb{min-width:46px;height:46px;font-size:15px}
 }
+/* ===== order page v4: one size control, compact phone layout, personalisation, invalid quantity ===== */
+@media (max-width:800px){
+  .order-hero{padding:2px 0 0;background:none}
+  .oh-visual,.oh-steps{display:none}
+  .order-hero h1{font-size:clamp(24px,6.6vw,30px)}
+  .order-hero .lead{font-size:15px;margin-top:6px}
+  .order-hero+.section{padding-top:10px}
+  .order .box{padding-top:14px}
+}
+.picked{margin-bottom:4px}
+.picked img{background:var(--sand)}
+.breakdown div{align-items:baseline}
+.breakdown div span:first-child{min-width:0;overflow-wrap:anywhere}
+.breakdown div span:last-child{white-space:nowrap;flex:none}
+@media (max-width:360px){.breakdown{font-size:14.5px;padding:10px 12px}.breakdown .tot{font-size:16px}.breakdown div{gap:8px}}
+.qneed{margin:0;color:#7a4a12;font-weight:600}
+.perso{margin-top:12px;border:1px dashed #cdb99e;border-radius:14px;padding:12px 14px;background:#fffaf2}
+.perso-h{margin:0 0 8px;font-weight:700;font-size:15.5px}
+.perso .row{margin-top:4px}
+.check{display:flex !important;align-items:flex-start;gap:10px;margin-top:10px;font-weight:600;font-size:15px;cursor:pointer}
+.check input{width:20px;height:20px;min-height:0;margin:2px 0 0;flex:none;accent-color:var(--gold-text)}
+.linkbtn{background:none;border:0;padding:6px 0;font:inherit;color:var(--gold-text);text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:36px}
+.form-meta{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.form-meta a{color:var(--gold-text)}
+.prose{max-width:760px}
+.prose h2{font-size:clamp(21px,2.6vw,26px);margin:26px 0 8px}
+.prose h2:first-child{margin-top:0}
+.prose p{margin:0 0 10px;font-size:16.5px;line-height:1.6}
+@media (max-width:420px){
+  .picked{grid-template-columns:44px 1fr auto;gap:10px;padding:8px 10px}
+  .picked img{width:44px;height:44px}
+  .picked button{grid-column:auto;justify-self:end;min-height:36px;padding:4px 10px;font-size:13px}
+  .picked b{font-size:15px}
+  .order-hero .lead{font-size:14.5px;line-height:1.45}
+  .order .box{padding-left:12px;padding-right:12px}
+}
+/* price rows: the amount never breaks; a long amount moves under its label instead of squeezing it */
+.breakdown div{flex-wrap:wrap;row-gap:0}
+.breakdown div span:first-child{flex:1 1 8.5em}
+.breakdown div span:last-child{margin-left:auto}

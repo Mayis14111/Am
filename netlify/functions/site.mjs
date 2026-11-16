@@ -52,6 +52,6 @@ ${pages.map((p) => entry((l) => pageUrl(l, p.slug), "0.6")).join("\n")}
 
 export const config = {
   path: ["/", "/ru", "/ru/", "/en", "/en/", "/p/*", "/ru/p/*", "/en/p/*", "/product/*", "/ru/product/*", "/en/product/*",
-    "/menu", "/delivery", "/order", "/about", "/faq", "/contact", "/ru/menu", "/ru/delivery", "/ru/order", "/ru/about", "/ru/faq", "/ru/contact",
-    "/en/menu", "/en/delivery", "/en/order", "/en/about", "/en/faq", "/en/contact", "/sitemap.xml", "/robots.txt"],
+    "/menu", "/delivery", "/order", "/about", "/faq", "/contact", "/privacy", "/ru/menu", "/ru/delivery", "/ru/order", "/ru/about", "/ru/faq", "/ru/contact", "/ru/privacy",
+    "/en/menu", "/en/delivery", "/en/order", "/en/about", "/en/faq", "/en/contact", "/en/privacy", "/sitemap.xml", "/robots.txt"],
 };
