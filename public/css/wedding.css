@@ -1,0 +1,76 @@
+/* ===== Wedding mood: ivory, blush, champagne gold, lace and petals ===== */
+:root{
+  --ivory:#fdf9f5;--sand:#f7ece8;--cream:#faf3ee;--line:#ead9cf;
+  --blush:#f3dcd6;--blush-2:#fbefeb;--rose:#b7787a;
+  --ink:#3a2a27;--muted:#6b5552;            /* 7:1 / 6.6:1 on ivory */
+  --gold:#c3a06a;--gold-soft:#e8d3a8;
+  --gold-text:#80592a;                      /* 5.9:1 */
+  --gold-btn:#8e6a3c;--gold-btn-h:#77572f;  /* white text 5:1+ */
+  --shadow:0 22px 50px -30px rgba(120,70,60,.35);
+}
+body{background-color:var(--ivory);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23c3a06a' stroke-opacity='.10' stroke-width='1'%3E%3Cpath d='M60 18c8 10 8 20 0 30-8-10-8-20 0-30zM60 102c8-10 8-20 0-30-8 10-8 20 0 30zM18 60c10-8 20-8 30 0-10 8-20 8-30 0zM102 60c-10-8-20-8-30 0 10 8 20 8 30 0z'/%3E%3Ccircle cx='60' cy='60' r='4'/%3E%3Ccircle cx='0' cy='0' r='3'/%3E%3Ccircle cx='120' cy='0' r='3'/%3E%3Ccircle cx='0' cy='120' r='3'/%3E%3Ccircle cx='120' cy='120' r='3'/%3E%3C/g%3E%3C/svg%3E")}
+h1,h2,h3{font-weight:400;letter-spacing:.01em}
+::selection{background:var(--blush)}
+
+/* kicker with fine gold flourishes */
+.kicker{display:inline-flex;align-items:center;gap:10px;font-size:13.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-text)}
+.kicker::before,.kicker::after{content:"";width:28px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+.kicker::after{transform:scaleX(-1)}
+
+/* ornament under section titles */
+.sec-head .h2::after,.page-hero h1::after{content:"";display:block;width:150px;height:22px;margin:12px auto 0;background:center/contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 22'%3E%3Cg fill='none' stroke='%23c3a06a' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M2 11h52M96 11h52'/%3E%3Ccircle cx='69' cy='11' r='7'/%3E%3Ccircle cx='81' cy='11' r='7'/%3E%3Cpath d='M54 11c4-5 8-5 8 0M96 11c-4-5-8-5-8 0'/%3E%3C/g%3E%3Ccircle cx='2' cy='11' r='1.6' fill='%23c3a06a'/%3E%3Ccircle cx='148' cy='11' r='1.6' fill='%23c3a06a'/%3E%3C/svg%3E")}
+
+/* top bar */
+.nav{background:rgba(253,249,245,.92);border-bottom:1px solid transparent;border-image:linear-gradient(90deg,transparent,var(--gold-soft),transparent) 1}
+
+/* buttons: champagne with a soft shimmer */
+.btn-gold{background:linear-gradient(135deg,#9a7444 0%,#8a6638 45%,#7a5a31 100%);position:relative;overflow:hidden;box-shadow:0 14px 28px -16px rgba(122,90,49,.9),inset 0 1px 0 rgba(255,255,255,.25)}
+.btn-gold::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(-120%);transition:transform .8s ease}
+.btn-gold:hover::after{transform:translateX(120%)}
+.btn-gold:hover{background:linear-gradient(135deg,#8a6638,#6f5130)}
+.btn-line{background:rgba(255,255,255,.85);border-color:var(--gold)}
+.btn-line:hover{border-color:var(--gold-text);background:#fff}
+
+/* hero: blush light, double gold ring around the gata */
+.hero{background:radial-gradient(55% 75% at 72% 50%,#f8e3dc 0%,rgba(248,227,220,0) 70%),radial-gradient(40% 50% at 10% 10%,rgba(232,211,168,.35),transparent 70%)}
+.order-hero{background:radial-gradient(55% 85% at 75% 45%,#f8e3dc 0%,rgba(248,227,220,0) 70%)}
+.hero-glow{background:radial-gradient(circle,rgba(243,200,190,.65),rgba(232,211,168,.35) 45%,transparent 66%)}
+.hero-stage::before,.hero-stage::after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+.hero-stage::before{inset:9.5%;border:1.5px solid var(--gold);opacity:.75}
+.hero-stage::after{inset:7.5%;border:1px solid var(--gold-soft);opacity:.9}
+.hero-ring{color:var(--rose)}
+.pearl{background:radial-gradient(circle at 32% 28%,#fff 0%,#fbf4f1 30%,#ead8d2 68%,#c9aea6 100%)}
+
+/* petals */
+.petals{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1}
+.petal{position:absolute;top:0;left:0;width:var(--w,14px);height:calc(var(--w,14px) * 1.25);border-radius:100% 0 100% 0;background:linear-gradient(135deg,#fff 0%,#f6d9d3 45%,#e9b9b1 100%);box-shadow:0 4px 8px -4px rgba(150,80,70,.35);opacity:.85;will-change:transform}
+
+/* cards: arched photos and a fine gold inner line */
+.card{border-radius:26px;box-shadow:var(--shadow)}
+.card::before{content:"";position:absolute;inset:7px;border:1px solid var(--gold-soft);border-radius:20px;pointer-events:none;z-index:2;opacity:.9}
+.card .pic{margin:14px 14px 0;border-radius:999px 999px 14px 14px;aspect-ratio:4/3.4}
+.card h3{font-size:23px}
+.card .tag{background:var(--blush-2);color:#7d4c4e;border:1px solid var(--blush)}
+@media (max-width:640px){.card .pic{margin:10px 0 10px 10px;border-radius:999px 999px 12px 12px}.card::before{inset:5px;border-radius:16px}}
+
+/* price table, delivery, faq, cta */
+.price-table,.qa{border:1px solid var(--line)}
+.price-table thead th{letter-spacing:.06em;text-transform:uppercase;font-size:12.5px}
+.price-table tbody tr:hover{background:var(--blush-2)}
+.dcard{border-color:var(--line);background:linear-gradient(180deg,#fff,#fffaf8)}
+.qa summary::after{color:var(--rose)}
+.cta-box{background:linear-gradient(135deg,#fbefeb 0%,#f7ece8 50%,#f3e6d6 100%);border:1px solid var(--blush);position:relative}
+.cta-box::before{content:"";position:absolute;inset:8px;border:1px solid rgba(195,160,106,.45);border-radius:14px;pointer-events:none}
+.advice-box{background:var(--blush-2);border-color:var(--blush)}
+
+/* dark sections & footer: deep wine-brown */
+.dark,footer{background:radial-gradient(120% 90% at 50% 0%,#4a2e2c 0%,#2f1d1d 55%,#241616 100%)}
+.story .photo{border-radius:999px 999px 24px 24px;box-shadow:0 0 0 8px rgba(232,211,168,.15),0 0 0 9px rgba(232,211,168,.35)}
+
+/* form & chat accents */
+.box,.order-box{border-color:var(--line)}
+.chat-head .av{background:linear-gradient(135deg,#9a7444,#7a5a31)}
+.szb{border-color:var(--gold)}
+.szb[aria-pressed="true"]{background:linear-gradient(135deg,#9a7444,#7a5a31)}
+.oh-steps i{background:linear-gradient(135deg,#9a7444,#7a5a31)}
+.pimg img{border-radius:999px 999px 26px 26px;box-shadow:0 0 0 10px rgba(255,255,255,.7),0 0 0 11px var(--gold-soft),var(--shadow)}

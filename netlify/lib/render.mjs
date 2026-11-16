@@ -87,12 +87,13 @@ ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld).replace(
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Armenian:wght@400;500&family=Noto+Sans+Armenian:wght@300;400;500;600${lang !== "hy" ? "&family=Noto+Serif:wght@400;500&family=Noto+Sans:wght@300;400;500;600" : ""}&display=swap">
 <link rel="stylesheet" href="/css/site.css?v=${ASSET_V}">
+<link rel="stylesheet" href="/css/wedding.css?v=${ASSET_V}">
 ${/^G-[A-Z0-9]+$/.test(c.seo.googleTag || "") ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${c.seo.googleTag}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${c.seo.googleTag}');</script>` : ""}
 </head>
 <body>
 <div class="root">`;
 }
-export const ASSET_V = "11";
+export const ASSET_V = "12";
 
 function logo(c, lang, id, href, light) {
   const src = light ? c.brand.logoLight || c.brand.logo : c.brand.logo;

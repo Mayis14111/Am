@@ -1309,4 +1309,34 @@ if (chatBtn && chatPanel) {
   sync(); setTimeout(sync, 50);
 })();
 
+
+/* ================= wedding petals (header) ================= */
+(() => {
+  if (reduce) return;
+  const host = document.querySelector(".hero, .order-hero"); if (!host) return;
+  const box = document.createElement("div"); box.className = "petals"; box.setAttribute("aria-hidden", "true"); host.prepend(box);
+  const N = innerWidth < 640 ? 10 : 18, P = [];
+  let W = host.clientWidth, H = host.clientHeight, mx = -999, my = -999;
+  for (let i = 0; i < N; i++) {
+    const el = document.createElement("span"); el.className = "petal"; el.style.setProperty("--w", 9 + Math.random() * 10 + "px"); box.appendChild(el);
+    P.push({ el, x: Math.random() * W, y: Math.random() * H, vy: 0.25 + Math.random() * 0.45, sw: Math.random() * 6.28, sp: 0.008 + Math.random() * 0.012, r: Math.random() * 360, vr: (Math.random() - 0.5) * 1.2, px: 0, py: 0 });
+  }
+  addEventListener("resize", () => { W = host.clientWidth; H = host.clientHeight; });
+  host.addEventListener("pointermove", (e) => { const r = host.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; }, { passive: true });
+  host.addEventListener("pointerleave", () => { mx = my = -999; });
+  let vis = true; new IntersectionObserver(([e]) => { vis = e.isIntersecting; }).observe(host);
+  (function step() {
+    if (vis) for (const p of P) {
+      p.sw += p.sp; p.y += p.vy; p.r += p.vr;
+      const dx = p.x - mx, dy = p.y - my, d2 = dx * dx + dy * dy;
+      if (d2 < 14400) { const f = (1 - Math.sqrt(d2) / 120) * 2.2; p.px += (dx / (Math.sqrt(d2) || 1)) * f; p.py += (dy / (Math.sqrt(d2) || 1)) * f; }
+      p.px *= 0.94; p.py *= 0.94; p.x += p.px; p.y += p.py;
+      if (p.y > H + 20) { p.y = -20; p.x = Math.random() * W; }
+      if (p.x < -20) p.x = W + 10; if (p.x > W + 20) p.x = -10;
+      p.el.style.transform = `translate3d(${p.x + Math.sin(p.sw) * 18}px,${p.y}px,0) rotate(${p.r}deg) rotateX(${Math.sin(p.sw * 1.3) * 60}deg)`;
+    }
+    requestAnimationFrame(step);
+  })();
+})();
+
 })();
